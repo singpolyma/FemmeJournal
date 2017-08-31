@@ -15,19 +15,16 @@ QT_BEGIN_NAMESPACE
 class CalendarModel : public QAbstractListModel
 {
 	Q_OBJECT
-	Q_PROPERTY(QDate selectedDate READ selectedDate WRITE setSelectedDate NOTIFY selectedDateChanged FINAL)
+	Q_PROPERTY(QDate selectedDate MEMBER _selectedDate NOTIFY selectedDateChanged FINAL)
 
 	Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged FINAL)
 	Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged FINAL)
 	Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged FINAL)
-	Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged FINAL)
+	Q_PROPERTY(QString title MEMBER _title NOTIFY titleChanged FINAL)
 	Q_PROPERTY(int count READ rowCount CONSTANT FINAL)
 
 public:
 	explicit CalendarModel(QObject *parent = nullptr);
-
-	QDate selectedDate() const;
-	void setSelectedDate(QDate date);
 
 	int month() const;
 	void setMonth(int month);
@@ -37,9 +34,6 @@ public:
 
 	QLocale locale() const;
 	void setLocale(const QLocale &locale);
-
-	QString title() const;
-	void setTitle(const QString &title);
 
 	Q_INVOKABLE QDate dateAt(int index) const;
 	Q_INVOKABLE int indexOf(const QDate &date) const;

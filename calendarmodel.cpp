@@ -31,7 +31,7 @@ bool CalendarModel::populate(int m, int y, const QLocale &l, bool force) {
 	for (int i = 0; i < daysOnACalendarMonth; ++i)
 		_dates[i] = firstDateToDisplay.addDays(i);
 
-	setTitle(l.standaloneMonthName(m) + QStringLiteral(" ") + QString::number(y));
+	setProperty("title", l.standaloneMonthName(m) + QStringLiteral(" ") + QString::number(y));
 
 	return true;
 }
@@ -41,15 +41,6 @@ CalendarModel::CalendarModel(QObject *parent) : QAbstractListModel(parent), _dat
 	_month = _today.month();
 	_year = _today.year();
 	populate(_month, _year, _locale, true);
-}
-
-QDate CalendarModel::selectedDate() const {
-	return _selectedDate;
-}
-
-void CalendarModel::setSelectedDate(QDate date) {
-	_selectedDate = date;
-	emit selectedDateChanged();
 }
 
 int CalendarModel::month() const {
@@ -88,17 +79,6 @@ void CalendarModel::setLocale(const QLocale &locale) {
 			emit dataChanged(index(0, 0), index(daysOnACalendarMonth - 1, 0));
 		_locale = locale;
 		emit localeChanged();
-	}
-}
-
-QString CalendarModel::title() const {
-	return _title;
-}
-
-void CalendarModel::setTitle(const QString &title) {
-	if (_title != title) {
-		_title = title;
-		emit titleChanged();
 	}
 }
 
