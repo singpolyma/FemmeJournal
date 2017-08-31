@@ -38,6 +38,7 @@ bool CalendarModel::populate(int m, int y, const QLocale &l, bool force) {
 
 CalendarModel::CalendarModel(QObject *parent) : QAbstractListModel(parent), _dates(daysOnACalendarMonth) {
 	_today = QDate::currentDate();
+	_selectedDate = _today;
 	_month = _today.month();
 	_year = _today.year();
 	populate(_month, _year, _locale, true);
