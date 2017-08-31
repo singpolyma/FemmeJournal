@@ -19,7 +19,7 @@ Rectangle {
 				onClicked: {
 					if(cal.month === 0) {
 						cal.month = 11
-						calendarModel.month = 11
+						calendarModel.month = 12
 						cal.year--
 						calendarModel.year--
 					} else {
@@ -42,7 +42,7 @@ Rectangle {
 				onClicked: {
 					if(cal.month === 11) {
 						cal.month = 0
-						calendarModel.month = 0
+						calendarModel.month = 1
 						cal.year++
 						calendarModel.year++
 					} else {
