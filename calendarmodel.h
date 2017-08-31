@@ -41,7 +41,6 @@ public:
 	enum {
 		DateRole = Qt::UserRole + 1,
 		DayRole,
-		TodayRole,
 		WeekNumberRole,
 		MonthRole,
 		YearRole,
@@ -68,7 +67,6 @@ protected:
 	QString _title;
 	QLocale _locale;
 	QVector<QDate> _dates;
-	QDate _today;
 	QDate _selectedDate;
 
 	Q_DISABLE_COPY(CalendarModel)

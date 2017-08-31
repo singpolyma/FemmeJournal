@@ -27,7 +27,6 @@ bool CalendarModel::populate(int m, int y, const QLocale &l, bool force) {
 		difference += 7;
 	QDate firstDateToDisplay = firstDayOfMonthDate.addDays(-difference);
 
-	_today = QDate::currentDate();
 	for (int i = 0; i < daysOnACalendarMonth; ++i)
 		_dates[i] = firstDateToDisplay.addDays(i);
 
@@ -37,7 +36,7 @@ bool CalendarModel::populate(int m, int y, const QLocale &l, bool force) {
 }
 
 CalendarModel::CalendarModel(QObject *parent) : QAbstractListModel(parent), _dates(daysOnACalendarMonth) {
-	_today = QDate::currentDate();
+	QDate _today = QDate::currentDate();
 	_selectedDate = _today;
 	_month = _today.month();
 	_year = _today.year();
@@ -101,8 +100,6 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 			return date;
 		case DayRole:
 			return date.day();
-		case TodayRole:
-			return date == _today;
 		case WeekNumberRole:
 			return date.weekNumber();
 		case MonthRole:
@@ -129,7 +126,6 @@ QHash<int, QByteArray> CalendarModel::roleNames() const {
 	QHash<int, QByteArray> roles;
 	roles[DateRole] = QByteArrayLiteral("date");
 	roles[DayRole] = QByteArrayLiteral("day");
-	roles[TodayRole] = QByteArrayLiteral("today");
 	roles[WeekNumberRole] = QByteArrayLiteral("weekNumber");
 	roles[MonthRole] = QByteArrayLiteral("month");
 	roles[YearRole] = QByteArrayLiteral("year");
