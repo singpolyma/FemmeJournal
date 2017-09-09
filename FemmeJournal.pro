@@ -3,7 +3,9 @@ QT += qml quick
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    calendarmodel.cpp
+    calendarmodel.cpp \
+    qcalparser.cpp \
+    journalentry.cpp
 
 RESOURCES += qml.qrc
 
@@ -30,4 +32,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    calendarmodel.h
+    calendarmodel.h \
+    qcalparser.h \
+    journalentry.h

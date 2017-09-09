@@ -31,6 +31,10 @@ Page {
 				wrapMode: TextEdit.Wrap
 				placeholderText: qsTr("Notes")
 				selectByMouse: true
+				text: calendarModel.selectedJournal.note
+				onTextChanged: {
+					calendarModel.selectedJournal.note = text
+				}
 			}
 
 			Rectangle {
@@ -50,7 +54,12 @@ Page {
 					elide: Text.ElideRight
 					text: qsTr("Intimate Today")
 				}
-				CheckBox {}
+				CheckBox {
+					checked: calendarModel.selectedJournal.intimate
+					onCheckedChanged: {
+						calendarModel.selectedJournal.intimate = checked
+					}
+				}
 
 				Rectangle {
 					Layout.fillWidth: true
@@ -59,15 +68,16 @@ Page {
 					color: "#000000"
 				}
 
-				ButtonGroup { id: startedOrEnded }
-
 				Label {
 					Layout.fillWidth: true
 					elide: Text.ElideRight
 					text: qsTr("Period Started Today")
 				}
-				UncheckableGroupBox {
-					ButtonGroup.group: startedOrEnded
+				CheckBox {
+					checked: calendarModel.selectedJournal.menstruationStarted
+					onCheckedChanged: {
+						calendarModel.selectedJournal.menstruationStarted = checked
+					}
 				}
 
 				Rectangle {
@@ -82,8 +92,11 @@ Page {
 					elide: Text.ElideRight
 					text: qsTr("Period Ended Today")
 				}
-				UncheckableGroupBox {
-					ButtonGroup.group: startedOrEnded
+				CheckBox {
+					checked: calendarModel.selectedJournal.menstruationStopped
+					onCheckedChanged: {
+						calendarModel.selectedJournal.menstruationStopped = checked
+					}
 				}
 
 				Rectangle {
@@ -98,7 +111,12 @@ Page {
 					elide: Text.ElideRight
 					text: qsTr("Ovulated Today")
 				}
-				CheckBox {}
+				CheckBox {
+					checked: calendarModel.selectedJournal.ovulated
+					onCheckedChanged: {
+						calendarModel.selectedJournal.ovulated = checked
+					}
+				}
 			}
 		}
 

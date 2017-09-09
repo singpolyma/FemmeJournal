@@ -10,12 +10,15 @@
 #include <QtCore/qlocale.h>
 #include <QtQml/qqml.h>
 
+#include "journalentry.h"
+
 QT_BEGIN_NAMESPACE
 
 class CalendarModel : public QAbstractListModel
 {
 	Q_OBJECT
-	Q_PROPERTY(QDate selectedDate MEMBER _selectedDate NOTIFY selectedDateChanged FINAL)
+	Q_PROPERTY(QDate selectedDate MEMBER _selectedDate WRITE setSelectedDate NOTIFY selectedDateChanged FINAL)
+	Q_PROPERTY(JournalEntry *selectedJournal READ selectedJournal NOTIFY selectedJournalChanged FINAL)
 
 	Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged FINAL)
 	Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged FINAL)
@@ -25,6 +28,9 @@ class CalendarModel : public QAbstractListModel
 
 public:
 	explicit CalendarModel(QObject *parent = nullptr);
+
+	void setSelectedDate(QDate date);
+	JournalEntry *selectedJournal();
 
 	int month() const;
 	void setMonth(int month);
@@ -44,7 +50,7 @@ public:
 		WeekNumberRole,
 		MonthRole,
 		YearRole,
-		PeriodRole,
+		MenstruatingRole,
 		CycleDayRole
 	};
 
@@ -54,20 +60,30 @@ public:
 
 Q_SIGNALS:
 	void selectedDateChanged();
+	void selectedJournalChanged();
 	void monthChanged();
 	void yearChanged();
 	void localeChanged();
 	void titleChanged();
 
+public slots:
+	void refreshMenstrualData();
+
 protected:
 	bool populate(int month, int year, const QLocale &locale, bool force = false);
+	void populateMeanCycleTimes();
+	int cycleDay(QDate date) const;
 
 	int _month;
 	int _year;
 	QString _title;
 	QLocale _locale;
 	QVector<QDate> _dates;
+	QMap<QDate, JournalEntry*> _journalDates;
 	QDate _selectedDate;
+	QDate _lastRecordedMenstruation;
+	int _meanCycleLength;
+	int _meanMenstruationLength;
 
 	Q_DISABLE_COPY(CalendarModel)
 };

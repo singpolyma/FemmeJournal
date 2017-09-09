@@ -35,12 +35,51 @@ bool CalendarModel::populate(int m, int y, const QLocale &l, bool force) {
 	return true;
 }
 
-CalendarModel::CalendarModel(QObject *parent) : QAbstractListModel(parent), _dates(daysOnACalendarMonth) {
+CalendarModel::CalendarModel(QObject *parent) : QAbstractListModel(parent), _dates(daysOnACalendarMonth), _journalDates() {
 	QDate _today = QDate::currentDate();
 	_selectedDate = _today;
 	_month = _today.month();
 	_year = _today.year();
 	populate(_month, _year, _locale, true);
+	populateMeanCycleTimes();
+}
+
+void CalendarModel::setSelectedDate(QDate date) {
+	_selectedDate = date;
+	emit selectedDateChanged();
+	emit selectedJournalChanged();
+}
+
+JournalEntry *CalendarModel::selectedJournal() {
+	JournalEntry *entry = _journalDates.value(_selectedDate, NULL);
+	if(!entry) {
+		entry = new JournalEntry();
+		_journalDates.insert(_selectedDate, entry);
+		// TODO: insert into list for writing to file
+		// list owns the memory
+		connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
+		connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
+	}
+
+	return entry;
+}
+
+void CalendarModel::refreshMenstrualData() {
+	for(
+		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
+		i != (_journalDates.begin() - 1);
+		i--
+	) {
+		if(i.value()->menstruationStarted()) {
+			_lastRecordedMenstruation = i.key();
+			break;
+		}
+	}
+
+	populateMeanCycleTimes();
+
+	QVector<int> roles({MenstruatingRole, CycleDayRole});
+	emit dataChanged(index(0, 0), index(daysOnACalendarMonth - 1, 0), roles);
 }
 
 int CalendarModel::month() const {
@@ -106,15 +145,95 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 			return date.month() - 1;
 		case YearRole:
 			return date.year();
-		case PeriodRole:
-			return date.day() > 5 && date.day() < 10;
+		case MenstruatingRole: {
+			int cday = cycleDay(date);
+			if(!cday) return false;
+
+			for(
+				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+				i != _journalDates.end() && !i.value()->menstruationStarted();
+				i++
+			) {
+				if(i.value()->menstruationStopped()) return true;
+			}
+
+			for(
+				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+				i != (_journalDates.begin() - 1);
+				i--
+			) {
+				if(i == _journalDates.end()) continue;
+				if(i.value()->menstruationStarted() || i.key().daysTo(date) >= cday) break;
+				if(i.value()->menstruationStopped()) return false;
+			}
+
+			return cday <= _meanMenstruationLength;
+		}
 		case CycleDayRole:
-			return date.day();
+			return cycleDay(date);
 		default:
 			break;
 		}
 	}
 	return QVariant();
+}
+
+void CalendarModel::populateMeanCycleTimes() {
+	int numerator = 0;
+	int count = 0;
+	int mNumerator = 0;
+	int mCount = 0;
+	const QDate *lastBegan = NULL;
+	const QDate *lastEnded = NULL;
+
+	for(
+		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
+		i != (_journalDates.begin() - 1) && count < 6;
+		i--
+	) {
+		if(i.value()->menstruationStarted()) {
+			if(lastBegan) {
+				numerator += i.key().daysTo(*lastBegan);
+				count++;
+			}
+
+			if(lastEnded) {
+				mNumerator += i.key().daysTo(*lastEnded) + 1;
+				mCount++;
+				lastEnded = NULL;
+			}
+
+			lastBegan = &i.key();
+		}
+
+		if(i.value()->menstruationStopped()) {
+			lastEnded = &i.key();
+		}
+	}
+
+	// TODO: discount very long cycles (likely a skipped period)
+	_meanCycleLength = count == 0 ? 28 : numerator / count;
+	_meanMenstruationLength = mCount == 0 ? 4 : mNumerator / mCount;
+}
+
+int CalendarModel::cycleDay(QDate date) const {
+	for(
+		QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+		i != (_journalDates.begin() - 1);
+		i--
+	) {
+		if(i == _journalDates.end() || i.key() > date) continue;
+		if(i.value()->menstruationStarted()) {
+			if(_lastRecordedMenstruation < date) {
+				// Predict future cycles based on mean length alone for now
+				return (i.key().daysTo(date) % _meanCycleLength) + 1;
+			} else {
+				return i.key().daysTo(date) + 1;
+			}
+		}
+	}
+
+	return 0;
 }
 
 int CalendarModel::rowCount(const QModelIndex &parent) const {
@@ -129,7 +248,7 @@ QHash<int, QByteArray> CalendarModel::roleNames() const {
 	roles[WeekNumberRole] = QByteArrayLiteral("weekNumber");
 	roles[MonthRole] = QByteArrayLiteral("month");
 	roles[YearRole] = QByteArrayLiteral("year");
-	roles[PeriodRole] = QByteArrayLiteral("period");
+	roles[MenstruatingRole] = QByteArrayLiteral("menstruating");
 	roles[CycleDayRole] = QByteArrayLiteral("cycleDay");
 	return roles;
 }

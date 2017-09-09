@@ -101,7 +101,7 @@ Rectangle {
 							text: model.cycleDay
 							font.pixelSize: parent.height
 							color: materialContext.Material.secondaryTextColor
-							opacity: model.period ? 1 : 0.5
+							opacity: model.cycleDay == 0 ? 0 : (model.menstruating ? 1 : 0.5)
 						}
 
 						Rectangle {
@@ -109,7 +109,7 @@ Rectangle {
 							Layout.alignment: Qt.AlignVCenter
 							implicitHeight: Math.ceil(parent.height / 2)
 							color: Qt.rgba(1, 0, 0.2, 0.5)
-							opacity: model.period ? 1 : 0
+							opacity: model.menstruating ? 1 : 0
 						}
 					}
 

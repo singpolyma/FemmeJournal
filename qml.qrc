@@ -5,6 +5,5 @@
         <file>Calendar.qml</file>
         <file>Segment.qml</file>
         <file>JournalEntry.qml</file>
-        <file>UncheckableGroupBox.qml</file>
     </qresource>
 </RCC>
