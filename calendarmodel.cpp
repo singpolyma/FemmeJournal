@@ -64,6 +64,14 @@ JournalEntry *CalendarModel::selectedJournal() {
 	return entry;
 }
 
+QDate CalendarModel::nextCycle() {
+	// Predict future cycles based on mean length alone for now
+
+	QDate today = QDate::currentDate();
+	int cycleLeft = _meanCycleLength - cycleDay(today);
+	return today.addDays(cycleLeft + 1);
+}
+
 void CalendarModel::refreshMenstrualData() {
 	for(
 		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
@@ -77,6 +85,8 @@ void CalendarModel::refreshMenstrualData() {
 	}
 
 	populateMeanCycleTimes();
+
+	emit nextCycleChanged();
 
 	QVector<int> roles({MenstruatingRole, CycleDayRole});
 	emit dataChanged(index(0, 0), index(daysOnACalendarMonth - 1, 0), roles);

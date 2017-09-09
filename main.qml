@@ -20,7 +20,9 @@ ApplicationWindow {
 				opacity: stack.depth > 1 ? 1 : 0
 			}
 			Label {
-				text: ""
+				text:
+					calendarModel.nextCycle.toLocaleDateString(Locale.ShortFormat) + " (" +
+					parseInt((calendarModel.nextCycle.getTime() - new Date().getTime()) / 86400000, 10) + ")"
 				elide: Label.ElideRight
 				horizontalAlignment: Qt.AlignHCenter
 				verticalAlignment: Qt.AlignVCenter
