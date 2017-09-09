@@ -2,6 +2,7 @@ import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Material 2.0
+import QtGraphicalEffects 1.0
 
 ApplicationWindow {
 	visible: true
@@ -29,9 +30,20 @@ ApplicationWindow {
 				Layout.fillWidth: true
 			}
 			ToolButton {
-				text: qsTr("✚")
 				onClicked: { journal.visible = true; stack.push(journal) }
-				visible: parent.width < 1024
+				visible: parent.width < 1024 && stack.currentItem != journal
+
+				Image {
+					anchors.centerIn: parent
+					source: "qrc:/edit.svg"
+					sourceSize: Qt.size(parent.width/2, parent.height/2)
+
+					ColorOverlay {
+						anchors.fill: parent
+						source: parent
+						color: materialContext.Material.primaryTextColor
+					}
+				}
 			}
 		}
 	}
