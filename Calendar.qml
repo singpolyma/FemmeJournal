@@ -122,6 +122,30 @@ Rectangle {
 						font.bold: true
 						color: Material.foreground
 					}
+
+					RowLayout {
+						anchors.left: parent.left
+						anchors.right: parent.right
+						anchors.bottom: parent.bottom
+						anchors.margins: 2
+						height: Math.ceil(parent.height * 0.17)
+
+						Rectangle {
+							implicitHeight: parent.height
+							implicitWidth: height
+							radius: width*0.5
+							color: Material.foreground
+							opacity: (model.journalEntry && !model.journalEntry.empty) ? 0.5 : 0
+						}
+
+						Image {
+							Layout.alignment: Qt.AlignRight
+							source: "qrc:/heart.svg"
+							sourceSize: Qt.size(parent.height, parent.height)
+							fillMode: Image.PreserveAspectFit
+							opacity: (model.journalEntry && model.journalEntry.intimate) ? 1 : 0
+						}
+					}
 				}
 			}
 

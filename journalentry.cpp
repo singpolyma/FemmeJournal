@@ -7,7 +7,10 @@ JournalEntry::JournalEntry(QObject *parent) :
 	_menstrualChange(MenstruationUnchanged),
 	_intimate(false),
 	_ovulated(false),
-	_note("") { }
+	_note("") {
+	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(emptyChanged()));
+	connect(this, SIGNAL(noteChanged()), this, SIGNAL(emptyChanged()));
+}
 
 bool JournalEntry::menstruationStarted() {
 	return _menstrualChange == MenstruationStarted;
@@ -33,4 +36,8 @@ void JournalEntry::setMenstruationStopped(bool ended) {
 	_menstrualChange = ended ? MenstruationStopped : MenstruationUnchanged;
 	emit menstruationStartedChanged();
 	emit menstruationStoppedChanged();
+}
+
+bool JournalEntry::empty() {
+	return !_intimate && _note == "";
 }

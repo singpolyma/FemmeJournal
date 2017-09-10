@@ -16,6 +16,7 @@ class JournalEntry : public QObject
 	Q_PROPERTY(bool intimate MEMBER _intimate NOTIFY intimateChanged FINAL)
 	Q_PROPERTY(bool ovulated MEMBER _ovulated NOTIFY ovulatedChanged FINAL)
 	Q_PROPERTY(QString note MEMBER _note NOTIFY noteChanged FINAL)
+	Q_PROPERTY(bool empty READ empty NOTIFY emptyChanged FINAL)
 
 public:
 	explicit JournalEntry(QObject *parent = nullptr);
@@ -25,6 +26,8 @@ public:
 
 	bool menstruationStopped();
 	void setMenstruationStopped(bool stopped);
+
+	bool empty();
 
 	enum MenstrualChange {
 		MenstruationUnchanged,
@@ -38,6 +41,7 @@ signals:
 	void intimateChanged();
 	void ovulatedChanged();
 	void noteChanged();
+	void emptyChanged();
 
 protected:
 	enum MenstrualChange _menstrualChange;

@@ -63,6 +63,8 @@ JournalEntry *CalendarModel::entryOf(const QDate &date) {
 		// list owns the memory
 		connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
 		connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
+		connect(entry, SIGNAL(emptyChanged()), this, SLOT(refreshJournalData()));
+		refreshJournalData();
 	}
 
 	return entry;
@@ -93,6 +95,11 @@ void CalendarModel::refreshMenstrualData() {
 	emit nextCycleChanged();
 
 	QVector<int> roles({MenstruatingRole, CycleDayRole});
+	emit dataChanged(index(0, 0), index(daysOnACalendarMonth - 1, 0), roles);
+}
+
+void CalendarModel::refreshJournalData() {
+	QVector<int> roles({JournalEntryRole});
 	emit dataChanged(index(0, 0), index(daysOnACalendarMonth - 1, 0), roles);
 }
 
@@ -185,6 +192,8 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 		}
 		case CycleDayRole:
 			return cycleDay(date);
+		case JournalEntryRole:
+			return QVariant::fromValue(_journalDates.value(date));
 		default:
 			break;
 		}
@@ -264,6 +273,7 @@ QHash<int, QByteArray> CalendarModel::roleNames() const {
 	roles[YearRole] = QByteArrayLiteral("year");
 	roles[MenstruatingRole] = QByteArrayLiteral("menstruating");
 	roles[CycleDayRole] = QByteArrayLiteral("cycleDay");
+	roles[JournalEntryRole] = QByteArrayLiteral("journalEntry");
 	return roles;
 }
 

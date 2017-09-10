@@ -55,7 +55,8 @@ public:
 		MonthRole,
 		YearRole,
 		MenstruatingRole,
-		CycleDayRole
+		CycleDayRole,
+		JournalEntryRole
 	};
 
 	QHash<int, QByteArray> roleNames() const override;
@@ -73,6 +74,7 @@ Q_SIGNALS:
 
 public slots:
 	void refreshMenstrualData();
+	void refreshJournalData();
 
 protected:
 	bool populate(int month, int year, const QLocale &locale, bool force = false);
