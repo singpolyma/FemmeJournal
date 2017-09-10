@@ -51,10 +51,14 @@ void CalendarModel::setSelectedDate(QDate date) {
 }
 
 JournalEntry *CalendarModel::selectedJournal() {
-	JournalEntry *entry = _journalDates.value(_selectedDate, NULL);
+	return entryOf(_selectedDate);
+}
+
+JournalEntry *CalendarModel::entryOf(const QDate &date) {
+	JournalEntry *entry = _journalDates.value(date, NULL);
 	if(!entry) {
 		entry = new JournalEntry();
-		_journalDates.insert(_selectedDate, entry);
+		_journalDates.insert(date, entry);
 		// TODO: insert into list for writing to file
 		// list owns the memory
 		connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
