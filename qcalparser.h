@@ -9,27 +9,31 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
+#include <QDate>
 
 #include "journalentry.h"
 
 class QCalParser : public QObject {
 	Q_OBJECT
 public:
-	QCalParser(QObject *parent = 0);
+	QCalParser(QFile *file, QObject *parent = 0);
 	~QCalParser();
 
-	void populateModel(QObject *model, const char *slot);
-
 public slots:
-	bool parse(const QByteArray &data);
-	bool parse(QFile *file);
+	void parse();
+	void addJournalEntry(QDate date, JournalEntry *entry);
+	void save();
+
+signals:
+	void newJournalEntry(QDate date, JournalEntry *entry);
 
 protected:
-	void parse();
 	void parseBlock();
+	void saveEntry(JournalEntry* entry);
 
 	QList<QVariant> m_eventList;
-	QTextStream *m_dataStream;
+	QTextStream m_dataStream;
+	QFile *_file;
 };
 
 #endif // QCALPARSER_H

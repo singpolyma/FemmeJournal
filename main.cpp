@@ -22,11 +22,11 @@ int main(int argc, char *argv[])
 		qFatal("Could not open file: %s", qUtf8Printable(journalFile.fileName()));
 	}
 
-	QCalParser journalParser;
-	journalParser.parse(&journalFile);
-
+	QCalParser journalParser(&journalFile);
 	CalendarModel calendarModel;
-	journalParser.populateModel(&calendarModel, "addJournalDate");
+	QObject::connect(&calendarModel, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &journalParser, SLOT(addJournalEntry(QDate,JournalEntry*)));
+	QObject::connect(&journalParser, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &calendarModel, SLOT(addJournalEntry(QDate,JournalEntry*)));
+	journalParser.parse();
 
 	QQmlApplicationEngine engine;
 	engine.rootContext()->setContextProperty("calendarModel", &calendarModel);

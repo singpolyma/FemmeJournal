@@ -58,17 +58,16 @@ JournalEntry *CalendarModel::selectedJournal() {
 JournalEntry *CalendarModel::entryOf(const QDate &date) {
 	JournalEntry *entry = _journalDates.value(date, NULL);
 	if(!entry) {
-		entry = new JournalEntry();
+		entry = new JournalEntry(this);
 		_journalDates.insert(date, entry);
-		addJournalDate(date, entry);
-		// TODO: insert into list for writing to file
-		// list owns the memory
+		addJournalEntry(date, entry);
+		emit newJournalEntry(date, entry);
 	}
 
 	return entry;
 }
 
-void CalendarModel::addJournalDate(QDate date, JournalEntry *entry) {
+void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry) {
 	Q_ASSERT(entry);
 
 	_journalDates.insert(date, entry);

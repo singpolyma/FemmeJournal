@@ -72,11 +72,12 @@ Q_SIGNALS:
 	void yearChanged();
 	void localeChanged();
 	void titleChanged();
+	void newJournalEntry(QDate, JournalEntry*);
 
 public slots:
 	void refreshMenstrualData();
 	void refreshJournalData();
-	void addJournalDate(QDate date, JournalEntry *entry);
+	void addJournalEntry(QDate date, JournalEntry *entry);
 
 protected:
 	bool populate(int month, int year, const QLocale &locale, bool force = false);

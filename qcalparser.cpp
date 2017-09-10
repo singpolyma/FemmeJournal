@@ -7,57 +7,69 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QStringList>
 
-QCalParser::QCalParser(QObject *parent) : QObject(parent), m_dataStream(NULL) {
+QCalParser::QCalParser(QFile *file, QObject *parent) : QObject(parent), m_dataStream() {
+	_file = file;
+	m_dataStream.setDevice(_file);
 }
 
 QCalParser::~QCalParser() {
-	if(m_dataStream) delete m_dataStream;
+	_file->close();
 }
 
-void QCalParser::populateModel(QObject *model, const char *slot) {
+void QCalParser::addJournalEntry(QDate date, JournalEntry *entry) {
+	Q_ASSERT(entry);
+	entry->setParent(this);
+	m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
+}
+
+void QCalParser::save() {
+	m_dataStream.seek(0);
+	_file->seek(0);
+	_file->resize(0);
+
 	for(
 		QList<QVariant>::iterator i = m_eventList.begin();
 		i != m_eventList.end();
 		i++
 	) {
-		if(i->typeName() != QString("QPair<QDate,JournalEntry*>")) continue;
-		QPair<QDate,JournalEntry*> v = i->value<QPair<QDate,JournalEntry*>>();
+		if(i->typeName() != QString("QPair<QDate,JournalEntry*>")) {
+			QPair<QDate,JournalEntry*> v = i->value<QPair<QDate,JournalEntry*>>();
 
-		QMetaObject::invokeMethod(
-			model,
-			slot,
-			Qt::AutoConnection,
-			Q_ARG(QDate, v.first),
-			Q_ARG(JournalEntry*, v.second)
-		);
-	}
-}
-
-bool QCalParser::parse(const QByteArray &data) {
-	if(m_dataStream) delete m_dataStream;
-
-	m_dataStream = new QTextStream(data);
-	parse();
-
-	return true;
-}
-
-bool QCalParser::parse(QFile *file) {
-	if (!file->isOpen()) {
-		if (!file->open(QIODevice::ReadOnly | QIODevice::Text))
-			return false;
+			m_dataStream << "BEGIN:VJOURNAL" << endl;
+			m_dataStream << "DTSTART:" << v.first.toString("yyyyMMdd") << endl;
+			saveEntry(v.second);
+			m_dataStream << "END:VJOURNAL" << endl;
+		} else if(i->typeName() != QString("JournalEntry*")) {
+			m_dataStream << "BEGIN:VJOURNAL" << endl;
+			saveEntry(i->value<JournalEntry*>());
+			m_dataStream << "END:VJOURNAL" << endl;
+		} else {
+			m_dataStream << i->toString() << endl;
+		}
 	}
 
-	if(m_dataStream) delete m_dataStream;
+	m_dataStream.flush();
+}
 
-	m_dataStream = new QTextStream(file);
-	parse();
+void QCalParser::saveEntry(JournalEntry *entry) {
+	if(entry->menstruationStarted()) m_dataStream << "X-THEFERTILECYCLE-MENSTRUATION:STARTED" << endl;
+	if(entry->menstruationStopped()) m_dataStream << "X-THEFERTILECYCLE-MENSTRUATION:STOPPED" << endl;
+	if(entry->property("intimate").toBool()) m_dataStream << "X-THEFERTILECYCLE-INTIMATE:YES" << endl;
+	if(entry->property("ovulated").toBool()) m_dataStream << "X-THEFERTILECYCLE-OVULATED:POSITIVE" << endl;
 
-	return true;
+	QString note = entry->property("note").toString();
+	if(!note.isEmpty()) {
+		note.replace("\\", "\\\\");
+		note.replace("\n", "\\n");
+		note.replace(",", "\\,");
+		note.replace(";", "\\;");
+		m_dataStream << "DESCRIPTION:" << note << endl;
+	}
 }
 
 void QCalParser::parse() {
-	QString line = m_dataStream->readLine();
+	m_dataStream.seek(0);
+	QString line = m_dataStream.readLine();
 	while(!line.isNull()) {
 		if(line.contains("BEGIN:VJOURNAL")) {
 			parseBlock();
@@ -65,7 +77,7 @@ void QCalParser::parse() {
 			m_eventList.append(QVariant::fromValue(line));
 		}
 
-		line = m_dataStream->readLine();
+		line = m_dataStream.readLine();
 	}
 }
 
@@ -73,7 +85,7 @@ void QCalParser::parseBlock() {
 	QDate date;
 	JournalEntry *entry = new JournalEntry(this);
 	QString line;
-	while(!(line = m_dataStream->readLine()).contains(QByteArray("END:VJOURNAL"))) {
+	while(!(line = m_dataStream.readLine()).contains(QByteArray("END:VJOURNAL"))) {
 		const int deliminatorPosition = line.indexOf(QChar(':'));
 		const QString key   = line.mid(0, deliminatorPosition);
 		const QString value = line.mid(deliminatorPosition + 1, -1);
@@ -105,5 +117,6 @@ void QCalParser::parseBlock() {
 		m_eventList.append(QVariant::fromValue(entry));
 	} else {
 		m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
+		emit newJournalEntry(date, entry);
 	}
 }
