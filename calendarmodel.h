@@ -56,6 +56,7 @@ public:
 		YearRole,
 		MenstruatingRole,
 		CycleDayRole,
+		OvulatedRole,
 		JournalEntryRole
 	};
 
@@ -91,6 +92,7 @@ protected:
 	QDate _lastRecordedMenstruation;
 	int _meanCycleLength;
 	int _meanMenstruationLength;
+	int _meanOvulationDaysFromEnd;
 
 	Q_DISABLE_COPY(CalendarModel)
 };

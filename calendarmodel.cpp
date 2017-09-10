@@ -3,6 +3,7 @@
 // Modifications and new code for this project are licensed under the AGPLv3
 
 #include <QDebug>
+#include <math.h>
 
 #include "calendarmodel.h"
 
@@ -63,8 +64,8 @@ JournalEntry *CalendarModel::entryOf(const QDate &date) {
 		// list owns the memory
 		connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
 		connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
+		connect(entry, SIGNAL(ovulatedChanged()), this, SLOT(refreshMenstrualData()));
 		connect(entry, SIGNAL(emptyChanged()), this, SLOT(refreshJournalData()));
-		connect(entry, SIGNAL(ovulatedChanged()), this, SLOT(refreshJournalData()));
 		refreshJournalData();
 	}
 
@@ -95,7 +96,7 @@ void CalendarModel::refreshMenstrualData() {
 
 	emit nextCycleChanged();
 
-	QVector<int> roles({MenstruatingRole, CycleDayRole});
+	QVector<int> roles({MenstruatingRole, CycleDayRole, OvulatedRole});
 	emit dataChanged(index(0, 0), index(daysOnACalendarMonth - 1, 0), roles);
 }
 
@@ -193,6 +194,34 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 		}
 		case CycleDayRole:
 			return cycleDay(date);
+		case OvulatedRole: {
+			int cday = cycleDay(date);
+			QDate nextCycle = date.addDays(_meanCycleLength - cday + 1);
+
+			for(
+				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+				i != _journalDates.end();
+				i++
+			) {
+				if(i.value()->menstruationStarted()) {
+					nextCycle = i.key();
+					break;
+				}
+				if(i.value()->property("ovulated").toBool()) return i.key() == date;
+			}
+
+			for(
+				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+				i != (_journalDates.begin() - 1);
+				i--
+			) {
+				if(i == _journalDates.end()) continue;
+				if(i.key().daysTo(date) >= cday) break;
+				if(i.value()->property("ovulated").toBool()) return i.key() == date;
+			}
+
+			return date == nextCycle.addDays(_meanOvulationDaysFromEnd * -1);
+		}
 		case JournalEntryRole:
 			return QVariant::fromValue(_journalDates.value(date));
 		default:
@@ -207,6 +236,8 @@ void CalendarModel::populateMeanCycleTimes() {
 	int count = 0;
 	int mNumerator = 0;
 	int mCount = 0;
+	int ovulationNumerator = 0;
+	int ovulationCount = 0;
 	const QDate *lastBegan = NULL;
 	const QDate *lastEnded = NULL;
 
@@ -233,11 +264,17 @@ void CalendarModel::populateMeanCycleTimes() {
 		if(i.value()->menstruationStopped()) {
 			lastEnded = &i.key();
 		}
+
+		if(lastBegan && i.value()->property("ovulated").toBool()) {
+			ovulationNumerator += i.key().daysTo(*lastBegan);
+			ovulationCount++;
+		}
 	}
 
 	// TODO: discount very long cycles (likely a skipped period)
-	_meanCycleLength = count == 0 ? 28 : numerator / count;
-	_meanMenstruationLength = mCount == 0 ? 4 : mNumerator / mCount;
+	_meanCycleLength = count == 0 ? 28 : round((double)numerator / count);
+	_meanMenstruationLength = mCount == 0 ? 4 : round((double)mNumerator / mCount);
+	_meanOvulationDaysFromEnd = ovulationCount == 0 ? _meanCycleLength - 14 : round((double)ovulationNumerator / ovulationCount);
 }
 
 int CalendarModel::cycleDay(QDate date) const {
@@ -274,6 +311,7 @@ QHash<int, QByteArray> CalendarModel::roleNames() const {
 	roles[YearRole] = QByteArrayLiteral("year");
 	roles[MenstruatingRole] = QByteArrayLiteral("menstruating");
 	roles[CycleDayRole] = QByteArrayLiteral("cycleDay");
+	roles[OvulatedRole] = QByteArrayLiteral("ovulated");
 	roles[JournalEntryRole] = QByteArrayLiteral("journalEntry");
 	return roles;
 }

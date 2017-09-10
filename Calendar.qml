@@ -119,7 +119,7 @@ Rectangle {
 							sourceSize: Qt.size(parent.height, parent.height)
 							fillMode: Image.PreserveAspectFit
 							opacity: 0.5
-							visible: model.journalEntry && model.journalEntry.ovulated
+							visible: model.ovulated
 
 							ColorOverlay {
 								anchors.fill: parent
