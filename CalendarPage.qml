@@ -18,13 +18,22 @@ Page {
 
 		Rectangle {
 			color: materialContext.Material.dialogColor
+			Layout.margins: parent.width * 0.02
 			Layout.fillHeight: parent.width > parent.height
 			Layout.fillWidth: parent.width <= parent.height
 			Layout.preferredHeight: parent.width <= parent.height ? 0.3 * parent.height : 0
 			Layout.preferredWidth: parent.width > parent.height ? 0.3 * parent.width : 0
 			visible: parent.width < 1024
 
-			Text { text: "hai" }
+			Text {
+				anchors.fill: parent
+				elide: Text.ElideRight
+				wrapMode: Text.Wrap
+				text: [
+					(calendarModel.selectedJournal.intimate ? "Intimate" : null),
+					"\n" + calendarModel.selectedJournal.note
+				].filter(function(x) { return x; }).join("\n")
+			}
 		}
 
 		JournalEntry {
