@@ -16,17 +16,16 @@ ApplicationWindow {
 		RowLayout {
 			anchors.fill: parent
 			ToolButton {
-				text: qsTr("❮")
+				text: qsTr("❮ ") + stack.currentItem.title
 				onClicked: stack.pop()
-				opacity: stack.depth > 1 ? 1 : 0
+				visible: stack.depth > 1
+				font.capitalization: Font.MixedCase
 			}
 			Label {
-				text: ""
-				elide: Label.ElideRight
-				horizontalAlignment: Qt.AlignHCenter
-				verticalAlignment: Qt.AlignVCenter
-				Layout.fillWidth: true
+				text: "      " + stack.currentItem.title
+				visible: stack.depth < 2
 			}
+			Rectangle { Layout.fillWidth: true }
 			ToolButton {
 				onClicked: { calendarPage.journal.visible = true; stack.push(calendarPage.journal) }
 				visible: parent.width < 1024 && stack.currentItem == calendarPage
@@ -68,6 +67,7 @@ ApplicationWindow {
 		anchors.fill: parent
 		initialItem: Page {
 			id: summaryPage
+			title: qsTr("Summary")
 
 			background: Image {
 				source: "qrc:/bg.png"

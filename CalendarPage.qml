@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.0
 import QtQuick.Controls.Material 2.0
 
 Page {
+	title: qsTr("Calendar")
 	property var journal: journal
 
 	GridLayout {
@@ -38,6 +39,7 @@ Page {
 
 		JournalEntry {
 			id: journal
+			title: qsTr("Journal")
 			z: -1
 			Layout.fillHeight: true
 			Layout.minimumWidth: parent.width > parent.height ? 0.3 * parent.width : 0
