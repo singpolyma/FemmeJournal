@@ -139,6 +139,9 @@ ApplicationWindow {
 			}
 		}
 
-		CalendarPage { id: calendarPage }
+		CalendarPage {
+			id: calendarPage
+			visible: false
+		}
 	}
 }
