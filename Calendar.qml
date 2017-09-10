@@ -3,6 +3,7 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import Qt.labs.calendar 1.0
 import QtQuick.Controls.Material 2.0
+import QtGraphicalEffects 1.0
 
 Rectangle {
 	color: Material.background
@@ -119,6 +120,13 @@ Rectangle {
 							fillMode: Image.PreserveAspectFit
 							opacity: 0.5
 							visible: model.journalEntry && model.journalEntry.ovulated
+
+							ColorOverlay {
+								anchors.fill: parent
+								source: parent
+								opacity: 0.5
+								color: Material.foreground
+							}
 						}
 					}
 
@@ -143,8 +151,15 @@ Rectangle {
 							implicitHeight: parent.height
 							implicitWidth: height
 							radius: width*0.5
-							color: Material.foreground
+							color: "black"
 							opacity: (model.journalEntry && !model.journalEntry.empty) ? 0.5 : 0
+
+							ColorOverlay {
+								anchors.fill: parent
+								source: parent
+								opacity: 0.5
+								color: Material.foreground
+							}
 						}
 
 						Image {
@@ -153,6 +168,13 @@ Rectangle {
 							sourceSize: Qt.size(parent.height, parent.height)
 							fillMode: Image.PreserveAspectFit
 							opacity: (model.journalEntry && model.journalEntry.intimate) ? 0.5 : 0
+
+							ColorOverlay {
+								anchors.fill: parent
+								source: parent
+								opacity: 0.5
+								color: Material.foreground
+							}
 						}
 					}
 				}
