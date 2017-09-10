@@ -38,6 +38,10 @@ void JournalEntry::setMenstruationStopped(bool ended) {
 	emit menstruationStoppedChanged();
 }
 
+void JournalEntry::addUnknownLine(QString line) {
+	_unknown.append(line);
+}
+
 bool JournalEntry::empty() {
 	return !_intimate && _note == "";
 }

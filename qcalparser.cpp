@@ -71,21 +71,39 @@ void QCalParser::parse() {
 
 void QCalParser::parseBlock() {
 	QDate date;
-	JournalEntry *event = new JournalEntry(this);
+	JournalEntry *entry = new JournalEntry(this);
 	QString line;
 	while(!(line = m_dataStream->readLine()).contains(QByteArray("END:VJOURNAL"))) {
-		const int deliminatorPosition = line.indexOf(QLatin1Char(':'));
+		const int deliminatorPosition = line.indexOf(QChar(':'));
 		const QString key   = line.mid(0, deliminatorPosition);
 		const QString value = line.mid(deliminatorPosition + 1, -1);
 
 		if(key == QString("DTSTART")) {
 			date = QDate::fromString(value, "yyyyMMdd");
+		} else if(key == QString("DESCRIPTION")) {
+			QString desc = value;
+			desc.replace("\\N", "\n");
+			desc.replace("\\n", "\n");
+			desc.replace("\\,", ",");
+			desc.replace("\\;", ";");
+			desc.replace("\\\\", "\\");
+			entry->setProperty("note", desc);
+		} else if(key == QString("X-THEFERTILECYCLE-MENSTRUATION") && value.toCaseFolded() == QString("started")) {
+			entry->setMenstruationStarted(true);
+		} else if(key == QString("X-THEFERTILECYCLE-MENSTRUATION") && value.toCaseFolded() == QString("stopped")) {
+			entry->setMenstruationStopped(true);
+		} else if(key == QString("X-THEFERTILECYCLE-INTIMATE")) {
+			entry->setProperty("intimate", true);
+		} else if(key == QString("X-THEFERTILECYCLE-OVULATED")) {
+			entry->setProperty("ovulated", true);
+		} else {
+			entry->addUnknownLine(line);
 		}
 	}
 
 	if(date.isNull()) {
-		m_eventList.append(QVariant::fromValue(event));
+		m_eventList.append(QVariant::fromValue(entry));
 	} else {
-		m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, event)));
+		m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
 	}
 }

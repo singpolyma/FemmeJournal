@@ -28,6 +28,7 @@ public:
 	void setMenstruationStopped(bool stopped);
 
 	bool empty();
+	void addUnknownLine(QString line);
 
 	enum MenstrualChange {
 		MenstruationUnchanged,
@@ -48,6 +49,7 @@ protected:
 	bool _intimate;
 	bool _ovulated;
 	QString _note;
+	QList<QString> _unknown;
 
 	Q_DISABLE_COPY(JournalEntry)
 };
