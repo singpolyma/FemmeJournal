@@ -111,6 +111,15 @@ Rectangle {
 							color: Qt.rgba(1, 0, 0.2, 0.5)
 							opacity: model.menstruating ? 1 : 0
 						}
+
+						Image {
+							Layout.alignment: Qt.AlignRight
+							source: "qrc:/flower.svg"
+							sourceSize: Qt.size(parent.height, parent.height)
+							fillMode: Image.PreserveAspectFit
+							opacity: 0.5
+							visible: model.journalEntry && model.journalEntry.ovulated
+						}
 					}
 
 					Text {
@@ -143,7 +152,7 @@ Rectangle {
 							source: "qrc:/heart.svg"
 							sourceSize: Qt.size(parent.height, parent.height)
 							fillMode: Image.PreserveAspectFit
-							opacity: (model.journalEntry && model.journalEntry.intimate) ? 1 : 0
+							opacity: (model.journalEntry && model.journalEntry.intimate) ? 0.5 : 0
 						}
 					}
 				}

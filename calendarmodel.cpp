@@ -64,6 +64,7 @@ JournalEntry *CalendarModel::entryOf(const QDate &date) {
 		connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
 		connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
 		connect(entry, SIGNAL(emptyChanged()), this, SLOT(refreshJournalData()));
+		connect(entry, SIGNAL(ovulatedChanged()), this, SLOT(refreshJournalData()));
 		refreshJournalData();
 	}
 
