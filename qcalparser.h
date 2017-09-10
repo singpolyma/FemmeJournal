@@ -13,21 +13,23 @@
 #include "journalentry.h"
 
 class QCalParser : public QObject {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    QCalParser(QObject *parent = 0);
-    ~QCalParser();
+	QCalParser(QObject *parent = 0);
+	~QCalParser();
+
+	void populateModel(QObject *model, const char *slot);
 
 public slots:
-    bool parse(const QByteArray &data);
-    bool parse(QFile *file);
+	bool parse(const QByteArray &data);
+	bool parse(QFile *file);
 
 protected:
-    void parse();
-    void parseBlock();
+	void parse();
+	void parseBlock();
 
-    QList<QVariant> m_eventList;
-    QTextStream *m_dataStream;
+	QList<QVariant> m_eventList;
+	QTextStream *m_dataStream;
 };
 
 #endif // QCALPARSER_H

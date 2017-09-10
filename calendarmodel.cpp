@@ -60,16 +60,25 @@ JournalEntry *CalendarModel::entryOf(const QDate &date) {
 	if(!entry) {
 		entry = new JournalEntry();
 		_journalDates.insert(date, entry);
+		addJournalDate(date, entry);
 		// TODO: insert into list for writing to file
 		// list owns the memory
-		connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
-		connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
-		connect(entry, SIGNAL(ovulatedChanged()), this, SLOT(refreshMenstrualData()));
-		connect(entry, SIGNAL(emptyChanged()), this, SLOT(refreshJournalData()));
-		refreshJournalData();
 	}
 
 	return entry;
+}
+
+void CalendarModel::addJournalDate(QDate date, JournalEntry *entry) {
+	Q_ASSERT(entry);
+
+	_journalDates.insert(date, entry);
+
+	connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
+	connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
+	connect(entry, SIGNAL(ovulatedChanged()), this, SLOT(refreshMenstrualData()));
+	connect(entry, SIGNAL(emptyChanged()), this, SLOT(refreshJournalData()));
+
+	refreshJournalData();
 }
 
 QDate CalendarModel::nextCycle() {

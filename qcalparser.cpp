@@ -14,6 +14,25 @@ QCalParser::~QCalParser() {
 	if(m_dataStream) delete m_dataStream;
 }
 
+void QCalParser::populateModel(QObject *model, const char *slot) {
+	for(
+		QList<QVariant>::iterator i = m_eventList.begin();
+		i != m_eventList.end();
+		i++
+	) {
+		if(i->typeName() != QString("QPair<QDate,JournalEntry*>")) continue;
+		QPair<QDate,JournalEntry*> v = i->value<QPair<QDate,JournalEntry*>>();
+
+		QMetaObject::invokeMethod(
+			model,
+			slot,
+			Qt::AutoConnection,
+			Q_ARG(QDate, v.first),
+			Q_ARG(JournalEntry*, v.second)
+		);
+	}
+}
+
 bool QCalParser::parse(const QByteArray &data) {
 	if(m_dataStream) delete m_dataStream;
 
@@ -51,23 +70,22 @@ void QCalParser::parse() {
 }
 
 void QCalParser::parseBlock() {
-	QSharedPointer<JournalEntry> event = QSharedPointer<JournalEntry>(new JournalEntry);
+	QDate date;
+	JournalEntry *event = new JournalEntry(this);
 	QString line;
 	while(!(line = m_dataStream->readLine()).contains(QByteArray("END:VJOURNAL"))) {
 		const int deliminatorPosition = line.indexOf(QLatin1Char(':'));
 		const QString key   = line.mid(0, deliminatorPosition);
 		const QString value = line.mid(deliminatorPosition + 1, -1);
 
-		/*if(key == QLatin1String("DTSTART") || key == QLatin1String("DTEND")) {
-			QDateTime utcTime = QDateTime::fromString(value, "yyyyMMdd'T'hhmmss'Z'");
-			utcTime.setTimeSpec(Qt::UTC);
-			event->setProperty(key, utcTime.toLocalTime());
-			continue;
-		} else if (key == QLatin1String("CATEGORIES")) {
-			event->setProperty(key, value.split(" " || ",", QString::SkipEmptyParts));
-		} else {
-			event->setProperty(key, value);
-		}*/
+		if(key == QString("DTSTART")) {
+			date = QDate::fromString(value, "yyyyMMdd");
+		}
 	}
-	m_eventList.append(QVariant::fromValue(event));
+
+	if(date.isNull()) {
+		m_eventList.append(QVariant::fromValue(event));
+	} else {
+		m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, event)));
+	}
 }

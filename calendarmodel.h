@@ -76,6 +76,7 @@ Q_SIGNALS:
 public slots:
 	void refreshMenstrualData();
 	void refreshJournalData();
+	void addJournalDate(QDate date, JournalEntry *entry);
 
 protected:
 	bool populate(int month, int year, const QLocale &locale, bool force = false);
