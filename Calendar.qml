@@ -113,13 +113,24 @@ Rectangle {
 							opacity: model.menstruating ? 1 : 0
 						}
 
+						Rectangle {
+							Layout.margins: 2
+							implicitHeight: parent.height
+							implicitWidth: height
+							radius: width*0.5
+							color: "#84aa41"
+							opacity: 0.75
+							visible: model.fertility == "fertile"
+						}
+
 						Image {
+							Layout.margins: 2
 							Layout.alignment: Qt.AlignRight
 							source: "qrc:/flower.svg"
 							sourceSize: Qt.size(parent.height, parent.height)
 							fillMode: Image.PreserveAspectFit
 							opacity: 0.5
-							visible: model.ovulated
+							visible: model.fertility == "ovulated"
 
 							ColorOverlay {
 								anchors.fill: parent

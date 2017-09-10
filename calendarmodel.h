@@ -56,7 +56,7 @@ public:
 		YearRole,
 		MenstruatingRole,
 		CycleDayRole,
-		OvulatedRole,
+		FertilityRole,
 		JournalEntryRole
 	};
 

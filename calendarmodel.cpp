@@ -96,7 +96,7 @@ void CalendarModel::refreshMenstrualData() {
 
 	emit nextCycleChanged();
 
-	QVector<int> roles({MenstruatingRole, CycleDayRole, OvulatedRole});
+	QVector<int> roles({MenstruatingRole, CycleDayRole, FertilityRole});
 	emit dataChanged(index(0, 0), index(daysOnACalendarMonth - 1, 0), roles);
 }
 
@@ -194,7 +194,7 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 		}
 		case CycleDayRole:
 			return cycleDay(date);
-		case OvulatedRole: {
+		case FertilityRole: {
 			int cday = cycleDay(date);
 			QDate nextCycle = date.addDays(_meanCycleLength - cday + 1);
 
@@ -207,7 +207,11 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 					nextCycle = i.key();
 					break;
 				}
-				if(i.value()->property("ovulated").toBool()) return i.key() == date;
+				if(i.value()->property("ovulated").toBool()) {
+					if(i.key() == date) return "ovulated";
+					if(date.daysTo(i.key()) < 5) return "fertile";
+					return false;
+				}
 			}
 
 			for(
@@ -217,10 +221,19 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 			) {
 				if(i == _journalDates.end()) continue;
 				if(i.key().daysTo(date) >= cday) break;
-				if(i.value()->property("ovulated").toBool()) return i.key() == date;
+				if(i.value()->property("ovulated").toBool()) {
+					if(i.key() == date) return "ovulated";
+					if(i.key().daysTo(date) < 2) return "fertile";
+					return false;
+				}
 			}
 
-			return date == nextCycle.addDays(_meanOvulationDaysFromEnd * -1);
+			QDate predictedOvulation = nextCycle.addDays(_meanOvulationDaysFromEnd * -1);
+			int daysTo = predictedOvulation.daysTo(date);
+			if(daysTo == 0) return "ovulated";
+			if(daysTo > 0 && daysTo < 2) return "fertile";
+			if(daysTo < 0 && daysTo > -5) return "fertile";
+			return false;
 		}
 		case JournalEntryRole:
 			return QVariant::fromValue(_journalDates.value(date));
@@ -311,7 +324,7 @@ QHash<int, QByteArray> CalendarModel::roleNames() const {
 	roles[YearRole] = QByteArrayLiteral("year");
 	roles[MenstruatingRole] = QByteArrayLiteral("menstruating");
 	roles[CycleDayRole] = QByteArrayLiteral("cycleDay");
-	roles[OvulatedRole] = QByteArrayLiteral("ovulated");
+	roles[FertilityRole] = QByteArrayLiteral("fertility");
 	roles[JournalEntryRole] = QByteArrayLiteral("journalEntry");
 	return roles;
 }
