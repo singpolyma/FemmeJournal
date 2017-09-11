@@ -70,13 +70,16 @@ JournalEntry *CalendarModel::entryOf(const QDate &date) {
 void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry) {
 	Q_ASSERT(entry);
 
+	entry->setParent(this);
 	_journalDates.insert(date, entry);
 
 	connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(ovulatedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(emptyChanged()), this, SLOT(refreshJournalData()));
+	connect(entry, SIGNAL(changed()), this, SIGNAL(journalChanged()));
 
+	refreshMenstrualData();
 	refreshJournalData();
 }
 

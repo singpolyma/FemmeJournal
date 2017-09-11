@@ -6,6 +6,8 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QStringList>
+#include <QtWidgets/QApplication>
+#include <QThread>
 
 QCalParser::QCalParser(QFile *file, QObject *parent) : QObject(parent), m_dataStream() {
 	_file = file;
@@ -18,7 +20,6 @@ QCalParser::~QCalParser() {
 
 void QCalParser::addJournalEntry(QDate date, JournalEntry *entry) {
 	Q_ASSERT(entry);
-	entry->setParent(this);
 	m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
 }
 
@@ -32,16 +33,24 @@ void QCalParser::save() {
 		i != m_eventList.end();
 		i++
 	) {
-		if(i->typeName() != QString("QPair<QDate,JournalEntry*>")) {
+		if(i->typeName() == QString("QPair<QDate,JournalEntry*>")) {
 			QPair<QDate,JournalEntry*> v = i->value<QPair<QDate,JournalEntry*>>();
 
+			QStringList lines = saveEntry(v.second);
+			if(!lines.empty()) {
+				m_dataStream << "BEGIN:VJOURNAL" << endl;
+				m_dataStream << "DTSTART:" << v.first.toString("yyyyMMdd") << endl;
+				for(QStringList::iterator i = lines.begin(); i != lines.end(); i++) {
+					m_dataStream << *i << endl;
+				}
+				m_dataStream << "END:VJOURNAL" << endl;
+			}
+		} else if(i->typeName() == QString("JournalEntry*")) {
 			m_dataStream << "BEGIN:VJOURNAL" << endl;
-			m_dataStream << "DTSTART:" << v.first.toString("yyyyMMdd") << endl;
-			saveEntry(v.second);
-			m_dataStream << "END:VJOURNAL" << endl;
-		} else if(i->typeName() != QString("JournalEntry*")) {
-			m_dataStream << "BEGIN:VJOURNAL" << endl;
-			saveEntry(i->value<JournalEntry*>());
+			QStringList lines = saveEntry(i->value<JournalEntry*>());
+			for(QStringList::iterator i = lines.begin(); i != lines.end(); i++) {
+				m_dataStream << *i << endl;
+			}
 			m_dataStream << "END:VJOURNAL" << endl;
 		} else {
 			m_dataStream << i->toString() << endl;
@@ -51,20 +60,33 @@ void QCalParser::save() {
 	m_dataStream.flush();
 }
 
-void QCalParser::saveEntry(JournalEntry *entry) {
-	if(entry->menstruationStarted()) m_dataStream << "X-THEFERTILECYCLE-MENSTRUATION:STARTED" << endl;
-	if(entry->menstruationStopped()) m_dataStream << "X-THEFERTILECYCLE-MENSTRUATION:STOPPED" << endl;
-	if(entry->property("intimate").toBool()) m_dataStream << "X-THEFERTILECYCLE-INTIMATE:YES" << endl;
-	if(entry->property("ovulated").toBool()) m_dataStream << "X-THEFERTILECYCLE-OVULATED:POSITIVE" << endl;
+QStringList QCalParser::saveEntry(JournalEntry *entry) {
+	QStringList lines;
+	QVariant retVal;
 
-	QString note = entry->property("note").toString();
+	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "menstruationStarted"), Q_ARG(void*, &retVal));
+	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-MENSTRUATION:STARTED";
+
+	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "menstruationStopped"), Q_ARG(void*, &retVal));
+	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-MENSTRUATION:STOPPED";
+
+	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "intimate"), Q_ARG(void*, &retVal));
+	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-INTIMATE:YES";
+
+	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "ovulated"), Q_ARG(void*, &retVal));
+	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-OVULATED:POSITIVE";
+
+	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "note"), Q_ARG(void*, &retVal));
+	QString note = retVal.toString();
 	if(!note.isEmpty()) {
 		note.replace("\\", "\\\\");
 		note.replace("\n", "\\n");
 		note.replace(",", "\\,");
 		note.replace(";", "\\;");
-		m_dataStream << "DESCRIPTION:" << note << endl;
+		lines << "DESCRIPTION:" + note;
 	}
+
+	return lines;
 }
 
 void QCalParser::parse() {
@@ -83,7 +105,7 @@ void QCalParser::parse() {
 
 void QCalParser::parseBlock() {
 	QDate date;
-	JournalEntry *entry = new JournalEntry(this);
+	JournalEntry *entry = new JournalEntry();
 	QString line;
 	while(!(line = m_dataStream.readLine()).contains(QByteArray("END:VJOURNAL"))) {
 		const int deliminatorPosition = line.indexOf(QChar(':'));
@@ -115,8 +137,10 @@ void QCalParser::parseBlock() {
 
 	if(date.isNull()) {
 		m_eventList.append(QVariant::fromValue(entry));
+		entry->setParent(this);
 	} else {
 		m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
+		entry->moveToThread(QApplication::instance()->thread());
 		emit newJournalEntry(date, entry);
 	}
 }

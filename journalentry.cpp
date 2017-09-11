@@ -10,6 +10,10 @@ JournalEntry::JournalEntry(QObject *parent) :
 	_note("") {
 	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(emptyChanged()));
 	connect(this, SIGNAL(noteChanged()), this, SIGNAL(emptyChanged()));
+
+	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(changed()));
+	connect(this, SIGNAL(ovulatedChanged()), this, SIGNAL(changed()));
+	connect(this, SIGNAL(noteChanged()), this, SIGNAL(changed()));
 }
 
 bool JournalEntry::menstruationStarted() {
@@ -23,6 +27,7 @@ void JournalEntry::setMenstruationStarted(bool began) {
 	_menstrualChange = began ? MenstruationStarted : MenstruationUnchanged;
 	emit menstruationStartedChanged();
 	emit menstruationStoppedChanged();
+	emit changed();
 }
 
 bool JournalEntry::menstruationStopped() {
@@ -36,12 +41,18 @@ void JournalEntry::setMenstruationStopped(bool ended) {
 	_menstrualChange = ended ? MenstruationStopped : MenstruationUnchanged;
 	emit menstruationStartedChanged();
 	emit menstruationStoppedChanged();
+	emit changed();
 }
 
 void JournalEntry::addUnknownLine(QString line) {
 	_unknown.append(line);
+	emit changed();
 }
 
 bool JournalEntry::empty() {
 	return !_intimate && _note == "";
+}
+
+void JournalEntry::readProperty(QByteArray name, void *ret) {
+	*((QVariant*)ret) = property(name.constData());
 }

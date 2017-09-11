@@ -17,6 +17,7 @@ class JournalEntry : public QObject
 	Q_PROPERTY(bool ovulated MEMBER _ovulated NOTIFY ovulatedChanged FINAL)
 	Q_PROPERTY(QString note MEMBER _note NOTIFY noteChanged FINAL)
 	Q_PROPERTY(bool empty READ empty NOTIFY emptyChanged FINAL)
+	Q_PROPERTY(QStringList unknownLines MEMBER _unknown FINAL)
 
 public:
 	explicit JournalEntry(QObject *parent = nullptr);
@@ -29,6 +30,8 @@ public:
 
 	bool empty();
 	void addUnknownLine(QString line);
+
+	Q_INVOKABLE void readProperty(QByteArray name, void *ret);
 
 	enum MenstrualChange {
 		MenstruationUnchanged,
@@ -43,13 +46,14 @@ signals:
 	void ovulatedChanged();
 	void noteChanged();
 	void emptyChanged();
+	void changed();
 
 protected:
 	enum MenstrualChange _menstrualChange;
 	bool _intimate;
 	bool _ovulated;
 	QString _note;
-	QList<QString> _unknown;
+	QStringList _unknown;
 
 	Q_DISABLE_COPY(JournalEntry)
 };

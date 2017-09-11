@@ -29,7 +29,7 @@ signals:
 
 protected:
 	void parseBlock();
-	void saveEntry(JournalEntry* entry);
+	QStringList saveEntry(JournalEntry* entry);
 
 	QList<QVariant> m_eventList;
 	QTextStream m_dataStream;

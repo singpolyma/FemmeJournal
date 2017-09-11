@@ -1,8 +1,10 @@
+#include <QtWidgets/QApplication>
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QStandardPaths>
 #include <QDir>
+#include <QThread>
 
 #include "calendarmodel.h"
 #include "qcalparser.h"
@@ -22,11 +24,17 @@ int main(int argc, char *argv[])
 		qFatal("Could not open file: %s", qUtf8Printable(journalFile.fileName()));
 	}
 
+	QThread parserThread;
 	QCalParser journalParser(&journalFile);
+	journalParser.moveToThread(&parserThread);
+
 	CalendarModel calendarModel;
 	QObject::connect(&calendarModel, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &journalParser, SLOT(addJournalEntry(QDate,JournalEntry*)));
 	QObject::connect(&journalParser, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &calendarModel, SLOT(addJournalEntry(QDate,JournalEntry*)));
-	journalParser.parse();
+	QObject::connect(&calendarModel, SIGNAL(journalChanged()), &journalParser, SLOT(save()));
+	QObject::connect(&parserThread, SIGNAL(started()), &journalParser, SLOT(parse()));
+	QObject::connect(QApplication::instance(), SIGNAL(aboutToQuit()), &parserThread, SLOT(quit()));
+	parserThread.start();
 
 	QQmlApplicationEngine engine;
 	engine.rootContext()->setContextProperty("calendarModel", &calendarModel);

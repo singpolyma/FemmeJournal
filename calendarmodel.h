@@ -73,6 +73,7 @@ Q_SIGNALS:
 	void localeChanged();
 	void titleChanged();
 	void newJournalEntry(QDate, JournalEntry*);
+	void journalChanged();
 
 public slots:
 	void refreshMenstrualData();
