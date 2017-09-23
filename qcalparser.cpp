@@ -11,8 +11,10 @@
 
 #include <QDebug>
 
-QCalParser::QCalParser(QFile *file, QObject *parent) : QObject(parent), m_dataStream() {
+QCalParser::QCalParser(QFile *file, QObject *parent) : QObject(parent), m_dataStream(), _timer(this) {
 	_file = file;
+	_timer.setSingleShot(true);
+	connect(&_timer, SIGNAL(timeout()), this, SLOT(save()));
 	m_dataStream.setDevice(_file);
 }
 
@@ -23,6 +25,10 @@ QCalParser::~QCalParser() {
 void QCalParser::addJournalEntry(QDate date, JournalEntry *entry) {
 	Q_ASSERT(entry);
 	m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
+}
+
+void QCalParser::delaySave() {
+	_timer.start(1000);
 }
 
 void QCalParser::save() {

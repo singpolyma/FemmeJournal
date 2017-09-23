@@ -9,6 +9,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
+#include <QTimer>
 #include <QDate>
 
 #include "journalentry.h"
@@ -22,6 +23,7 @@ public:
 public slots:
 	void parse();
 	void addJournalEntry(QDate date, JournalEntry *entry);
+	void delaySave();
 	void save();
 
 signals:
@@ -34,6 +36,7 @@ protected:
 	QList<QVariant> m_eventList;
 	QTextStream m_dataStream;
 	QFile *_file;
+	QTimer _timer;
 };
 
 #endif // QCALPARSER_H
