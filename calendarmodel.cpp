@@ -2,6 +2,7 @@
 // under the LGPLv3 and GPLv2-or-later from the Qt Labs Calendar module
 // Modifications and new code for this project are licensed under the AGPLv3
 
+#include <QTimer>
 #include <QDebug>
 #include <math.h>
 
@@ -73,9 +74,12 @@ void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry) {
 	entry->setParent(this);
 	_journalDates.insert(date, entry);
 
+	// Use a timer to work-around false binding loop detection
+	if(date == _selectedDate) QTimer::singleShot(0, this, SIGNAL(selectedJournalChanged()));
+
 	connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
-	connect(entry, SIGNAL(ovulatedChanged()), this, SLOT(refreshMenstrualData()));
+	connect(entry, SIGNAL(opkChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(emptyChanged()), this, SLOT(refreshJournalData()));
 	connect(entry, SIGNAL(changed()), this, SIGNAL(journalChanged()));
 
@@ -218,7 +222,7 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 					nextCycle = i.key();
 					break;
 				}
-				if(i.value()->property("ovulated").toBool()) {
+				if(i.value()->property("opk") == JournalEntry::OPKPositive) {
 					if(i.key() == date) return "ovulated";
 					if(date.daysTo(i.key()) < 5) return "fertile";
 					return false;
@@ -232,7 +236,7 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 			) {
 				if(i == _journalDates.end()) continue;
 				if(i.key().daysTo(date) >= cday) break;
-				if(i.value()->property("ovulated").toBool()) {
+				if(i.value()->property("opk") == JournalEntry::OPKPositive) {
 					if(i.key() == date) return "ovulated";
 					if(i.key().daysTo(date) < 2) return "fertile";
 					return false;
@@ -289,7 +293,7 @@ void CalendarModel::populateMeanCycleTimes() {
 			lastEnded = &i.key();
 		}
 
-		if(lastBegan && i.value()->property("ovulated").toBool()) {
+		if(lastBegan && i.value()->property("opk") == JournalEntry::OPKPositive) {
 			ovulationNumerator += i.key().daysTo(*lastBegan);
 			ovulationCount++;
 		}

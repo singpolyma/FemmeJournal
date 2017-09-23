@@ -9,6 +9,8 @@
 #include <QtWidgets/QApplication>
 #include <QThread>
 
+#include <QDebug>
+
 QCalParser::QCalParser(QFile *file, QObject *parent) : QObject(parent), m_dataStream() {
 	_file = file;
 	m_dataStream.setDevice(_file);
@@ -71,10 +73,34 @@ QStringList QCalParser::saveEntry(JournalEntry *entry) {
 	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-MENSTRUATION:STOPPED";
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "intimate"), Q_ARG(void*, &retVal));
-	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-INTIMATE:YES";
+	if(retVal.toBool()) {
+		QString line = "X-THEFERTILECYCLE-INTIMATE";
 
-	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "ovulated"), Q_ARG(void*, &retVal));
-	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-OVULATED:POSITIVE";
+		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "intimateProtection"), Q_ARG(void*, &retVal));
+		if(!retVal.isValid() || retVal.isNull()) {
+			// Protection unknown
+		} else if(retVal.toBool()) {
+			line += ";PROTECTION=TRUE";
+		} else {
+			line += ";PROTECTION=FALSE";
+		}
+
+		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "orgasm"), Q_ARG(void*, &retVal));
+		if(retVal.toInt() == JournalEntry::HadOrgasm) {
+			line += ";ORGASM=TRUE";
+		} else if(retVal.toInt() == JournalEntry::NoOrgasm) {
+			line += ";ORGASM=FALSE";
+		}
+
+		lines << line + ":TRUE";
+	}
+
+	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "opk"), Q_ARG(void*, &retVal));
+	if(retVal.toInt() == JournalEntry::OPKPositive) {
+		lines << "X-THEFERTILECYCLE-OPK:POSITIVE";
+	} else if(retVal.toInt() == JournalEntry::OPKNegative) {
+		lines << "X-THEFERTILECYCLE-OPK:NEGATIVE";
+	}
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "note"), Q_ARG(void*, &retVal));
 	QString note = retVal.toString();
@@ -111,10 +137,11 @@ void QCalParser::parseBlock() {
 		const int deliminatorPosition = line.indexOf(QChar(':'));
 		const QString key   = line.mid(0, deliminatorPosition);
 		const QString value = line.mid(deliminatorPosition + 1, -1);
+		const QStringList attrs = key.split(';', QString::SkipEmptyParts);
 
-		if(key == QString("DTSTART")) {
+		if(attrs.at(0) == QString("DTSTART")) {
 			date = QDate::fromString(value, "yyyyMMdd");
-		} else if(key == QString("DESCRIPTION")) {
+		} else if(attrs.at(0) == QString("DESCRIPTION")) {
 			QString desc = value;
 			desc.replace("\\N", "\n");
 			desc.replace("\\n", "\n");
@@ -122,14 +149,34 @@ void QCalParser::parseBlock() {
 			desc.replace("\\;", ";");
 			desc.replace("\\\\", "\\");
 			entry->setProperty("note", desc);
-		} else if(key == QString("X-THEFERTILECYCLE-MENSTRUATION") && value.toCaseFolded() == QString("started")) {
+		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-MENSTRUATION") && value.toCaseFolded() == QString("started")) {
 			entry->setMenstruationStarted(true);
-		} else if(key == QString("X-THEFERTILECYCLE-MENSTRUATION") && value.toCaseFolded() == QString("stopped")) {
+		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-MENSTRUATION") && value.toCaseFolded() == QString("stopped")) {
 			entry->setMenstruationStopped(true);
-		} else if(key == QString("X-THEFERTILECYCLE-INTIMATE")) {
+		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-INTIMATE") && value.toCaseFolded() == QString("true")) {
 			entry->setProperty("intimate", true);
-		} else if(key == QString("X-THEFERTILECYCLE-OVULATED")) {
-			entry->setProperty("ovulated", true);
+
+			for(
+				QStringList::const_iterator i = attrs.begin();
+				i != attrs.end();
+				i++
+			) {
+				if(i->toCaseFolded() == QString("protection=true")) {
+					entry->setProperty("intimateProtection", true);
+				} else if(i->toCaseFolded() == QString("protection=false")) {
+					entry->setProperty("intimateProtection", false);
+				} else if(i->toCaseFolded() == QString("orgasm=true")) {
+					entry->setProperty("orgasm", JournalEntry::HadOrgasm);
+				} else if(i->toCaseFolded() == QString("orgasm=false")) {
+					entry->setProperty("orgasm", JournalEntry::NoOrgasm);
+				}
+			}
+		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-OPK")) {
+			if(value.toCaseFolded() == QString("positive")) {
+				entry->setProperty("opk", JournalEntry::OPKPositive);
+			} else if(value.toCaseFolded() == QString("negative")) {
+				entry->setProperty("opk", JournalEntry::OPKNegative);
+			}
 		} else {
 			entry->addUnknownLine(line);
 		}

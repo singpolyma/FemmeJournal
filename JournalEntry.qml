@@ -3,6 +3,7 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import Qt.labs.calendar 1.0
 import QtQuick.Controls.Material 2.0
+import net.singpolyma.thefertilecycle 1.0
 
 Page {
 	header: TabBar {
@@ -11,7 +12,6 @@ Page {
 
 		TabButton { text: qsTr("Notes") }
 		TabButton { text: qsTr("Symptoms") }
-		TabButton { text: qsTr("Moods") }
 		TabButton { text: qsTr("Others") }
 	}
 
@@ -61,6 +61,94 @@ Page {
 					}
 				}
 
+				ColumnLayout {
+					Layout.fillWidth: true
+					Layout.columnSpan: 2
+					Layout.leftMargin: parent.parent.parent.width * 0.02
+					Layout.rightMargin: 8 + parent.parent.parent.width * 0.02
+					visible: calendarModel.selectedJournal.intimate
+
+					Row {
+						Layout.fillWidth: true
+
+						Button {
+							checkable: true
+							implicitHeight: font.pixelSize * 2
+							implicitWidth: parent.width / 2
+							text: "Protected"
+							font.capitalization: Font.MixedCase
+							background: Segment {
+								radiusOn: "left"
+							}
+
+							checked: calendarModel.selectedJournal.intimateProtection === true
+							onClicked: {
+								calendarModel.selectedJournal.intimateProtection =
+									calendarModel.selectedJournal.intimateProtection === true ? undefined : true;
+								checked = Qt.binding(function () { return calendarModel.selectedJournal.intimateProtection === true; });
+							}
+						}
+						Button {
+							checkable: true
+							implicitHeight: font.pixelSize * 2
+							implicitWidth: parent.width / 2
+							text: "Unprotected"
+							font.capitalization: Font.MixedCase
+							background: Segment {
+								radiusOn: "right"
+							}
+
+							checked: calendarModel.selectedJournal.intimateProtection === false
+							onClicked: {
+								calendarModel.selectedJournal.intimateProtection =
+									calendarModel.selectedJournal.intimateProtection === false ? undefined : false;
+								checked = Qt.binding(function () { return calendarModel.selectedJournal.intimateProtection === false; });
+							}
+						}
+					}
+
+					Row {
+						Layout.fillWidth: true
+
+						Button {
+							checkable: true
+							implicitHeight: font.pixelSize * 2
+							implicitWidth: parent.width / 2
+							text: "Orgasm"
+							font.capitalization: Font.MixedCase
+							background: Segment {
+								radiusOn: "left"
+							}
+
+							checked: calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm
+							onClicked: {
+								calendarModel.selectedJournal.orgasm =
+									calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm ? JournalEntry.OrgasmUnknown : JournalEntry.HadOrgasm;
+								checked = Qt.binding(function () { return calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm; });
+							}
+						}
+						Button {
+							checkable: true
+							implicitHeight: font.pixelSize * 2
+							implicitWidth: parent.width / 2
+							text: "No Orgasm"
+							font.capitalization: Font.MixedCase
+							background: Segment {
+								radiusOn: "right"
+							}
+
+							checked: calendarModel.selectedJournal.orgasm == JournalEntry.NoOrgasm
+							onClicked: {
+								calendarModel.selectedJournal.orgasm =
+									calendarModel.selectedJournal.orgasm === JournalEntry.NoOrgasm ? JournalEntry.OrgasmUnknown : JournalEntry.NoOrgasm;
+								checked = Qt.binding(function () { return calendarModel.selectedJournal.orgasm === JournalEntry.NoOrgasm; });
+							}
+						}
+					}
+
+					Rectangle { height: 5 }
+				}
+
 				Rectangle {
 					Layout.fillWidth: true
 					Layout.columnSpan: 2
@@ -96,25 +184,6 @@ Page {
 					checked: calendarModel.selectedJournal.menstruationStopped
 					onCheckedChanged: {
 						calendarModel.selectedJournal.menstruationStopped = checked
-					}
-				}
-
-				Rectangle {
-					Layout.fillWidth: true
-					Layout.columnSpan: 2
-					height: 1
-					color: "#000000"
-				}
-
-				Label {
-					Layout.fillWidth: true
-					elide: Text.ElideRight
-					text: qsTr("Ovulated Today")
-				}
-				CheckBox {
-					checked: calendarModel.selectedJournal.ovulated
-					onCheckedChanged: {
-						calendarModel.selectedJournal.ovulated = checked
 					}
 				}
 			}
@@ -169,7 +238,38 @@ Page {
 			}
 		}
 
-		Item {}
-		Item {}
+		Item {
+			ComboBox {
+				id: opkSelect
+
+				textRole: "label"
+				model: ListModel {
+					ListElement { label: qsTr("None"); value: JournalEntry.OPKNone }
+					ListElement { label: qsTr("Negative"); value: JournalEntry.OPKNegative }
+					ListElement { label: qsTr("Positive"); value: JournalEntry.OPKPositive }
+				}
+
+				Binding {
+					target: opkSelect
+					property: "currentIndex"
+					value: {
+						var idx = null;
+
+						for(var i = 0; i < opkSelect.model.count; i++) {
+							if(opkSelect.model.get(i).value == calendarModel.selectedJournal.opk) {
+								idx = i;
+								break;
+							}
+						}
+
+						return idx;
+					}
+				}
+
+				onActivated: {
+					calendarModel.selectedJournal.opk = model.get(index).value
+				}
+			}
+		}
 	}
 }
