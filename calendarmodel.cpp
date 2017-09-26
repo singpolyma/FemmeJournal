@@ -244,6 +244,19 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 			}
 
 			QDate predictedOvulation = nextCycle.addDays(_meanOvulationDaysFromEnd * -1);
+
+			QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(predictedOvulation);
+			if(i.key() == predictedOvulation) {
+				// If there is data for the predicted day, advance past any negative OPK values
+				for(
+					;
+					i != _journalDates.end() && i.value()->property("opk") == JournalEntry::OPKNegative;
+					i++
+				) {
+					predictedOvulation = predictedOvulation.addDays(1);
+				}
+			}
+
 			int daysTo = predictedOvulation.daysTo(date);
 			if(daysTo == 0) return "ovulated";
 			if(daysTo > 0 && daysTo < 2) return "fertile";
