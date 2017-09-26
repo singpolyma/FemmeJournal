@@ -28,6 +28,7 @@ Page {
 				Layout.fillHeight: true
 				Layout.fillWidth: true
 				Layout.bottomMargin: parent.parent.height * 0.1
+				leftPadding: 8
 				wrapMode: TextEdit.Wrap
 				placeholderText: qsTr("Notes")
 				selectByMouse: true
