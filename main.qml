@@ -89,7 +89,7 @@ ApplicationWindow {
 					Text {
 						anchors.centerIn: parent
 						id: projectedStart
-						text: qsTr("Projected start date is ") + calendarModel.nextCycle.toLocaleDateString(Locale.ShortFormat)
+						text: qsTr("Projected start date: ") + calendarModel.nextCycle.toLocaleDateString(Locale.ShortFormat)
 						font.pixelSize: parent.parent.width / 25
 					}
 				}
@@ -104,7 +104,10 @@ ApplicationWindow {
 					Text {
 						anchors.centerIn: parent
 						id: daysLeft
-						text: parseInt((calendarModel.nextCycle.getTime() - new Date().getTime()) / 86400000, 10) + qsTr(" Days Left")
+						text: {
+							var daysLeft = parseInt((calendarModel.nextCycle.getTime() - new Date().getTime()) / 86400000, 10);
+							daysLeft > 0 ? daysLeft + qsTr(" Days Left") : (-1*daysLeft) + qsTr(" Days Late")
+						}
 						font.pixelSize: parent.parent.width / 10
 					}
 				}

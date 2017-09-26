@@ -91,7 +91,7 @@ QDate CalendarModel::nextCycle() {
 	// Predict future cycles based on mean length alone for now
 
 	QDate today = QDate::currentDate();
-	int cycleLeft = _meanCycleLength - cycleDay(today);
+	int cycleLeft = _meanCycleLength - cycleDay(today, false);
 	return today.addDays(cycleLeft + 1);
 }
 
@@ -336,7 +336,7 @@ void CalendarModel::populateMeanCycleTimes() {
 	_meanOvulationDaysFromEnd = ovulationCount == 0 ? _meanCycleLength - 14 : round((double)ovulationNumerator / ovulationCount);
 }
 
-int CalendarModel::cycleDay(QDate date) const {
+int CalendarModel::cycleDay(QDate date, bool rollover) const {
 	for(
 		QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
 		i != (_journalDates.begin() - 1);
@@ -344,7 +344,7 @@ int CalendarModel::cycleDay(QDate date) const {
 	) {
 		if(i == _journalDates.end() || i.key() > date) continue;
 		if(i.value()->menstruationStarted()) {
-			if(_lastRecordedMenstruation < date) {
+			if(_lastRecordedMenstruation < date && rollover) {
 				// Predict future cycles based on mean length alone for now
 				return (i.key().daysTo(date) % _meanCycleLength) + 1;
 			} else {
