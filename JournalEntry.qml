@@ -240,35 +240,48 @@ Page {
 		}
 
 		Item {
-			ComboBox {
-				id: opkSelect
+			GridLayout {
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.margins: 8
+				rowSpacing: 1
+				columns: 2
 
-				textRole: "label"
-				model: ListModel {
-					ListElement { label: qsTr("None"); value: JournalEntry.OPKNone }
-					ListElement { label: qsTr("Negative"); value: JournalEntry.OPKNegative }
-					ListElement { label: qsTr("Positive"); value: JournalEntry.OPKPositive }
-				}
+				Rectangle { Layout.columnSpan: 2; height: 8 }
 
-				Binding {
-					target: opkSelect
-					property: "currentIndex"
-					value: {
-						var idx = null;
+				Label { text: qsTr("Ovulation Prediction Kit") }
 
-						for(var i = 0; i < opkSelect.model.count; i++) {
-							if(opkSelect.model.get(i).value == calendarModel.selectedJournal.opk) {
-								idx = i;
-								break;
-							}
-						}
+				ComboBox {
+					id: opkSelect
+					Layout.alignment: Qt.AlignRight
 
-						return idx;
+					textRole: "label"
+					model: ListModel {
+						ListElement { label: qsTr("None"); value: JournalEntry.OPKNone }
+						ListElement { label: qsTr("Negative"); value: JournalEntry.OPKNegative }
+						ListElement { label: qsTr("Positive"); value: JournalEntry.OPKPositive }
 					}
-				}
 
-				onActivated: {
-					calendarModel.selectedJournal.opk = model.get(index).value
+					Binding {
+						target: opkSelect
+						property: "currentIndex"
+						value: {
+							var idx = null;
+
+							for(var i = 0; i < opkSelect.model.count; i++) {
+								if(opkSelect.model.get(i).value == calendarModel.selectedJournal.opk) {
+									idx = i;
+									break;
+								}
+							}
+
+							return idx;
+						}
+					}
+
+					onActivated: {
+						calendarModel.selectedJournal.opk = model.get(index).value
+					}
 				}
 			}
 		}
