@@ -268,6 +268,8 @@ void CalendarModel::populateMeanCycleTimes() {
 	int ovulationCount = 0;
 	const QDate *lastBegan = NULL;
 	const QDate *lastEnded = NULL;
+	const QDate *lastOPKnegative = NULL;
+	const QDate *lastOPKpositive = NULL;
 
 	for(
 		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
@@ -286,6 +288,17 @@ void CalendarModel::populateMeanCycleTimes() {
 				lastEnded = NULL;
 			}
 
+			if(lastBegan && lastOPKnegative) {
+				if(!lastOPKpositive && lastOPKnegative->daysTo(*lastBegan) < 14) {
+					// No positive OPK, but a late negative, so ovulation
+					// likely took place later than this
+					ovulationNumerator += lastOPKnegative->daysTo(*lastBegan) - 1;
+					ovulationCount++;
+				}
+				lastOPKnegative = NULL;
+			}
+
+			lastOPKpositive = NULL;
 			lastBegan = &i.key();
 		}
 
@@ -294,8 +307,13 @@ void CalendarModel::populateMeanCycleTimes() {
 		}
 
 		if(lastBegan && i.value()->property("opk") == JournalEntry::OPKPositive) {
+			lastOPKpositive = &i.key();
 			ovulationNumerator += i.key().daysTo(*lastBegan);
 			ovulationCount++;
+		}
+
+		if(lastBegan && !lastOPKnegative && i.value()->property("opk") == JournalEntry::OPKNegative) {
+			lastOPKnegative = &i.key();
 		}
 	}
 
