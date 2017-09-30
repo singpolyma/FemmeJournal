@@ -127,7 +127,10 @@ Rectangle {
 							Layout.margins: 2
 							Layout.alignment: Qt.AlignRight
 							source: "qrc:/flower.svg"
-							sourceSize: Qt.size(parent.height, parent.height)
+							Layout.preferredWidth: parent.height
+							Layout.preferredHeight: parent.height
+							sourceSize.width: parent.height
+							sourceSize.height: parent.height
 							fillMode: Image.PreserveAspectFit
 							opacity: 0.5
 							visible: model.fertility == "ovulated"
@@ -176,7 +179,10 @@ Rectangle {
 						Image {
 							Layout.alignment: Qt.AlignRight
 							source: "qrc:/heart.svg"
-							sourceSize: Qt.size(parent.height, parent.height)
+							Layout.preferredWidth: parent.height
+							Layout.preferredHeight: parent.height
+							sourceSize.width: parent.height
+							sourceSize.height: parent.height
 							fillMode: Image.PreserveAspectFit
 							opacity: (model.journalEntry && model.journalEntry.intimate) ? 0.5 : 0
 
