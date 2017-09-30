@@ -73,11 +73,38 @@ Page {
 					}
 
 					ColumnLayout {
+						id: intimateColumn
+						clip: true
 						Layout.fillWidth: true
 						Layout.columnSpan: 2
 						Layout.leftMargin: parent.parent.parent.width * 0.02
 						Layout.rightMargin: 8 + parent.parent.parent.width * 0.02
-						visible: calendarModel.selectedJournal.intimate
+						Layout.maximumHeight: 0
+
+						states: [
+							State {
+								name: "visible"
+								PropertyChanges {
+									target: intimateColumn
+									Layout.maximumHeight: intimateColumn.implicitHeight
+								}
+							}
+						]
+
+						transitions: [
+							Transition {
+								SmoothedAnimation {
+									duration: 400
+									properties: "Layout.maximumHeight"
+								}
+							}
+						]
+
+						Binding {
+							target: intimateColumn
+							property: "state"
+							value: calendarModel.selectedJournal.intimate ? "visible" : ""
+						}
 
 						Row {
 							Layout.fillWidth: true
