@@ -5,7 +5,7 @@
         <file>Calendar.qml</file>
         <file>CalendarPage.qml</file>
         <file>Segment.qml</file>
-        <file>JournalEntry.qml</file>
+        <file>EditJournalEntry.qml</file>
         <file>edit.svg</file>
         <file>calendar.svg</file>
         <file>heart.svg</file>

@@ -2,15 +2,45 @@ import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Material 2.0
+import net.singpolyma.thefertilecycle 1.0
 
 Page {
 	title: qsTr("Calendar")
 	property var journal: journal
 
+	function intimateSummary(entry) {
+		if(!entry.intimate) return null;
+		var extras = [];
+		if(entry.intimateProtection === true) extras.push(qsTr("Protected"))
+		if(entry.intimateProtection === false) extras.push(qsTr("Unprotected"))
+		if(entry.orgasm == JournalEntry.HadOrgasm) extras.push(qsTr("Orgasm"))
+		if(entry.orgasm == JournalEntry.NoOrgasm) extras.push(qsTr("No Orgasm"))
+
+		return qsTr("Intimate") + (extras.length < 1 ? "" : " (" + extras.join(", ") + ")");
+	}
+
+	function symptomsSummary(symptoms) {
+		var summary = [];
+
+		for(var i = 0; i < symptoms.rowCount(); i++) {
+			var data = symptoms.data(symptoms.index(i, 0), SymptomsModel.SeverityRole);
+			if(data !== null && data !== undefined) {
+				summary.push(symptoms.data(symptoms.index(i, 0), SymptomsModel.SymptomRole));
+			}
+		}
+
+		return summary.length > 0 ? qsTr("Symptoms: ") + summary.join(", ") : null;
+	}
+
 	function summaryText(entry) {
 		if(!entry) return "";
 		return [
-			(entry.intimate ? "Intimate" : null),
+			intimateSummary(entry),
+			entry.opk == JournalEntry.OPKPositive ? qsTr("OPK: Positive") : null,
+			entry.opk == JournalEntry.OPKNegative ? qsTr("OPK: Negative") : null,
+			entry.temperature > 0 ? qsTr("Temperature: ") + entry.temperature.toLocaleString(Qt.locale(), "f", 2).replace(/\.?0+$/, '') + qsTr("°C") : null,
+			entry.weight > 0 ? qsTr("Weight: ") + entry.weight.toLocaleString(Qt.locale(), "f", 2).replace(/\.?0+$/, '') + qsTr("kg") : null,
+			symptomsSummary(entry.symptoms),
 			"\n" + entry.note
 		].filter(function(x) { return x; }).join("\n").trim();
 	}
@@ -42,7 +72,7 @@ Page {
 			}
 		}
 
-		JournalEntry {
+		EditJournalEntry {
 			id: journal
 			title: qsTr("Journal")
 			z: -1
