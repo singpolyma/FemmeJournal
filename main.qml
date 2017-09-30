@@ -10,6 +10,13 @@ ApplicationWindow {
 	height: 596
 	title: qsTr("Hello World")
 
+	onClosing: {
+		if(Qt.platform.os == "android" && stack.depth > 1) {
+			close.accepted = false;
+			stack.pop();
+		}
+	}
+
 	header: ToolBar {
 		id: materialContext
 
