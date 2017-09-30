@@ -108,6 +108,16 @@ QStringList QCalParser::saveEntry(JournalEntry *entry) {
 		lines << "X-THEFERTILECYCLE-OPK:NEGATIVE";
 	}
 
+	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "temperature"), Q_ARG(void*, &retVal));
+	if(retVal.toDouble() != 0) {
+		lines << "X-THEFERTILECYCLE-TEMPERATURE;UNIT=C:" + QString::number(retVal.toDouble());
+	}
+
+	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "weight"), Q_ARG(void*, &retVal));
+	if(retVal.toDouble() != 0) {
+		lines << "X-THEFERTILECYCLE-WEIGHT;UNIT=KG:" + QString::number(retVal.toDouble());
+	}
+
 	{
 		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "symptoms"), Q_ARG(void*, &retVal));
 		SymptomsModel *model = retVal.value<SymptomsModel*>();
@@ -217,6 +227,58 @@ void QCalParser::parseBlock() {
 			}
 
 			symptoms->setSymptomSeverity(value.toCaseFolded(), (SymptomsModel::SymptomSeverity)severity);
+		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-TEMPERATURE")) {
+			QString unit = "c";
+			double temp = value.toDouble();
+
+			for(
+				QStringList::const_iterator i = attrs.begin();
+				i != attrs.end();
+				i++
+			) {
+				if(i->toCaseFolded().startsWith(QString("unit="))) {
+					unit = i->mid(5).toCaseFolded();
+				}
+			}
+
+			if(unit == "f") {
+				temp -= 32;
+				temp *= 5;
+				temp /= 9;
+				unit = "c";
+			}
+
+			if(unit == "c") {
+				entry->setProperty("temperature", temp);
+			} else {
+				entry->addUnknownLine(line);
+			}
+		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-WEIGHT")) {
+			QString unit = "kg";
+			double weight = value.toDouble();
+
+			for(
+				QStringList::const_iterator i = attrs.begin();
+				i != attrs.end();
+				i++
+			) {
+				if(i->toCaseFolded().startsWith(QString("unit="))) {
+					unit = i->mid(5).toCaseFolded();
+				}
+			}
+
+			if(unit == "kgs") unit = "kg";
+
+			if(unit == "lb" || unit == "lbs") {
+				weight *= 0.45359237;
+				unit = "kg";
+			}
+
+			if(unit == "kg") {
+				entry->setProperty("weight", weight);
+			} else {
+				entry->addUnknownLine(line);
+			}
 		} else {
 			entry->addUnknownLine(line);
 		}

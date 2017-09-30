@@ -302,6 +302,42 @@ Page {
 
 				Rectangle { Layout.columnSpan: 2; height: 8 }
 
+				Label { text: qsTr("Temperature") }
+
+				TextField {
+					Layout.alignment: Qt.AlignRight
+					horizontalAlignment: TextInput.AlignRight
+					selectByMouse: true
+					inputMethodHints: Qt.ImhFormattedNumbersOnly
+					validator: DoubleValidator {
+						bottom: 0
+						decimals: 5
+						notation: DoubleValidator.StandardNotation
+					}
+					text: calendarModel.selectedJournal.temperature === 0 ? "" : calendarModel.selectedJournal.temperature.toLocaleString(Qt.locale(), "f", 5).replace(/\.?0+$/, '')
+					onEditingFinished: {
+						calendarModel.selectedJournal.temperature = Number.fromLocaleString(Qt.locale(), text)
+					}
+				}
+
+				Label { text: qsTr("Weight") }
+
+				TextField {
+					Layout.alignment: Qt.AlignRight
+					horizontalAlignment: TextInput.AlignRight
+					selectByMouse: true
+					inputMethodHints: Qt.ImhFormattedNumbersOnly
+					validator: DoubleValidator {
+						bottom: 0
+						decimals: 5
+						notation: DoubleValidator.StandardNotation
+					}
+					text: calendarModel.selectedJournal.weight === 0 ? "" : calendarModel.selectedJournal.weight.toLocaleString(Qt.locale(), "f", 5).replace(/\.?0+$/, '')
+					onEditingFinished: {
+						calendarModel.selectedJournal.weight = Number.fromLocaleString(Qt.locale(), text)
+					}
+				}
+
 				Label { text: qsTr("Ovulation Prediction Kit") }
 
 				ComboBox {

@@ -20,6 +20,8 @@ class JournalEntry : public QObject
 	Q_PROPERTY(enum Orgasm orgasm MEMBER _orgasm WRITE setOrgasm NOTIFY orgasmChanged FINAL)
 	Q_PROPERTY(enum OPK opk MEMBER _opk NOTIFY opkChanged FINAL)
 	Q_PROPERTY(QString note MEMBER _note NOTIFY noteChanged FINAL)
+	Q_PROPERTY(double temperature MEMBER _temperature NOTIFY temperatureChanged FINAL)
+	Q_PROPERTY(double weight MEMBER _weight NOTIFY weightChanged FINAL)
 	Q_PROPERTY(SymptomsModel* symptoms READ symptoms NOTIFY symptomsChanged FINAL)
 	Q_PROPERTY(bool empty READ empty NOTIFY emptyChanged FINAL)
 	Q_PROPERTY(QStringList unknownLines MEMBER _unknown FINAL)
@@ -85,6 +87,8 @@ signals:
 	void noteChanged();
 	void symptomsChanged();
 	void emptyChanged();
+	void weightChanged();
+	void temperatureChanged();
 	void changed();
 
 protected:
@@ -92,6 +96,8 @@ protected:
 	enum Intimate _intimate;
 	enum Orgasm _orgasm;
 	enum OPK _opk;
+	double _temperature;
+	double _weight;
 	QString _note;
 	QStringList _unknown;
 	SymptomsModel _symptoms;
