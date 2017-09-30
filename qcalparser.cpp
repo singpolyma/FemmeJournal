@@ -185,7 +185,19 @@ void QCalParser::parseBlock() {
 			}
 		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-SYMPTOM")) {
 			SymptomsModel *symptoms = entry->property("symptoms").value<SymptomsModel*>();
-			symptoms->setSymptomSeverity(value.toCaseFolded(), SymptomsModel::Unknown);
+			int severity = SymptomsModel::Unknown;
+
+			for(
+				QStringList::const_iterator i = attrs.begin();
+				i != attrs.end();
+				i++
+			) {
+				if(i->toCaseFolded().startsWith(QString("severity="))) {
+					severity = i->midRef(9).toInt();
+				}
+			}
+
+			symptoms->setSymptomSeverity(value.toCaseFolded(), (SymptomsModel::SymptomSeverity)severity);
 		} else {
 			entry->addUnknownLine(line);
 		}
