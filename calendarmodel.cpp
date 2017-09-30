@@ -37,13 +37,18 @@ bool CalendarModel::populate(int m, int y, const QLocale &l, bool force) {
 	return true;
 }
 
-CalendarModel::CalendarModel(QObject *parent) : QAbstractListModel(parent), _dates(daysOnACalendarMonth), _journalDates() {
+CalendarModel::CalendarModel(QObject *parent) : QAbstractListModel(parent), _dates(daysOnACalendarMonth), _journalDates(), _ready(false) {
 	QDate _today = QDate::currentDate();
 	_selectedDate = _today;
 	_month = _today.month();
 	_year = _today.year();
 	populate(_month, _year, _locale, true);
 	populateMeanCycleTimes();
+}
+
+void CalendarModel::ready() {
+	_ready = true;
+	refreshMenstrualData();
 }
 
 void CalendarModel::setSelectedDate(QDate date) {
@@ -96,6 +101,8 @@ QDate CalendarModel::nextCycle() {
 }
 
 void CalendarModel::refreshMenstrualData() {
+	if(!_ready) return;
+
 	for(
 		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
 		i != (_journalDates.begin() - 1);

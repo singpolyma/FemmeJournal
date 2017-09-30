@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
 	CalendarModel calendarModel;
 	QObject::connect(&calendarModel, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &journalParser, SLOT(addJournalEntry(QDate,JournalEntry*)));
 	QObject::connect(&journalParser, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &calendarModel, SLOT(addJournalEntry(QDate,JournalEntry*)));
+	QObject::connect(&journalParser, SIGNAL(doneParse()), &calendarModel, SLOT(ready()));
 	QObject::connect(&calendarModel, SIGNAL(journalChanged()), &journalParser, SLOT(delaySave()));
 	QObject::connect(&parserThread, SIGNAL(started()), &journalParser, SLOT(parse()));
 	QObject::connect(QApplication::instance(), SIGNAL(aboutToQuit()), &parserThread, SLOT(quit()));

@@ -79,6 +79,7 @@ public slots:
 	void refreshMenstrualData();
 	void refreshJournalData();
 	void addJournalEntry(QDate date, JournalEntry *entry);
+	void ready();
 
 protected:
 	bool populate(int month, int year, const QLocale &locale, bool force = false);
@@ -96,6 +97,7 @@ protected:
 	int _meanCycleLength;
 	int _meanMenstruationLength;
 	int _meanOvulationDaysFromEnd;
+	bool _ready;
 
 	Q_DISABLE_COPY(CalendarModel)
 };

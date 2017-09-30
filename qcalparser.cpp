@@ -150,6 +150,8 @@ void QCalParser::parse() {
 
 		line = m_dataStream.readLine();
 	}
+
+	emit doneParse();
 }
 
 void QCalParser::parseBlock() {

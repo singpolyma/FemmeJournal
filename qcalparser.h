@@ -27,6 +27,7 @@ public slots:
 	void save();
 
 signals:
+	void doneParse();
 	void newJournalEntry(QDate date, JournalEntry *entry);
 
 protected:
