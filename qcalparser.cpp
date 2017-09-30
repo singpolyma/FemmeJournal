@@ -108,6 +108,23 @@ QStringList QCalParser::saveEntry(JournalEntry *entry) {
 		lines << "X-THEFERTILECYCLE-OPK:NEGATIVE";
 	}
 
+	{
+		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "symptoms"), Q_ARG(void*, &retVal));
+		SymptomsModel *model = retVal.value<SymptomsModel*>();
+		QMetaObject::invokeMethod(model, "readSymptoms", Qt::BlockingQueuedConnection, Q_ARG(void*, &retVal));
+		QMap<QString, enum SymptomsModel::SymptomSeverity> symptoms = retVal.value<QMap<QString, enum SymptomsModel::SymptomSeverity>>();
+		for(
+			QMap<QString, enum SymptomsModel::SymptomSeverity>::const_iterator i = symptoms.cbegin();
+			i != symptoms.cend();
+			i++
+		) {
+			QString line = "X-THEFERTILECYCLE-SYMPTOM";
+			if(*i != SymptomsModel::Unknown) line += ";SEVERITY=" + QString::number(*i);
+			line += ":" + i.key().toUpper();
+			lines << line;
+		}
+	}
+
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "note"), Q_ARG(void*, &retVal));
 	QString note = retVal.toString();
 	if(!note.isEmpty()) {

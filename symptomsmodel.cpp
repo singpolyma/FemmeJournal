@@ -11,6 +11,10 @@ QT_BEGIN_NAMESPACE
 SymptomsModel::SymptomsModel(QObject *parent) : QAbstractListModel(parent) {
 }
 
+void SymptomsModel::readSymptoms(void *ret) {
+	*((QVariant*)ret) = QVariant::fromValue(_symptoms);
+}
+
 void SymptomsModel::setSymptomSeverity(QString symptom, enum SymptomSeverity severity) {
 	_symptoms.insert(symptom, severity);
 
@@ -34,7 +38,7 @@ bool SymptomsModel::setData(const QModelIndex &index, const QVariant &value, int
 		switch (role) {
 		case SeverityRole:
 			if(value.isValid() && !value.isNull()) {
-				if(_symptoms.value(symptom) == value.toInt()) return false;
+				if(_symptoms.contains(symptom) && _symptoms.value(symptom) == value.toInt()) return false;
 				_symptoms.insert(symptom, (SymptomSeverity)value.toInt());
 			} else {
 				if(!_symptoms.contains(symptom)) return false;

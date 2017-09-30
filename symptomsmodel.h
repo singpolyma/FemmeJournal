@@ -35,6 +35,7 @@ public:
 	QVariant data(const QModelIndex &index, int role) const override;
 	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
+	Q_INVOKABLE void readSymptoms(void *ret);
 	void setSymptomSeverity(QString symptom, enum SymptomSeverity severity);
 
 protected:

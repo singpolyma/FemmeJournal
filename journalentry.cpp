@@ -8,7 +8,8 @@ JournalEntry::JournalEntry(QObject *parent) :
 	_intimate(NotIntimate),
 	_orgasm(OrgasmUnknown),
 	_opk(OPKNone),
-	_note("") {
+	_note(""),
+	_symptoms(this) {
 	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(emptyChanged()));
 	connect(this, SIGNAL(noteChanged()), this, SIGNAL(emptyChanged()));
 
@@ -16,6 +17,7 @@ JournalEntry::JournalEntry(QObject *parent) :
 	connect(this, SIGNAL(orgasmChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(opkChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(noteChanged()), this, SIGNAL(changed()));
+	connect(&_symptoms, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SIGNAL(changed()));
 }
 
 bool JournalEntry::menstruationStarted() {
