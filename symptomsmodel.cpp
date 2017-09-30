@@ -3,7 +3,7 @@
 #include "symptomsmodel.h"
 
 namespace {
-	static QStringList allSymptoms = QStringList({"Acne"});
+	static QStringList allSymptoms = QStringList({"acne"});
 }
 
 QT_BEGIN_NAMESPACE
@@ -17,10 +17,11 @@ void SymptomsModel::setSymptomSeverity(QString symptom, enum SymptomSeverity sev
 	int idx = allSymptoms.indexOf(symptom);
 	if(idx == -1) {
 		allSymptoms.append(symptom);
-		idx = allSymptoms.count() - 1;
+		allSymptoms.sort();
+		emit dataChanged(index(0, 0), index(rowCount(), 0));
+	} else {
+		emit dataChanged(index(idx, 0), index(idx, 0));
 	}
-
-	emit dataChanged(index(idx, 0), index(idx, 0));
 }
 
 bool SymptomsModel::setData(const int idx, const QVariant &value, int role) {
@@ -57,6 +58,7 @@ QVariant SymptomsModel::data(const QModelIndex &index, int role) const {
 		case SymptomRole:
 			return symptom;
 		case SeverityRole:
+			if(!_symptoms.contains(symptom)) break;
 			return _symptoms.value(symptom);
 		default:
 			break;

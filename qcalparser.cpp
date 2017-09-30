@@ -183,6 +183,9 @@ void QCalParser::parseBlock() {
 			} else if(value.toCaseFolded() == QString("negative")) {
 				entry->setProperty("opk", JournalEntry::OPKNegative);
 			}
+		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-SYMPTOM")) {
+			SymptomsModel *symptoms = entry->property("symptoms").value<SymptomsModel*>();
+			symptoms->setSymptomSeverity(value.toCaseFolded(), SymptomsModel::Unknown);
 		} else {
 			entry->addUnknownLine(line);
 		}

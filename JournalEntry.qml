@@ -200,13 +200,13 @@ Page {
 
 				Text {
 					Layout.fillWidth: true
-					Layout.preferredWidth: parent.width / 8
 					text: model.symptom
 					elide: Text.ElideRight
+					font.capitalization: Font.Capitalize
 				}
 
 				CheckBox {
-					checked: model.severity
+					checked: model.severity !== null && model.severity !== undefined
 					onCheckedChanged: {
 						var severity = model.severity ? model.severity : SymptomsModel.Unknown;
 						calendarModel.selectedJournal.symptoms.setData(model.index, checked ? severity : undefined, SymptomsModel.SeverityRole)
@@ -214,8 +214,7 @@ Page {
 				}
 
 				RadioButton {
-					Layout.fillWidth: true
-					text: qsTr("Light")
+					text: qsTr("L")
 					checked: model.severity == SymptomsModel.Light
 					onCheckedChanged: {
 						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Light, SymptomsModel.SeverityRole)
@@ -223,8 +222,7 @@ Page {
 				}
 
 				RadioButton {
-					Layout.fillWidth: true
-					text: qsTr("Medium")
+					text: qsTr("M")
 					checked: model.severity == SymptomsModel.Medium
 					onCheckedChanged: {
 						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Medium, SymptomsModel.SeverityRole)
@@ -232,8 +230,7 @@ Page {
 				}
 
 				RadioButton {
-					Layout.fillWidth: true
-					text: qsTr("Heavy")
+					text: qsTr("H")
 					checked: model.severity == SymptomsModel.Heavy
 					onCheckedChanged: {
 						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Heavy, SymptomsModel.SeverityRole)
