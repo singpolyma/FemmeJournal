@@ -27,6 +27,7 @@ Page {
 				// TODO: Not currently scrollable
 				Layout.fillHeight: true
 				Layout.fillWidth: true
+				Layout.minimumHeight: font.pixelSize * 3
 				Layout.bottomMargin: parent.parent.height * 0.1
 				leftPadding: 8
 				wrapMode: TextEdit.Wrap
