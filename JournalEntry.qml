@@ -191,48 +191,58 @@ Page {
 		}
 
 		ListView {
-			model: ListModel {
-				ListElement { name: "Acne" }
-			}
+			model: calendarModel.selectedJournal.symptoms
 
 			delegate: GridLayout {
 				anchors.left: parent.left
 				anchors.right: parent.right
-				columns: 2
+				columns: 5
 
 				Text {
 					Layout.fillWidth: true
-					text: model.name
+					Layout.preferredWidth: parent.width / 8
+					text: model.symptom
+					elide: Text.ElideRight
 				}
 
-				RowLayout {
-					Layout.fillWidth: true
-					spacing: 0
+				CheckBox {
+					checked: model.severity
+					onCheckedChanged: {
+						var severity = model.severity ? model.severity : SymptomsModel.Unknown;
+						calendarModel.selectedJournal.symptoms.setData(model.index, checked ? severity : undefined, SymptomsModel.SeverityRole)
+					}
+				}
 
-					TabButton {
-						Layout.fillWidth: true
-						text: "1"
-						background: Segment {
-							radiusOn: "left"
-						}
+				RadioButton {
+					Layout.fillWidth: true
+					text: qsTr("Light")
+					checked: model.severity == SymptomsModel.Light
+					onCheckedChanged: {
+						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Light, SymptomsModel.SeverityRole)
 					}
-					TabButton {
-						Layout.fillWidth: true
-						text: "2"
-						background: Segment {}
+				}
+
+				RadioButton {
+					Layout.fillWidth: true
+					text: qsTr("Medium")
+					checked: model.severity == SymptomsModel.Medium
+					onCheckedChanged: {
+						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Medium, SymptomsModel.SeverityRole)
 					}
-					TabButton {
-						Layout.fillWidth: true
-						text: "3"
-						background: Segment {
-							radiusOn: "right"
-						}
+				}
+
+				RadioButton {
+					Layout.fillWidth: true
+					text: qsTr("Heavy")
+					checked: model.severity == SymptomsModel.Heavy
+					onCheckedChanged: {
+						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Heavy, SymptomsModel.SeverityRole)
 					}
 				}
 
 				Rectangle {
 					Layout.fillWidth: true
-					Layout.columnSpan: 2
+					Layout.columnSpan: 5
 					height: 1
 					color: "#000000"
 				}

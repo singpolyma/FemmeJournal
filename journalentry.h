@@ -5,6 +5,8 @@
 #include <QtCore/qabstractitemmodel.h>
 #include <QtQml/qqml.h>
 
+#include "symptomsmodel.h"
+
 QT_BEGIN_NAMESPACE
 
 class JournalEntry : public QObject
@@ -18,6 +20,7 @@ class JournalEntry : public QObject
 	Q_PROPERTY(enum Orgasm orgasm MEMBER _orgasm WRITE setOrgasm NOTIFY orgasmChanged FINAL)
 	Q_PROPERTY(enum OPK opk MEMBER _opk NOTIFY opkChanged FINAL)
 	Q_PROPERTY(QString note MEMBER _note NOTIFY noteChanged FINAL)
+	Q_PROPERTY(SymptomsModel* symptoms READ symptoms NOTIFY symptomsChanged FINAL)
 	Q_PROPERTY(bool empty READ empty NOTIFY emptyChanged FINAL)
 	Q_PROPERTY(QStringList unknownLines MEMBER _unknown FINAL)
 
@@ -66,6 +69,8 @@ public:
 
 	void setOrgasm(enum Orgasm orgasm);
 
+	SymptomsModel *symptoms();
+
 	bool empty();
 	void addUnknownLine(QString line);
 
@@ -78,6 +83,7 @@ signals:
 	void orgasmChanged();
 	void opkChanged();
 	void noteChanged();
+	void symptomsChanged();
 	void emptyChanged();
 	void changed();
 
@@ -88,6 +94,7 @@ protected:
 	enum OPK _opk;
 	QString _note;
 	QStringList _unknown;
+	SymptomsModel _symptoms;
 
 	Q_DISABLE_COPY(JournalEntry)
 };

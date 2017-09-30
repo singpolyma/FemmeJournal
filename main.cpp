@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 	parserThread.start();
 
 	qmlRegisterType<JournalEntry>("net.singpolyma.thefertilecycle", 1, 0, "JournalEntry");
+	qmlRegisterType<SymptomsModel>("net.singpolyma.thefertilecycle", 1, 0, "SymptomsModel");
 
 	QQmlApplicationEngine engine;
 	engine.rootContext()->setContextProperty("calendarModel", &calendarModel);

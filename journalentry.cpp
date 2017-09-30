@@ -84,6 +84,10 @@ void JournalEntry::setOrgasm(enum Orgasm orgasm) {
 	emit orgasmChanged();
 }
 
+SymptomsModel *JournalEntry::symptoms() {
+	return &_symptoms;
+}
+
 void JournalEntry::addUnknownLine(QString line) {
 	_unknown.append(line);
 	emit changed();

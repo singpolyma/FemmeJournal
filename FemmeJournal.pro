@@ -5,7 +5,8 @@ CONFIG += c++11
 SOURCES += main.cpp \
     calendarmodel.cpp \
     qcalparser.cpp \
-    journalentry.cpp
+    journalentry.cpp \
+    symptomsmodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -34,4 +35,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     calendarmodel.h \
     qcalparser.h \
-    journalentry.h
+    journalentry.h \
+    symptomsmodel.h
