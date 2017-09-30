@@ -7,6 +7,14 @@ Page {
 	title: qsTr("Calendar")
 	property var journal: journal
 
+	function summaryText(entry) {
+		if(!entry) return "";
+		return [
+			(entry.intimate ? "Intimate" : null),
+			"\n" + entry.note
+		].filter(function(x) { return x; }).join("\n").trim();
+	}
+
 	GridLayout {
 		columnSpacing: 0
 		anchors.fill: parent
@@ -30,10 +38,7 @@ Page {
 				anchors.fill: parent
 				elide: Text.ElideRight
 				wrapMode: Text.Wrap
-				text: [
-					(calendarModel.selectedJournal.intimate ? "Intimate" : null),
-					"\n" + calendarModel.selectedJournal.note
-				].filter(function(x) { return x; }).join("\n")
+				text: summaryText(calendarModel.selectedJournal)
 			}
 		}
 

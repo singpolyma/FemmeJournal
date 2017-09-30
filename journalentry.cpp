@@ -12,9 +12,6 @@ JournalEntry::JournalEntry(QObject *parent) :
 	_weight(0),
 	_note(""),
 	_symptoms(this) {
-	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(emptyChanged()));
-	connect(this, SIGNAL(noteChanged()), this, SIGNAL(emptyChanged()));
-
 	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(orgasmChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(opkChanged()), this, SIGNAL(changed()));
@@ -97,10 +94,6 @@ SymptomsModel *JournalEntry::symptoms() {
 void JournalEntry::addUnknownLine(QString line) {
 	_unknown.append(line);
 	emit changed();
-}
-
-bool JournalEntry::empty() {
-	return !intimate() && _note == "";
 }
 
 void JournalEntry::readProperty(QByteArray name, void *ret) {

@@ -163,7 +163,7 @@ Rectangle {
 							implicitWidth: height
 							radius: width*0.5
 							color: "black"
-							opacity: (model.journalEntry && !model.journalEntry.empty) ? 0.5 : 0
+							opacity: summaryText(model.journalEntry) == "" ? 0 : 0.5
 
 							ColorOverlay {
 								anchors.fill: parent

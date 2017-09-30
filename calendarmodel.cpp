@@ -85,7 +85,6 @@ void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry) {
 	connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(opkChanged()), this, SLOT(refreshMenstrualData()));
-	connect(entry, SIGNAL(emptyChanged()), this, SLOT(refreshJournalData()));
 	connect(entry, SIGNAL(changed()), this, SIGNAL(journalChanged()));
 
 	refreshMenstrualData();

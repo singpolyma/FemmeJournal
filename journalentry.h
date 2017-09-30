@@ -23,7 +23,6 @@ class JournalEntry : public QObject
 	Q_PROPERTY(double temperature MEMBER _temperature NOTIFY temperatureChanged FINAL)
 	Q_PROPERTY(double weight MEMBER _weight NOTIFY weightChanged FINAL)
 	Q_PROPERTY(SymptomsModel* symptoms READ symptoms NOTIFY symptomsChanged FINAL)
-	Q_PROPERTY(bool empty READ empty NOTIFY emptyChanged FINAL)
 	Q_PROPERTY(QStringList unknownLines MEMBER _unknown FINAL)
 
 public:
@@ -73,7 +72,6 @@ public:
 
 	SymptomsModel *symptoms();
 
-	bool empty();
 	void addUnknownLine(QString line);
 
 	Q_INVOKABLE void readProperty(QByteArray name, void *ret);
@@ -86,7 +84,6 @@ signals:
 	void opkChanged();
 	void noteChanged();
 	void symptomsChanged();
-	void emptyChanged();
 	void weightChanged();
 	void temperatureChanged();
 	void changed();
