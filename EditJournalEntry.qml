@@ -45,147 +45,157 @@ Page {
 				color: "#000000"
 			}
 
-			GridLayout {
+			Flickable {
+				clip: true
 				Layout.fillWidth: true
+				Layout.fillHeight: true
 				Layout.leftMargin: 8
-				rowSpacing: 1
-				columns: 2
+				Layout.maximumHeight: contentHeight
+				Layout.preferredHeight: contentHeight
+				contentHeight: contentItem.childrenRect.height
 
-				Label {
-					Layout.fillWidth: true
-					elide: Text.ElideRight
-					text: qsTr("Intimate Today")
-				}
-				CheckBox {
-					checked: calendarModel.selectedJournal.intimate
-					onCheckedChanged: {
-						calendarModel.selectedJournal.intimate = checked
-					}
-				}
+				GridLayout {
+					anchors.left: parent.left
+					anchors.right: parent.right
+					rowSpacing: 1
+					columns: 2
 
-				ColumnLayout {
-					Layout.fillWidth: true
-					Layout.columnSpan: 2
-					Layout.leftMargin: parent.parent.parent.width * 0.02
-					Layout.rightMargin: 8 + parent.parent.parent.width * 0.02
-					visible: calendarModel.selectedJournal.intimate
-
-					Row {
+					Label {
 						Layout.fillWidth: true
-
-						Button {
-							checkable: true
-							implicitHeight: font.pixelSize * 2
-							implicitWidth: parent.width / 2
-							text: "Protected"
-							font.capitalization: Font.MixedCase
-							background: Segment {
-								radiusOn: "left"
-							}
-
-							checked: calendarModel.selectedJournal.intimateProtection === true
-							onClicked: {
-								calendarModel.selectedJournal.intimateProtection =
-									calendarModel.selectedJournal.intimateProtection === true ? undefined : true;
-								checked = Qt.binding(function () { return calendarModel.selectedJournal.intimateProtection === true; });
-							}
-						}
-						Button {
-							checkable: true
-							implicitHeight: font.pixelSize * 2
-							implicitWidth: parent.width / 2
-							text: "Unprotected"
-							font.capitalization: Font.MixedCase
-							background: Segment {
-								radiusOn: "right"
-							}
-
-							checked: calendarModel.selectedJournal.intimateProtection === false
-							onClicked: {
-								calendarModel.selectedJournal.intimateProtection =
-									calendarModel.selectedJournal.intimateProtection === false ? undefined : false;
-								checked = Qt.binding(function () { return calendarModel.selectedJournal.intimateProtection === false; });
-							}
+						elide: Text.ElideRight
+						text: qsTr("Intimate Today")
+					}
+					CheckBox {
+						checked: calendarModel.selectedJournal.intimate
+						onCheckedChanged: {
+							calendarModel.selectedJournal.intimate = checked
 						}
 					}
 
-					Row {
+					ColumnLayout {
 						Layout.fillWidth: true
+						Layout.columnSpan: 2
+						Layout.leftMargin: parent.parent.parent.width * 0.02
+						Layout.rightMargin: 8 + parent.parent.parent.width * 0.02
+						visible: calendarModel.selectedJournal.intimate
 
-						Button {
-							checkable: true
-							implicitHeight: font.pixelSize * 2
-							implicitWidth: parent.width / 2
-							text: "Orgasm"
-							font.capitalization: Font.MixedCase
-							background: Segment {
-								radiusOn: "left"
+						Row {
+							Layout.fillWidth: true
+
+							Button {
+								checkable: true
+								implicitHeight: font.pixelSize * 2
+								implicitWidth: parent.width / 2
+								text: "Protected"
+								font.capitalization: Font.MixedCase
+								background: Segment {
+									radiusOn: "left"
+								}
+
+								checked: calendarModel.selectedJournal.intimateProtection === true
+								onClicked: {
+									calendarModel.selectedJournal.intimateProtection =
+										calendarModel.selectedJournal.intimateProtection === true ? undefined : true;
+									checked = Qt.binding(function () { return calendarModel.selectedJournal.intimateProtection === true; });
+								}
 							}
+							Button {
+								checkable: true
+								implicitHeight: font.pixelSize * 2
+								implicitWidth: parent.width / 2
+								text: "Unprotected"
+								font.capitalization: Font.MixedCase
+								background: Segment {
+									radiusOn: "right"
+								}
 
-							checked: calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm
-							onClicked: {
-								calendarModel.selectedJournal.orgasm =
-									calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm ? JournalEntry.OrgasmUnknown : JournalEntry.HadOrgasm;
-								checked = Qt.binding(function () { return calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm; });
+								checked: calendarModel.selectedJournal.intimateProtection === false
+								onClicked: {
+									calendarModel.selectedJournal.intimateProtection =
+										calendarModel.selectedJournal.intimateProtection === false ? undefined : false;
+									checked = Qt.binding(function () { return calendarModel.selectedJournal.intimateProtection === false; });
+								}
 							}
 						}
-						Button {
-							checkable: true
-							implicitHeight: font.pixelSize * 2
-							implicitWidth: parent.width / 2
-							text: "No Orgasm"
-							font.capitalization: Font.MixedCase
-							background: Segment {
-								radiusOn: "right"
-							}
 
-							checked: calendarModel.selectedJournal.orgasm == JournalEntry.NoOrgasm
-							onClicked: {
-								calendarModel.selectedJournal.orgasm =
-									calendarModel.selectedJournal.orgasm === JournalEntry.NoOrgasm ? JournalEntry.OrgasmUnknown : JournalEntry.NoOrgasm;
-								checked = Qt.binding(function () { return calendarModel.selectedJournal.orgasm === JournalEntry.NoOrgasm; });
+						Row {
+							Layout.fillWidth: true
+
+							Button {
+								checkable: true
+								implicitHeight: font.pixelSize * 2
+								implicitWidth: parent.width / 2
+								text: "Orgasm"
+								font.capitalization: Font.MixedCase
+								background: Segment {
+									radiusOn: "left"
+								}
+
+								checked: calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm
+								onClicked: {
+									calendarModel.selectedJournal.orgasm =
+										calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm ? JournalEntry.OrgasmUnknown : JournalEntry.HadOrgasm;
+									checked = Qt.binding(function () { return calendarModel.selectedJournal.orgasm === JournalEntry.HadOrgasm; });
+								}
 							}
+							Button {
+								checkable: true
+								implicitHeight: font.pixelSize * 2
+								implicitWidth: parent.width / 2
+								text: "No Orgasm"
+								font.capitalization: Font.MixedCase
+								background: Segment {
+									radiusOn: "right"
+								}
+
+								checked: calendarModel.selectedJournal.orgasm == JournalEntry.NoOrgasm
+								onClicked: {
+									calendarModel.selectedJournal.orgasm =
+										calendarModel.selectedJournal.orgasm === JournalEntry.NoOrgasm ? JournalEntry.OrgasmUnknown : JournalEntry.NoOrgasm;
+									checked = Qt.binding(function () { return calendarModel.selectedJournal.orgasm === JournalEntry.NoOrgasm; });
+								}
+							}
+						}
+
+						Rectangle { height: 5 }
+					}
+
+					Rectangle {
+						Layout.fillWidth: true
+						Layout.columnSpan: 2
+						height: 1
+						color: "#000000"
+					}
+
+					Label {
+						Layout.fillWidth: true
+						elide: Text.ElideRight
+						text: qsTr("Period Started Today")
+					}
+					CheckBox {
+						checked: calendarModel.selectedJournal.menstruationStarted
+						onCheckedChanged: {
+							calendarModel.selectedJournal.menstruationStarted = checked
 						}
 					}
 
-					Rectangle { height: 5 }
-				}
-
-				Rectangle {
-					Layout.fillWidth: true
-					Layout.columnSpan: 2
-					height: 1
-					color: "#000000"
-				}
-
-				Label {
-					Layout.fillWidth: true
-					elide: Text.ElideRight
-					text: qsTr("Period Started Today")
-				}
-				CheckBox {
-					checked: calendarModel.selectedJournal.menstruationStarted
-					onCheckedChanged: {
-						calendarModel.selectedJournal.menstruationStarted = checked
+					Rectangle {
+						Layout.fillWidth: true
+						Layout.columnSpan: 2
+						height: 1
+						color: "#000000"
 					}
-				}
 
-				Rectangle {
-					Layout.fillWidth: true
-					Layout.columnSpan: 2
-					height: 1
-					color: "#000000"
-				}
-
-				Label {
-					Layout.fillWidth: true
-					elide: Text.ElideRight
-					text: qsTr("Period Ended Today")
-				}
-				CheckBox {
-					checked: calendarModel.selectedJournal.menstruationStopped
-					onCheckedChanged: {
-						calendarModel.selectedJournal.menstruationStopped = checked
+					Label {
+						Layout.fillWidth: true
+						elide: Text.ElideRight
+						text: qsTr("Period Ended Today")
+					}
+					CheckBox {
+						checked: calendarModel.selectedJournal.menstruationStopped
+						onCheckedChanged: {
+							calendarModel.selectedJournal.menstruationStopped = checked
+						}
 					}
 				}
 			}
@@ -293,7 +303,9 @@ Page {
 			}
 		}
 
-		Item {
+		Flickable {
+			contentHeight: contentItem.childrenRect.height
+
 			GridLayout {
 				anchors.left: parent.left
 				anchors.right: parent.right
