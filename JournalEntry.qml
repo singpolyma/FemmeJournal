@@ -193,10 +193,55 @@ Page {
 		ListView {
 			model: calendarModel.selectedJournal.symptoms
 
-			delegate: GridLayout {
+			header: Rectangle {
+				property var label: mediumLabel
 				anchors.left: parent.left
 				anchors.right: parent.right
+				height: mediumLabel.font.pixelSize * 3
+				z: 5
+				color: materialContext.Material.background
+
+				RowLayout {
+					anchors.fill: parent
+					anchors.rightMargin: 5
+					anchors.leftMargin: 5
+
+					Rectangle {
+						Layout.fillWidth: true
+					}
+
+					Rectangle {
+						Layout.preferredWidth: label.implicitWidth
+					}
+
+					Label {
+						Layout.preferredWidth: label.implicitWidth
+						horizontalAlignment: Text.AlignHCenter
+						text: qsTr("Light")
+					}
+					Label {
+						horizontalAlignment: Text.AlignHCenter
+						id: mediumLabel
+						text: qsTr("Medium")
+					}
+					Label {
+						Layout.preferredWidth: label.implicitWidth
+						horizontalAlignment: Text.AlignHCenter
+						text: qsTr("Heavy")
+					}
+				}
+			}
+
+			headerPositioning: ListView.OverlayHeader
+
+			delegate: GridLayout {
+				id: delegate
+				anchors.left: parent.left
+				anchors.right: parent.right
+				anchors.rightMargin: 5
+				anchors.leftMargin: 5
 				columns: 5
+				rowSpacing: 0
 
 				Text {
 					Layout.fillWidth: true
@@ -206,6 +251,7 @@ Page {
 				}
 
 				CheckBox {
+					implicitWidth: delegate.ListView.view.headerItem.label.width
 					checked: model.severity !== null && model.severity !== undefined
 					onCheckedChanged: {
 						var severity = model.severity ? model.severity : SymptomsModel.Unknown;
@@ -214,7 +260,7 @@ Page {
 				}
 
 				RadioButton {
-					text: qsTr("L")
+					implicitWidth: delegate.ListView.view.headerItem.label.width
 					checked: model.severity == SymptomsModel.Light
 					onCheckedChanged: {
 						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Light, SymptomsModel.SeverityRole)
@@ -222,7 +268,7 @@ Page {
 				}
 
 				RadioButton {
-					text: qsTr("M")
+					implicitWidth: delegate.ListView.view.headerItem.label.width
 					checked: model.severity == SymptomsModel.Medium
 					onCheckedChanged: {
 						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Medium, SymptomsModel.SeverityRole)
@@ -230,7 +276,7 @@ Page {
 				}
 
 				RadioButton {
-					text: qsTr("H")
+					implicitWidth: delegate.ListView.view.headerItem.label.width
 					checked: model.severity == SymptomsModel.Heavy
 					onCheckedChanged: {
 						if (checked) calendarModel.selectedJournal.symptoms.setData(model.index, SymptomsModel.Heavy, SymptomsModel.SeverityRole)
