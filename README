@@ -1,0 +1,6 @@
+== Android Build ==
+
+* Run the Android-flavoured qmake for the architecture you're targetting.
+* make
+* make install INSTALL_ROOT=$(pwd)/apk
+* androiddeployqt --gradle --output apk
