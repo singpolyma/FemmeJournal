@@ -11,7 +11,8 @@
 
 #include <QDebug>
 
-QCalParser::QCalParser(QFile *file, QObject *parent) : QObject(parent), m_dataStream(), _timer(this) {
+QCalParser::QCalParser(QFile *file, ConfigModel *config, QObject *parent) : QObject(parent), m_dataStream(), _timer(this), _config(config) {
+	Q_ASSERT(config);
 	_file = file;
 	_timer.setSingleShot(true);
 	connect(&_timer, SIGNAL(timeout()), this, SLOT(save()));
@@ -166,7 +167,7 @@ void QCalParser::parse() {
 
 void QCalParser::parseBlock() {
 	QDate date;
-	JournalEntry *entry = new JournalEntry();
+	JournalEntry *entry = new JournalEntry(_config);
 	QString line;
 	while(!(line = m_dataStream.readLine()).contains(QByteArray("END:VJOURNAL"))) {
 		const int deliminatorPosition = line.indexOf(QChar(':'));

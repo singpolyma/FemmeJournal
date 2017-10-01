@@ -55,7 +55,7 @@ public:
 		MenstruationStopped
 	};
 
-	explicit JournalEntry(QObject *parent = nullptr);
+	explicit JournalEntry(ConfigModel *config = nullptr, QObject *parent = nullptr);
 
 	bool menstruationStarted();
 	void setMenstruationStarted(bool started);
@@ -98,6 +98,7 @@ protected:
 	QString _note;
 	QStringList _unknown;
 	SymptomsModel _symptoms;
+	ConfigModel *_config;
 
 	Q_DISABLE_COPY(JournalEntry)
 };

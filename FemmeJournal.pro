@@ -6,7 +6,8 @@ SOURCES += main.cpp \
     calendarmodel.cpp \
     qcalparser.cpp \
     journalentry.cpp \
-    symptomsmodel.cpp
+    symptomsmodel.cpp \
+    configmodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -41,4 +42,5 @@ HEADERS += \
     calendarmodel.h \
     qcalparser.h \
     journalentry.h \
-    symptomsmodel.h
+    symptomsmodel.h \
+    configmodel.h

@@ -12,12 +12,13 @@
 #include <QTimer>
 #include <QDate>
 
+#include "configmodel.h"
 #include "journalentry.h"
 
 class QCalParser : public QObject {
 	Q_OBJECT
 public:
-	QCalParser(QFile *file, QObject *parent = 0);
+	QCalParser(QFile *file, ConfigModel *config, QObject *parent = 0);
 	~QCalParser();
 
 public slots:
@@ -38,6 +39,7 @@ protected:
 	QTextStream m_dataStream;
 	QFile *_file;
 	QTimer _timer;
+	ConfigModel *_config;
 };
 
 #endif // QCALPARSER_H

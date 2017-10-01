@@ -10,6 +10,7 @@
 #include <QtCore/qlocale.h>
 #include <QtQml/qqml.h>
 
+#include "configmodel.h"
 #include "journalentry.h"
 
 QT_BEGIN_NAMESPACE
@@ -28,7 +29,7 @@ class CalendarModel : public QAbstractListModel
 	Q_PROPERTY(int count READ rowCount CONSTANT FINAL)
 
 public:
-	explicit CalendarModel(QObject *parent = nullptr);
+	explicit CalendarModel(ConfigModel *config = nullptr, QObject *parent = nullptr);
 
 	void setSelectedDate(QDate date);
 	JournalEntry *selectedJournal();
@@ -98,6 +99,7 @@ protected:
 	int _meanMenstruationLength;
 	int _meanOvulationDaysFromEnd;
 	bool _ready;
+	ConfigModel *_config;
 
 	Q_DISABLE_COPY(CalendarModel)
 };

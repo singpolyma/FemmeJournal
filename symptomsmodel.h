@@ -4,6 +4,8 @@
 #include <QtCore/qabstractitemmodel.h>
 #include <QtQml/qqml.h>
 
+#include "configmodel.h"
+
 QT_BEGIN_NAMESPACE
 
 class SymptomsModel : public QAbstractListModel
@@ -11,7 +13,7 @@ class SymptomsModel : public QAbstractListModel
 	Q_OBJECT
 
 public:
-	explicit SymptomsModel(QObject *parent = nullptr);
+	explicit SymptomsModel(ConfigModel *config = nullptr, QObject *parent = nullptr);
 
 	enum SymptomSeverity {
 		Unknown,
@@ -40,6 +42,7 @@ public:
 
 protected:
 	QMap<QString, enum SymptomSeverity> _symptoms;
+	ConfigModel *_config;
 
 	Q_DISABLE_COPY(SymptomsModel)
 };

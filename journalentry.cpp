@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-JournalEntry::JournalEntry(QObject *parent) :
+JournalEntry::JournalEntry(ConfigModel *config, QObject *parent) :
 	QObject(parent),
 	_menstrualChange(MenstruationUnchanged),
 	_intimate(NotIntimate),
@@ -11,7 +11,9 @@ JournalEntry::JournalEntry(QObject *parent) :
 	_temperature(0),
 	_weight(0),
 	_note(""),
-	_symptoms(this) {
+	_symptoms(config, this),
+	_config(config) {
+	Q_ASSERT(config);
 	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(orgasmChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(opkChanged()), this, SIGNAL(changed()));

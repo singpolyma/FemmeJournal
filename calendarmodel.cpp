@@ -37,7 +37,8 @@ bool CalendarModel::populate(int m, int y, const QLocale &l, bool force) {
 	return true;
 }
 
-CalendarModel::CalendarModel(QObject *parent) : QAbstractListModel(parent), _dates(daysOnACalendarMonth), _journalDates(), _ready(false) {
+CalendarModel::CalendarModel(ConfigModel *config, QObject *parent) : QAbstractListModel(parent), _dates(daysOnACalendarMonth), _journalDates(), _ready(false), _config(config) {
+	Q_ASSERT(config);
 	QDate _today = QDate::currentDate();
 	_selectedDate = _today;
 	_month = _today.month();
@@ -64,7 +65,7 @@ JournalEntry *CalendarModel::selectedJournal() {
 JournalEntry *CalendarModel::entryOf(const QDate &date) {
 	JournalEntry *entry = _journalDates.value(date, NULL);
 	if(!entry) {
-		entry = new JournalEntry(this);
+		entry = new JournalEntry(_config, this);
 		_journalDates.insert(date, entry);
 		addJournalEntry(date, entry);
 		emit newJournalEntry(date, entry);

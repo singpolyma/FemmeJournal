@@ -2,13 +2,10 @@
 
 #include "symptomsmodel.h"
 
-namespace {
-	static QStringList allSymptoms = QStringList({"acne"});
-}
-
 QT_BEGIN_NAMESPACE
 
-SymptomsModel::SymptomsModel(QObject *parent) : QAbstractListModel(parent) {
+SymptomsModel::SymptomsModel(ConfigModel *config, QObject *parent) : QAbstractListModel(parent), _config(config) {
+	Q_ASSERT(config);
 }
 
 void SymptomsModel::readSymptoms(void *ret) {
@@ -18,11 +15,9 @@ void SymptomsModel::readSymptoms(void *ret) {
 void SymptomsModel::setSymptomSeverity(QString symptom, enum SymptomSeverity severity) {
 	_symptoms.insert(symptom, severity);
 
-	int idx = allSymptoms.indexOf(symptom);
+	int idx = _config->allSymptoms().indexOf(symptom);
 	if(idx == -1) {
-		allSymptoms.append(symptom);
-		allSymptoms.sort();
-		emit dataChanged(index(0, 0), index(rowCount(), 0));
+		emit dataChanged(index(0, 0), index(_config->addSymptom(symptom), 0));
 	} else {
 		emit dataChanged(index(idx, 0), index(idx, 0));
 	}
@@ -34,7 +29,7 @@ bool SymptomsModel::setData(const int idx, const QVariant &value, int role) {
 
 bool SymptomsModel::setData(const QModelIndex &index, const QVariant &value, int role) {
 	if (index.isValid() && index.row() < rowCount()) {
-		QString symptom = allSymptoms.at(index.row());
+		QString symptom = _config->allSymptoms().at(index.row());
 		switch (role) {
 		case SeverityRole:
 			if(value.isValid() && !value.isNull()) {
@@ -57,7 +52,7 @@ bool SymptomsModel::setData(const QModelIndex &index, const QVariant &value, int
 
 QVariant SymptomsModel::data(const QModelIndex &index, int role) const {
 	if (index.isValid() && index.row() < rowCount()) {
-		QString symptom = allSymptoms.at(index.row());
+		QString symptom = _config->allSymptoms().at(index.row());
 		switch (role) {
 		case SymptomRole:
 			return symptom;
@@ -72,8 +67,8 @@ QVariant SymptomsModel::data(const QModelIndex &index, int role) const {
 }
 
 int SymptomsModel::rowCount(const QModelIndex &parent) const {
-	if (parent.isValid()) return 0;
-	return allSymptoms.count();
+	if (parent.isValid() || !_config) return 0;
+	return _config->allSymptoms().count();
 }
 
 QHash<int, QByteArray> SymptomsModel::roleNames() const {
