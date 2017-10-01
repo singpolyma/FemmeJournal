@@ -10,6 +10,11 @@ SOURCES += main.cpp \
 
 RESOURCES += qml.qrc
 
+lint.target = lint
+lint.commands = 'qmllint *.qml'
+QMAKE_EXTRA_TARGETS += lint
+PRE_TARGETDEPS += lint
+
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
