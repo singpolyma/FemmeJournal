@@ -198,6 +198,7 @@ Rectangle {
 			}
 
 			onClicked: {
+				focus = true;
 				calendarModel.selectedDate = date;
 			}
 		}
