@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtQml/qqml.h>
+#include <QFile>
+#include <QTextStream>
 
 QT_BEGIN_NAMESPACE
 
@@ -13,13 +15,19 @@ class ConfigModel : public QObject
 	//Q_PROPERTY(bool menstruationStarted READ menstruationStarted WRITE setMenstruationStarted NOTIFY menstruationStartedChanged FINAL)
 
 public:
-	explicit ConfigModel(QObject *parent = nullptr);
+	explicit ConfigModel(QFile *symptomsFile, QObject *parent = nullptr);
+	~ConfigModel();
 
 	const QStringList& allSymptoms() const;
-	int addSymptom(QString symptom);
+	int addSymptom(QString symptom, bool save = true);
+
+public slots:
+	void saveSymptoms();
 
 protected:
 	QStringList _allSymptoms;
+	QFile *_symptomsFile;
+	QTextStream _symptomsStream;
 
 	Q_DISABLE_COPY(ConfigModel)
 };

@@ -5,6 +5,7 @@
 #include <QStandardPaths>
 #include <QDir>
 #include <QThread>
+#include <QDebug>
 
 #include "configmodel.h"
 #include "calendarmodel.h"
@@ -14,7 +15,18 @@ int main(int argc, char *argv[])
 {
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QGuiApplication app(argc, argv);
-	ConfigModel config;
+
+	QDir configDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/FemmeJournal");
+	if(!configDir.mkpath(".")) {
+		qFatal("Could not make config directory: %s", qUtf8Printable(configDir.path()));
+	}
+
+	QFile symptomsFile(configDir.absoluteFilePath("symptoms"));
+	if(!symptomsFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(symptomsFile.fileName()));
+	}
+
+	ConfigModel config(&symptomsFile);
 
 	QDir dataDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
 	if(!dataDir.mkpath(".")) {

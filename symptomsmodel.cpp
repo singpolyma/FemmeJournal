@@ -13,7 +13,7 @@ void SymptomsModel::readSymptoms(void *ret) {
 }
 
 void SymptomsModel::setSymptomSeverity(QString symptom, enum SymptomSeverity severity) {
-	_symptoms.insert(symptom, severity);
+	_symptoms.insert(symptom.toCaseFolded(), severity);
 
 	int idx = _config->allSymptoms().indexOf(symptom);
 	if(idx == -1) {
