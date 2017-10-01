@@ -74,14 +74,14 @@ QStringList QCalParser::saveEntry(JournalEntry *entry) {
 	QVariant retVal;
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "menstruationStarted"), Q_ARG(void*, &retVal));
-	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-MENSTRUATION:STARTED";
+	if(retVal.toBool()) lines << "X-FEMMEJOURNAL-MENSTRUATION:STARTED";
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "menstruationStopped"), Q_ARG(void*, &retVal));
-	if(retVal.toBool()) lines << "X-THEFERTILECYCLE-MENSTRUATION:STOPPED";
+	if(retVal.toBool()) lines << "X-FEMMEJOURNAL-MENSTRUATION:STOPPED";
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "intimate"), Q_ARG(void*, &retVal));
 	if(retVal.toBool()) {
-		QString line = "X-THEFERTILECYCLE-INTIMATE";
+		QString line = "X-FEMMEJOURNAL-INTIMATE";
 
 		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "intimateProtection"), Q_ARG(void*, &retVal));
 		if(!retVal.isValid() || retVal.isNull()) {
@@ -104,19 +104,19 @@ QStringList QCalParser::saveEntry(JournalEntry *entry) {
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "opk"), Q_ARG(void*, &retVal));
 	if(retVal.toInt() == JournalEntry::OPKPositive) {
-		lines << "X-THEFERTILECYCLE-OPK:POSITIVE";
+		lines << "X-FEMMEJOURNAL-OPK:POSITIVE";
 	} else if(retVal.toInt() == JournalEntry::OPKNegative) {
-		lines << "X-THEFERTILECYCLE-OPK:NEGATIVE";
+		lines << "X-FEMMEJOURNAL-OPK:NEGATIVE";
 	}
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "temperature"), Q_ARG(void*, &retVal));
 	if(retVal.toDouble() != 0) {
-		lines << "X-THEFERTILECYCLE-TEMPERATURE;UNIT=C:" + QString::number(retVal.toDouble());
+		lines << "X-FEMMEJOURNAL-TEMPERATURE;UNIT=C:" + QString::number(retVal.toDouble());
 	}
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "weight"), Q_ARG(void*, &retVal));
 	if(retVal.toDouble() != 0) {
-		lines << "X-THEFERTILECYCLE-WEIGHT;UNIT=KG:" + QString::number(retVal.toDouble());
+		lines << "X-FEMMEJOURNAL-WEIGHT;UNIT=KG:" + QString::number(retVal.toDouble());
 	}
 
 	{
@@ -129,7 +129,7 @@ QStringList QCalParser::saveEntry(JournalEntry *entry) {
 			i != symptoms.cend();
 			i++
 		) {
-			QString line = "X-THEFERTILECYCLE-SYMPTOM";
+			QString line = "X-FEMMEJOURNAL-SYMPTOM";
 			if(*i != SymptomsModel::Unknown) line += ";SEVERITY=" + QString::number(*i);
 			line += ":" + i.key().toUpper();
 			lines << line;
@@ -185,11 +185,11 @@ void QCalParser::parseBlock() {
 			desc.replace("\\;", ";");
 			desc.replace("\\\\", "\\");
 			entry->setProperty("note", desc);
-		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-MENSTRUATION") && value.toCaseFolded() == QString("started")) {
+		} else if(attrs.at(0) == QString("X-FEMMEJOURNAL-MENSTRUATION") && value.toCaseFolded() == QString("started")) {
 			entry->setMenstruationStarted(true);
-		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-MENSTRUATION") && value.toCaseFolded() == QString("stopped")) {
+		} else if(attrs.at(0) == QString("X-FEMMEJOURNAL-MENSTRUATION") && value.toCaseFolded() == QString("stopped")) {
 			entry->setMenstruationStopped(true);
-		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-INTIMATE") && value.toCaseFolded() == QString("true")) {
+		} else if(attrs.at(0) == QString("X-FEMMEJOURNAL-INTIMATE") && value.toCaseFolded() == QString("true")) {
 			entry->setProperty("intimate", true);
 
 			for(
@@ -207,13 +207,13 @@ void QCalParser::parseBlock() {
 					entry->setProperty("orgasm", JournalEntry::NoOrgasm);
 				}
 			}
-		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-OPK")) {
+		} else if(attrs.at(0) == QString("X-FEMMEJOURNAL-OPK")) {
 			if(value.toCaseFolded() == QString("positive")) {
 				entry->setProperty("opk", JournalEntry::OPKPositive);
 			} else if(value.toCaseFolded() == QString("negative")) {
 				entry->setProperty("opk", JournalEntry::OPKNegative);
 			}
-		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-SYMPTOM")) {
+		} else if(attrs.at(0) == QString("X-FEMMEJOURNAL-SYMPTOM")) {
 			SymptomsModel *symptoms = entry->property("symptoms").value<SymptomsModel*>();
 			int severity = SymptomsModel::Unknown;
 
@@ -228,7 +228,7 @@ void QCalParser::parseBlock() {
 			}
 
 			symptoms->setSymptomSeverity(value.toCaseFolded(), (SymptomsModel::SymptomSeverity)severity);
-		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-TEMPERATURE")) {
+		} else if(attrs.at(0) == QString("X-FEMMEJOURNAL-TEMPERATURE")) {
 			QString unit = "c";
 			double temp = value.toDouble();
 
@@ -254,7 +254,7 @@ void QCalParser::parseBlock() {
 			} else {
 				entry->addUnknownLine(line);
 			}
-		} else if(attrs.at(0) == QString("X-THEFERTILECYCLE-WEIGHT")) {
+		} else if(attrs.at(0) == QString("X-FEMMEJOURNAL-WEIGHT")) {
 			QString unit = "kg";
 			double weight = value.toDouble();
 
