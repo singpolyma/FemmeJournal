@@ -146,6 +146,14 @@ QStringList QCalParser::saveEntry(JournalEntry *entry) {
 		lines << "DESCRIPTION:" + note;
 	}
 
+	{
+		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "unknownLines"), Q_ARG(void*, &retVal));
+		QStringList unknownLines = retVal.value<QStringList>();
+		for(QStringList::iterator i = unknownLines.begin(); i != unknownLines.end(); i++) {
+			lines << *i;
+		}
+	}
+
 	return lines;
 }
 
