@@ -8,7 +8,7 @@ ApplicationWindow {
 	visible: true
 	width: 384
 	height: 596
-	title: qsTr("Hello World")
+	title: qsTr("FemmeJournal")
 
 	onClosing: {
 		if(Qt.platform.os == "android" && stack.depth > 1) {
