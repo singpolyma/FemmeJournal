@@ -4,8 +4,10 @@
         <file>qtquickcontrols2.conf</file>
         <file>Calendar.qml</file>
         <file>CalendarPage.qml</file>
+        <file>ColouredSvg.qml</file>
         <file>Segment.qml</file>
         <file>EditJournalEntry.qml</file>
+        <file>arrowback.svg</file>
         <file>edit.svg</file>
         <file>calendar.svg</file>
         <file>heart.svg</file>

@@ -16,7 +16,13 @@ Rectangle {
 			Layout.fillWidth: true
 
 			ToolButton {
-				text: qsTr("❮")
+				ColouredSvg {
+					anchors.centerIn: parent
+					source: "qrc:/arrowback.svg"
+					sourceSize: Qt.size(parent.height/2, parent.height/2)
+					color: Material.foreground
+				}
+
 				onClicked: {
 					if(cal.month === 0) {
 						cal.month = 11
@@ -39,7 +45,14 @@ Rectangle {
 			}
 
 			ToolButton {
-				text: qsTr("❯")
+				ColouredSvg {
+					anchors.centerIn: parent
+					source: "qrc:/arrowback.svg"
+					sourceSize: Qt.size(parent.height/2, parent.height/2)
+					mirror: true
+					color: Material.foreground
+				}
+
 				onClicked: {
 					if(cal.month === 11) {
 						cal.month = 0
@@ -123,7 +136,7 @@ Rectangle {
 							visible: model.fertility == "fertile"
 						}
 
-						Image {
+						ColouredSvg {
 							Layout.margins: 2
 							Layout.alignment: Qt.AlignRight
 							source: "qrc:/flower.svg"
@@ -134,13 +147,7 @@ Rectangle {
 							fillMode: Image.PreserveAspectFit
 							opacity: 0.5
 							visible: model.fertility == "ovulated"
-
-							ColorOverlay {
-								anchors.fill: parent
-								source: parent
-								opacity: 0.5
-								color: Material.foreground
-							}
+							color: Material.foreground
 						}
 					}
 
@@ -176,7 +183,7 @@ Rectangle {
 							}
 						}
 
-						Image {
+						ColouredSvg {
 							Layout.alignment: Qt.AlignRight
 							source: "qrc:/heart.svg"
 							Layout.preferredWidth: parent.height
@@ -185,13 +192,7 @@ Rectangle {
 							sourceSize.height: parent.height
 							fillMode: Image.PreserveAspectFit
 							opacity: (model.journalEntry && model.journalEntry.intimate) ? 0.5 : 0
-
-							ColorOverlay {
-								anchors.fill: parent
-								source: parent
-								opacity: 0.5
-								color: Material.foreground
-							}
+							color: Material.foreground
 						}
 					}
 				}

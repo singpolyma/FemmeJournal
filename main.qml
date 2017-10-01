@@ -2,7 +2,6 @@ import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Material 2.0
-import QtGraphicalEffects 1.0
 
 ApplicationWindow {
 	visible: true
@@ -23,7 +22,17 @@ ApplicationWindow {
 		RowLayout {
 			anchors.fill: parent
 			ToolButton {
-				text: qsTr("❮ ") + stack.currentItem.title
+				ColouredSvg {
+					anchors.left: parent.left
+					anchors.verticalCenter: parent.contentItem.verticalCenter
+					source: "qrc:/arrowback.svg"
+					sourceSize: Qt.size(parent.height/2, parent.height/2)
+					color: materialContext.Material.primaryTextColor
+				}
+
+				text: stack.currentItem.title
+				contentItem.anchors.right: right
+				implicitWidth: contentItem.implicitWidth + (height/2) + 15
 				onClicked: stack.pop()
 				visible: stack.depth > 1
 				font.capitalization: Font.MixedCase
@@ -37,32 +46,22 @@ ApplicationWindow {
 				onClicked: { calendarPage.journal.visible = true; stack.push(calendarPage.journal) }
 				visible: parent.width < 1024 && stack.currentItem == calendarPage
 
-				Image {
+				ColouredSvg {
 					anchors.centerIn: parent
 					source: "qrc:/edit.svg"
 					sourceSize: Qt.size(parent.width/2, parent.height/2)
-
-					ColorOverlay {
-						anchors.fill: parent
-						source: parent
-						color: materialContext.Material.primaryTextColor
-					}
+					color: materialContext.Material.primaryTextColor
 				}
 			}
 			ToolButton {
 				onClicked: { stack.push(calendarPage) }
 				visible: stack.currentItem == summaryPage
 
-				Image {
+				ColouredSvg {
 					anchors.centerIn: parent
 					source: "qrc:/calendar.svg"
 					sourceSize: Qt.size(parent.width/2, parent.height/2)
-
-					ColorOverlay {
-						anchors.fill: parent
-						source: parent
-						color: materialContext.Material.primaryTextColor
-					}
+					color: materialContext.Material.primaryTextColor
 				}
 			}
 
