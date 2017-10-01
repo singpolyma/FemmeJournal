@@ -1,3 +1,9 @@
+== IPFS ==
+
+This repository can be cloned from any IPFS mirror:
+
+/ipns/QmRdPza7cd6cBHHpRNusBz6w8zwXcxeD5NEgRyETRCfQyy
+
 == Android Build ==
 
 * Run the Android-flavoured qmake for the architecture you're targetting.
