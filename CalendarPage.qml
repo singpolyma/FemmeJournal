@@ -32,14 +32,19 @@ Page {
 		return summary.length > 0 ? qsTr("Symptoms: ") + summary.join(", ") : null;
 	}
 
+	function formatNumber(n, decimals) {
+		var pointPattern = Qt.locale().decimalPoint.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+		return n.toLocaleString(Qt.locale(), "f", decimals).replace(new RegExp(pointPattern + "?0+$"), "");
+	}
+
 	function summaryText(entry) {
 		if(!entry) return "";
 		return [
 			intimateSummary(entry),
 			entry.opk == JournalEntry.OPKPositive ? qsTr("OPK: Positive") : null,
 			entry.opk == JournalEntry.OPKNegative ? qsTr("OPK: Negative") : null,
-			entry.temperature > 0 ? qsTr("Temperature: ") + entry.temperature.toLocaleString(Qt.locale(), "f", 2).replace(/\.?0+$/, '') + qsTr("°C") : null,
-			entry.weight > 0 ? qsTr("Weight: ") + entry.weight.toLocaleString(Qt.locale(), "f", 2).replace(/\.?0+$/, '') + qsTr("kg") : null,
+			entry.temperature > 0 ? qsTr("Temperature: ") + formatNumber(entry.temperature, 2) + qsTr("°C") : null,
+			entry.weight > 0 ? qsTr("Weight: ") + formatNumber(entry.weight, 2) + qsTr("kg") : null,
 			symptomsSummary(entry.symptoms),
 			"\n" + entry.note
 		].filter(function(x) { return x; }).join("\n").trim();

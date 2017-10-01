@@ -354,7 +354,7 @@ Page {
 						decimals: 5
 						notation: DoubleValidator.StandardNotation
 					}
-					text: calendarModel.selectedJournal.temperature === 0 ? "" : calendarModel.selectedJournal.temperature.toLocaleString(Qt.locale(), "f", 5).replace(/\.?0+$/, '')
+					text: calendarModel.selectedJournal.temperature === 0 ? "" : formatNumber(calendarModel.selectedJournal.temperature, 5)
 					onEditingFinished: {
 						calendarModel.selectedJournal.temperature = Number.fromLocaleString(Qt.locale(), text)
 					}
@@ -372,7 +372,7 @@ Page {
 						decimals: 5
 						notation: DoubleValidator.StandardNotation
 					}
-					text: calendarModel.selectedJournal.weight === 0 ? "" : calendarModel.selectedJournal.weight.toLocaleString(Qt.locale(), "f", 5).replace(/\.?0+$/, '')
+					text: calendarModel.selectedJournal.weight === 0 ? "" : formatNumber(calendarModel.selectedJournal.weight, 5)
 					onEditingFinished: {
 						calendarModel.selectedJournal.weight = Number.fromLocaleString(Qt.locale(), text)
 					}
