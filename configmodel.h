@@ -13,6 +13,7 @@ class ConfigModel : public QObject
 	Q_OBJECT
 
 	Q_PROPERTY(QString weightUnit MEMBER _weightUnit WRITE setWeightUnit NOTIFY weightUnitChanged FINAL)
+	Q_PROPERTY(QString temperatureUnit MEMBER _temperatureUnit WRITE setTemperatureUnit NOTIFY temperatureUnitChanged FINAL)
 
 public:
 	explicit ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent = nullptr);
@@ -22,11 +23,13 @@ public:
 	int addSymptom(QString symptom, bool save = true);
 
 	void setWeightUnit(QString unit);
+	void setTemperatureUnit(QString unit);
 
 	Q_INVOKABLE void readProperty(QByteArray name, void *ret);
 
 signals:
 	void weightUnitChanged(QString oldUnit, QString newUnit);
+	void temperatureUnitChanged(QString oldUnit, QString newUnit);
 
 public slots:
 	void saveSymptoms();
@@ -34,6 +37,7 @@ public slots:
 
 protected:
 	QString _weightUnit;
+	QString _temperatureUnit;
 	QStringList _allSymptoms;
 	QFile *_symptomsFile;
 	QFile *_configFile;

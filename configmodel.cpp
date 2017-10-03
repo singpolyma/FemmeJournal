@@ -9,6 +9,7 @@
 ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent) :
 	QObject(parent),
 	_weightUnit("kg"),
+	_temperatureUnit("c"),
 	_allSymptoms({
 		"acne",
 		"angry",
@@ -76,9 +77,11 @@ ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent
 
 	_configFile->seek(0);
 	QVariantMap fromFile(QJsonDocument::fromJson(_configFile->readAll()).object().toVariantMap());
-	if(fromFile.contains("weightUnit")) _weightUnit = fromFile["weightUnit"].toString();
+	if(fromFile.contains("weightUnit")) _weightUnit = fromFile["weightUnit"].toString().toCaseFolded();
+	if(fromFile.contains("temperatureUnit")) _temperatureUnit = fromFile["temperatureUnit"].toString().toCaseFolded();
 
 	connect(this, SIGNAL(weightUnitChanged(QString,QString)), this, SLOT(saveConfig()));
+	connect(this, SIGNAL(temperatureUnitChanged(QString,QString)), this, SLOT(saveConfig()));
 
 	saveSymptoms();
 }
@@ -109,6 +112,13 @@ void ConfigModel::setWeightUnit(QString unit) {
 	emit weightUnitChanged(oldUnit, unit);
 }
 
+void ConfigModel::setTemperatureUnit(QString unit) {
+	if(unit == _temperatureUnit) return;
+	QString oldUnit = _temperatureUnit;
+	_temperatureUnit = unit;
+	emit temperatureUnitChanged(oldUnit, unit);
+}
+
 void ConfigModel::saveSymptoms() {
 	_symptomsStream.seek(0);
 	_symptomsFile->seek(0);
@@ -125,6 +135,7 @@ void ConfigModel::saveConfig() {
 
 	QJsonObject o;
 	o["weightUnit"] = _weightUnit;
+	o["temperatureUnit"] = _temperatureUnit;
 
 	_configFile->write(QJsonDocument(o).toJson());
 }
