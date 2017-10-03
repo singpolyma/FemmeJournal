@@ -28,6 +28,17 @@ void QCalParser::addJournalEntry(QDate date, JournalEntry *entry) {
 	m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
 }
 
+void QCalParser::changeDataFilePath(QString newPath) {
+	_file->close();
+	_file->setFileName(newPath);
+	if(!_file->open(QIODevice::ReadWrite | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(_file->fileName()));
+	}
+	m_dataStream.setDevice(_file);
+	parse();
+	save();
+}
+
 void QCalParser::delaySave() {
 	_timer.start(1000);
 }

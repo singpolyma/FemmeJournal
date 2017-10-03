@@ -10,6 +10,7 @@ ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent
 	QObject(parent),
 	_weightUnit("kg"),
 	_temperatureUnit("c"),
+	_dataFilePath(QDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation)).absoluteFilePath("FemmeJournal.ics")),
 	_allSymptoms({
 		"acne",
 		"angry",
@@ -79,9 +80,11 @@ ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent
 	QVariantMap fromFile(QJsonDocument::fromJson(_configFile->readAll()).object().toVariantMap());
 	if(fromFile.contains("weightUnit")) _weightUnit = fromFile["weightUnit"].toString().toCaseFolded();
 	if(fromFile.contains("temperatureUnit")) _temperatureUnit = fromFile["temperatureUnit"].toString().toCaseFolded();
+	if(fromFile.contains("dataFilePath")) _dataFilePath = fromFile["dataFilePath"].toString();
 
 	connect(this, SIGNAL(weightUnitChanged(QString,QString)), this, SLOT(saveConfig()));
 	connect(this, SIGNAL(temperatureUnitChanged(QString,QString)), this, SLOT(saveConfig()));
+	connect(this, SIGNAL(dataFilePathChanged(QString)), this, SLOT(saveConfig()));
 
 	saveSymptoms();
 }
@@ -119,6 +122,10 @@ void ConfigModel::setTemperatureUnit(QString unit) {
 	emit temperatureUnitChanged(oldUnit, unit);
 }
 
+QFileInfo ConfigModel::dataFileInfo() {
+	return QFileInfo(_dataFilePath);
+}
+
 void ConfigModel::saveSymptoms() {
 	_symptomsStream.seek(0);
 	_symptomsFile->seek(0);
@@ -136,6 +143,7 @@ void ConfigModel::saveConfig() {
 	QJsonObject o;
 	o["weightUnit"] = _weightUnit;
 	o["temperatureUnit"] = _temperatureUnit;
+	o["dataFilePath"] = _dataFilePath;
 
 	_configFile->write(QJsonDocument(o).toJson());
 }

@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtQml/qqml.h>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 
 QT_BEGIN_NAMESPACE
@@ -14,6 +15,7 @@ class ConfigModel : public QObject
 
 	Q_PROPERTY(QString weightUnit MEMBER _weightUnit WRITE setWeightUnit NOTIFY weightUnitChanged FINAL)
 	Q_PROPERTY(QString temperatureUnit MEMBER _temperatureUnit WRITE setTemperatureUnit NOTIFY temperatureUnitChanged FINAL)
+	Q_PROPERTY(QString dataFilePath MEMBER _dataFilePath NOTIFY dataFilePathChanged FINAL)
 
 public:
 	explicit ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent = nullptr);
@@ -25,11 +27,14 @@ public:
 	void setWeightUnit(QString unit);
 	void setTemperatureUnit(QString unit);
 
+	QFileInfo dataFileInfo();
+
 	Q_INVOKABLE void readProperty(QByteArray name, void *ret);
 
 signals:
 	void weightUnitChanged(QString oldUnit, QString newUnit);
 	void temperatureUnitChanged(QString oldUnit, QString newUnit);
+	void dataFilePathChanged(QString newPath);
 
 public slots:
 	void saveSymptoms();
@@ -38,6 +43,7 @@ public slots:
 protected:
 	QString _weightUnit;
 	QString _temperatureUnit;
+	QString _dataFilePath;
 	QStringList _allSymptoms;
 	QFile *_symptomsFile;
 	QFile *_configFile;

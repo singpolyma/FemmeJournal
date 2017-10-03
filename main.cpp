@@ -32,13 +32,13 @@ int main(int argc, char *argv[])
 	}
 
 	ConfigModel config(&configFile, &symptomsFile);
+	QFileInfo dataFileInfo = config.dataFileInfo();
 
-	QDir dataDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
-	if(!dataDir.mkpath(".")) {
-		qFatal("Could not make data directory: %s", qUtf8Printable(dataDir.path()));
+	if(!dataFileInfo.dir().mkpath(".")) {
+		qFatal("Could not make data directory: %s", qUtf8Printable(dataFileInfo.dir().path()));
 	}
 
-	QFile journalFile(dataDir.absoluteFilePath("FemmeJournal.ics"));
+	QFile journalFile(dataFileInfo.filePath());
 	if(!journalFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
 		qFatal("Could not open file: %s", qUtf8Printable(journalFile.fileName()));
 	}
@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
 	journalParser.moveToThread(&parserThread);
 
 	CalendarModel calendarModel(&config);
+	QObject::connect(&config, SIGNAL(dataFilePathChanged(QString)), &journalParser, SLOT(changeDataFilePath(QString)));
 	QObject::connect(&calendarModel, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &journalParser, SLOT(addJournalEntry(QDate,JournalEntry*)));
 	QObject::connect(&journalParser, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &calendarModel, SLOT(addJournalEntry(QDate,JournalEntry*)));
 	QObject::connect(&journalParser, SIGNAL(doneParse()), &calendarModel, SLOT(ready()));

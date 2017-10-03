@@ -24,6 +24,7 @@ public:
 public slots:
 	void parse();
 	void addJournalEntry(QDate date, JournalEntry *entry);
+	void changeDataFilePath(QString newPath);
 	void delaySave();
 	void save();
 
