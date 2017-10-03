@@ -12,21 +12,29 @@ class ConfigModel : public QObject
 {
 	Q_OBJECT
 
-	//Q_PROPERTY(bool menstruationStarted READ menstruationStarted WRITE setMenstruationStarted NOTIFY menstruationStartedChanged FINAL)
+	Q_PROPERTY(QString weightUnit MEMBER _weightUnit NOTIFY weightUnitChanged FINAL)
 
 public:
-	explicit ConfigModel(QFile *symptomsFile, QObject *parent = nullptr);
+	explicit ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent = nullptr);
 	~ConfigModel();
 
 	const QStringList& allSymptoms() const;
 	int addSymptom(QString symptom, bool save = true);
 
+	Q_INVOKABLE void readProperty(QByteArray name, void *ret);
+
 public slots:
 	void saveSymptoms();
+	void saveConfig();
+
+signals:
+	void weightUnitChanged();
 
 protected:
+	QString _weightUnit;
 	QStringList _allSymptoms;
 	QFile *_symptomsFile;
+	QFile *_configFile;
 	QTextStream _symptomsStream;
 
 	Q_DISABLE_COPY(ConfigModel)

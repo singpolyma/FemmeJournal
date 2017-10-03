@@ -6,8 +6,10 @@
         <file>CalendarPage.qml</file>
         <file>ColouredSvg.qml</file>
         <file>Segment.qml</file>
+        <file>SettingsPage.qml</file>
         <file>EditJournalEntry.qml</file>
         <file>arrowback.svg</file>
+        <file>settings.svg</file>
         <file>edit.svg</file>
         <file>calendar.svg</file>
         <file>heart.svg</file>

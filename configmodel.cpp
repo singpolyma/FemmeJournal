@@ -2,10 +2,13 @@
 
 #include <QDir>
 #include <QStandardPaths>
+#include <QJsonObject>
+#include <QJsonDocument>
 #include <QDebug>
 
-ConfigModel::ConfigModel(QFile *symptomsFile, QObject *parent) :
+ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent) :
 	QObject(parent),
+	_weightUnit("kg"),
 	_allSymptoms({
 		"acne",
 		"angry",
@@ -59,8 +62,10 @@ ConfigModel::ConfigModel(QFile *symptomsFile, QObject *parent) :
 		"unbalanced",
 		"weepy"
 	}),
-	_symptomsFile(symptomsFile) {
+	_symptomsFile(symptomsFile),
+	_configFile(configFile) {
 	Q_ASSERT(symptomsFile);
+	Q_ASSERT(configFile);
 	_symptomsStream.setDevice(_symptomsFile);
 
 	QString line = _symptomsStream.readLine();
@@ -69,11 +74,18 @@ ConfigModel::ConfigModel(QFile *symptomsFile, QObject *parent) :
 		line = _symptomsStream.readLine();
 	}
 
+	_configFile->seek(0);
+	QVariantMap fromFile(QJsonDocument::fromJson(_configFile->readAll()).object().toVariantMap());
+	if(fromFile.contains("weightUnit")) _weightUnit = fromFile["weightUnit"].toString();
+
+	connect(this, SIGNAL(weightUnitChanged()), this, SLOT(saveConfig()));
+
 	saveSymptoms();
 }
 
 ConfigModel::~ConfigModel() {
 	_symptomsFile->close();
+	_configFile->close();
 }
 
 const QStringList& ConfigModel::allSymptoms() const {
@@ -98,4 +110,18 @@ void ConfigModel::saveSymptoms() {
 		_symptomsStream << *i << endl;
 	}
 	_symptomsStream.flush();
+}
+
+void ConfigModel::saveConfig() {
+	_configFile->seek(0);
+	_configFile->resize(0);
+
+	QJsonObject o;
+	o["weightUnit"] = _weightUnit;
+
+	_configFile->write(QJsonDocument(o).toJson());
+}
+
+void ConfigModel::readProperty(QByteArray name, void *ret) {
+	*((QVariant*)ret) = property(name.constData());
 }

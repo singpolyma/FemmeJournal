@@ -21,12 +21,17 @@ int main(int argc, char *argv[])
 		qFatal("Could not make config directory: %s", qUtf8Printable(configDir.path()));
 	}
 
+	QFile configFile(configDir.absoluteFilePath("config"));
+	if(!configFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(configFile.fileName()));
+	}
+
 	QFile symptomsFile(configDir.absoluteFilePath("symptoms"));
 	if(!symptomsFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
 		qFatal("Could not open file: %s", qUtf8Printable(symptomsFile.fileName()));
 	}
 
-	ConfigModel config(&symptomsFile);
+	ConfigModel config(&configFile, &symptomsFile);
 
 	QDir dataDir(QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation));
 	if(!dataDir.mkpath(".")) {
@@ -56,6 +61,7 @@ int main(int argc, char *argv[])
 
 	QQmlApplicationEngine engine;
 	engine.rootContext()->setContextProperty("calendarModel", &calendarModel);
+	engine.rootContext()->setContextProperty("config", &config);
 	engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
 	return app.exec();

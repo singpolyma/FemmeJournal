@@ -43,6 +43,17 @@ ApplicationWindow {
 			}
 			Rectangle { Layout.fillWidth: true }
 			ToolButton {
+				onClicked: { stack.push(settingsPage) }
+				visible: stack.currentItem != settingsPage
+
+				ColouredSvg {
+					anchors.centerIn: parent
+					source: "qrc:/settings.svg"
+					sourceSize: Qt.size(parent.width/2, parent.height/2)
+					color: materialContext.Material.primaryTextColor
+				}
+			}
+			ToolButton {
 				onClicked: { calendarPage.journal.visible = true; stack.push(calendarPage.journal) }
 				visible: parent.width < 1024 && stack.currentItem == calendarPage
 
@@ -64,7 +75,6 @@ ApplicationWindow {
 					color: materialContext.Material.primaryTextColor
 				}
 			}
-
 		}
 	}
 
@@ -150,6 +160,11 @@ ApplicationWindow {
 
 		CalendarPage {
 			id: calendarPage
+			visible: false
+		}
+
+		SettingsPage {
+			id: settingsPage
 			visible: false
 		}
 	}
