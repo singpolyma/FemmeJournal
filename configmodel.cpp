@@ -78,7 +78,7 @@ ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent
 	QVariantMap fromFile(QJsonDocument::fromJson(_configFile->readAll()).object().toVariantMap());
 	if(fromFile.contains("weightUnit")) _weightUnit = fromFile["weightUnit"].toString();
 
-	connect(this, SIGNAL(weightUnitChanged()), this, SLOT(saveConfig()));
+	connect(this, SIGNAL(weightUnitChanged(QString,QString)), this, SLOT(saveConfig()));
 
 	saveSymptoms();
 }
@@ -100,6 +100,13 @@ int ConfigModel::addSymptom(QString symptom, bool save) {
 		if(save) saveSymptoms();
 	}
 	return _allSymptoms.count();
+}
+
+void ConfigModel::setWeightUnit(QString unit) {
+	if(unit == _weightUnit) return;
+	QString oldUnit = _weightUnit;
+	_weightUnit = unit;
+	emit weightUnitChanged(oldUnit, unit);
 }
 
 void ConfigModel::saveSymptoms() {

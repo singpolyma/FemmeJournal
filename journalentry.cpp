@@ -14,6 +14,7 @@ JournalEntry::JournalEntry(ConfigModel *config, QObject *parent) :
 	_symptoms(config, this),
 	_config(config) {
 	Q_ASSERT(config);
+	connect(config, SIGNAL(weightUnitChanged(QString,QString)), this, SLOT(changeWeightUnit(QString,QString)));
 	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(orgasmChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(opkChanged()), this, SIGNAL(changed()));
@@ -96,6 +97,18 @@ SymptomsModel *JournalEntry::symptoms() {
 void JournalEntry::addUnknownLine(QString line) {
 	_unknown.append(line);
 	emit changed();
+}
+
+void JournalEntry::changeWeightUnit(QString oldUnit, QString newUnit) {
+	if(oldUnit == "lb" && newUnit == "kg") {
+		_weight *= 0.45359237;
+		emit weightChanged();
+	}
+
+	if(oldUnit == "kg" && newUnit == "lb") {
+		_weight /= 0.45359237;
+		emit weightChanged();
+	}
 }
 
 void JournalEntry::readProperty(QByteArray name, void *ret) {

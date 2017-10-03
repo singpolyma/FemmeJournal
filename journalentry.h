@@ -88,6 +88,9 @@ signals:
 	void temperatureChanged();
 	void changed();
 
+public slots:
+	void changeWeightUnit(QString oldUnit, QString newUnit);
+
 protected:
 	enum MenstrualChange _menstrualChange;
 	enum Intimate _intimate;
