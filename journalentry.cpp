@@ -15,6 +15,7 @@ JournalEntry::JournalEntry(ConfigModel *config, QObject *parent) :
 	_config(config) {
 	Q_ASSERT(config);
 	connect(config, SIGNAL(weightUnitChanged(QString,QString)), this, SLOT(changeWeightUnit(QString,QString)));
+	connect(config, SIGNAL(temperatureUnitChanged(QString,QString)), this, SLOT(changeTemperatureUnit(QString,QString)));
 	connect(this, SIGNAL(intimateChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(orgasmChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(opkChanged()), this, SIGNAL(changed()));
@@ -100,6 +101,8 @@ void JournalEntry::addUnknownLine(QString line) {
 }
 
 void JournalEntry::changeWeightUnit(QString oldUnit, QString newUnit) {
+	if(_weight == 0) return;
+
 	if(oldUnit == "lb" && newUnit == "kg") {
 		_weight *= 0.45359237;
 		emit weightChanged();
@@ -108,6 +111,24 @@ void JournalEntry::changeWeightUnit(QString oldUnit, QString newUnit) {
 	if(oldUnit == "kg" && newUnit == "lb") {
 		_weight /= 0.45359237;
 		emit weightChanged();
+	}
+}
+
+void JournalEntry::changeTemperatureUnit(QString oldUnit, QString newUnit) {
+	if(_temperature == 0) return;
+
+	if(oldUnit == "f" && newUnit == "c") {
+		_temperature -= 32;
+		_temperature *= 5;
+		_temperature /= 9;
+		emit temperatureChanged();
+	}
+
+	if(oldUnit == "c" && newUnit == "f") {
+		_temperature *= 9;
+		_temperature /= 5;
+		_temperature += 32;
+		emit temperatureChanged();
 	}
 }
 

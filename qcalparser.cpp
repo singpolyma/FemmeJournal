@@ -37,6 +37,9 @@ void QCalParser::save() {
 	QMetaObject::invokeMethod(_config, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "weightUnit"), Q_ARG(void*, &retVal));
 	QString weightUnit = retVal.toString().toUpper();
 
+	QMetaObject::invokeMethod(_config, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "temperatureUnit"), Q_ARG(void*, &retVal));
+	QString temperatureUnit = retVal.toString().toUpper();
+
 	m_dataStream.seek(0);
 	_file->seek(0);
 	_file->resize(0);
@@ -49,7 +52,7 @@ void QCalParser::save() {
 		if(i->typeName() == QString("QPair<QDate,JournalEntry*>")) {
 			QPair<QDate,JournalEntry*> v = i->value<QPair<QDate,JournalEntry*>>();
 
-			QStringList lines = saveEntry(weightUnit, v.second);
+			QStringList lines = saveEntry(weightUnit, temperatureUnit, v.second);
 			if(!lines.empty()) {
 				m_dataStream << "BEGIN:VJOURNAL" << endl;
 				m_dataStream << "DTSTART:" << v.first.toString("yyyyMMdd") << endl;
@@ -60,7 +63,7 @@ void QCalParser::save() {
 			}
 		} else if(i->typeName() == QString("JournalEntry*")) {
 			m_dataStream << "BEGIN:VJOURNAL" << endl;
-			QStringList lines = saveEntry(weightUnit, i->value<JournalEntry*>());
+			QStringList lines = saveEntry(weightUnit, temperatureUnit, i->value<JournalEntry*>());
 			for(QStringList::iterator i = lines.begin(); i != lines.end(); i++) {
 				m_dataStream << *i << endl;
 			}
@@ -73,7 +76,7 @@ void QCalParser::save() {
 	m_dataStream.flush();
 }
 
-QStringList QCalParser::saveEntry(QString weightUnit, JournalEntry *entry) {
+QStringList QCalParser::saveEntry(QString weightUnit, QString temperatureUnit, JournalEntry *entry) {
 	QStringList lines;
 	QVariant retVal;
 
@@ -115,7 +118,7 @@ QStringList QCalParser::saveEntry(QString weightUnit, JournalEntry *entry) {
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "temperature"), Q_ARG(void*, &retVal));
 	if(retVal.toDouble() != 0) {
-		lines << "X-FEMMEJOURNAL-TEMPERATURE;UNIT=C:" + QString::number(retVal.toDouble());
+		lines << "X-FEMMEJOURNAL-TEMPERATURE;UNIT=" + temperatureUnit + ":" + QString::number(retVal.toDouble());
 	}
 
 	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "weight"), Q_ARG(void*, &retVal));
@@ -166,11 +169,14 @@ void QCalParser::parse() {
 	QMetaObject::invokeMethod(_config, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "weightUnit"), Q_ARG(void*, &retVal));
 	QString weightUnit = retVal.toString();
 
+	QMetaObject::invokeMethod(_config, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "temperatureUnit"), Q_ARG(void*, &retVal));
+	QString temperatureUnit = retVal.toString();
+
 	m_dataStream.seek(0);
 	QString line = m_dataStream.readLine();
 	while(!line.isNull()) {
 		if(line.contains("BEGIN:VJOURNAL")) {
-			parseBlock(weightUnit);
+			parseBlock(weightUnit, temperatureUnit);
 		} else {
 			m_eventList.append(QVariant::fromValue(line));
 		}
@@ -181,7 +187,7 @@ void QCalParser::parse() {
 	emit doneParse();
 }
 
-void QCalParser::parseBlock(QString weightUnit) {
+void QCalParser::parseBlock(QString weightUnit, QString temperatureUnit) {
 	QDate date;
 	JournalEntry *entry = new JournalEntry(_config);
 	QString line;
@@ -258,14 +264,21 @@ void QCalParser::parseBlock(QString weightUnit) {
 				}
 			}
 
-			if(unit == "f") {
+			if(unit == "f" && temperatureUnit == "c") {
 				temp -= 32;
 				temp *= 5;
 				temp /= 9;
 				unit = "c";
 			}
 
-			if(unit == "c") {
+			if(unit == "c" && temperatureUnit == "f") {
+				temp *= 9;
+				temp /= 5;
+				temp += 32;
+				unit = "f";
+			}
+
+			if(unit == temperatureUnit) {
 				entry->setProperty("temperature", temp);
 			} else {
 				entry->addUnknownLine(line);

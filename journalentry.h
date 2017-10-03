@@ -90,6 +90,7 @@ signals:
 
 public slots:
 	void changeWeightUnit(QString oldUnit, QString newUnit);
+	void changeTemperatureUnit(QString oldUnit, QString newUnit);
 
 protected:
 	enum MenstrualChange _menstrualChange;

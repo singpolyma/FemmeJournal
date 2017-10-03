@@ -32,8 +32,8 @@ signals:
 	void newJournalEntry(QDate date, JournalEntry *entry);
 
 protected:
-	void parseBlock(QString weightUnit);
-	QStringList saveEntry(QString weightUnit, JournalEntry* entry);
+	void parseBlock(QString weightUnit, QString temperatureUnit);
+	QStringList saveEntry(QString weightUnit, QString temperatureUnit, JournalEntry* entry);
 
 	QList<QVariant> m_eventList;
 	QTextStream m_dataStream;

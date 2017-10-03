@@ -43,7 +43,7 @@ Page {
 			intimateSummary(entry),
 			entry.opk == JournalEntry.OPKPositive ? qsTr("OPK: Positive") : null,
 			entry.opk == JournalEntry.OPKNegative ? qsTr("OPK: Negative") : null,
-			entry.temperature > 0 ? qsTr("Temperature: ") + formatNumber(entry.temperature, 2) + qsTr("°C") : null,
+			entry.temperature > 0 ? qsTr("Temperature: ") + formatNumber(entry.temperature, 2) + qsTr("°" + config.temperatureUnit.toUpperCase()) : null,
 			entry.weight > 0 ? qsTr("Weight: ") + formatNumber(entry.weight, 2) + qsTr(config.weightUnit) : null,
 			symptomsSummary(entry.symptoms),
 			"\n" + entry.note
