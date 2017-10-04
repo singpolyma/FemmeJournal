@@ -2,11 +2,12 @@ import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Controls.Material 2.0
+import QtQuick.Window 2.2
 
 ApplicationWindow {
 	visible: true
-	width: 384
-	height: 596
+	width: Math.min(Screen.desktopAvailableWidth, 1024)
+	height: Math.min(Screen.desktopAvailableHeight, 768)
 	title: qsTr("FemmeJournal")
 
 	onClosing: {

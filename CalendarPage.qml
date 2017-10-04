@@ -82,7 +82,7 @@ Page {
 			title: qsTr("Journal")
 			z: -1
 			Layout.fillHeight: true
-			Layout.minimumWidth: parent.width > parent.height ? 0.3 * parent.width : 0
+			Layout.minimumWidth: parent.width > parent.height ? 0.4 * parent.width : 0
 			visible: parent.width >= 1024
 		}
 	}
