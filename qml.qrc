@@ -4,6 +4,7 @@
         <file>qtquickcontrols2.conf</file>
         <file>Calendar.qml</file>
         <file>CalendarPage.qml</file>
+        <file>CreditsPage.qml</file>
         <file>ColouredSvg.qml</file>
         <file>Segment.qml</file>
         <file>SettingsPage.qml</file>

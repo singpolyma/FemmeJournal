@@ -44,7 +44,7 @@ ApplicationWindow {
 			Rectangle { Layout.fillWidth: true }
 			ToolButton {
 				onClicked: { stack.push(settingsPage) }
-				visible: stack.currentItem != settingsPage
+				visible: stack.currentItem != settingsPage && stack.currentItem != creditsPage
 
 				ColouredSvg {
 					anchors.centerIn: parent
@@ -165,6 +165,11 @@ ApplicationWindow {
 
 		SettingsPage {
 			id: settingsPage
+			visible: false
+		}
+
+		CreditsPage {
+			id: creditsPage
 			visible: false
 		}
 	}
