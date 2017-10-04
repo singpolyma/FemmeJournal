@@ -279,13 +279,42 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 	return QVariant();
 }
 
-void CalendarModel::populateMeanCycleTimes() {
-	int numerator = 0;
+static double mean(QVector<int> v, double knownMean = 0, double knownStdDev = 0) {
+	double numerator = 0;
 	int count = 0;
-	int mNumerator = 0;
-	int mCount = 0;
-	int ovulationNumerator = 0;
-	int ovulationCount = 0;
+
+	for(QVector<int>::const_iterator i = v.cbegin(); i != v.cend(); i++) {
+		if(knownMean && knownStdDev && (*i < knownMean - knownStdDev || *i > knownMean + knownStdDev)) continue;
+		numerator += *i;
+		count++;
+	}
+
+	if(count < 1) return 0;
+	return numerator / count;
+}
+
+static double stddev(QVector<int> v) {
+	if(v.length() < 1) return 0;
+
+	double numerator = 0;
+
+	for(QVector<int>::const_iterator i = v.cbegin(); i != v.cend(); i++) {
+		numerator += pow(*i, 2);
+	}
+
+	return sqrt((numerator / v.length()) - pow(mean(v), 2));
+}
+
+void CalendarModel::populateMeanCycleTimes() {
+	QVector<int> cycles;
+	cycles.reserve(6);
+
+	QVector<int> menstruations;
+	menstruations.reserve(6);
+
+	QVector<int> ovulations;
+	menstruations.reserve(6);
+
 	const QDate *lastBegan = NULL;
 	const QDate *lastEnded = NULL;
 	const QDate *lastOPKnegative = NULL;
@@ -293,18 +322,16 @@ void CalendarModel::populateMeanCycleTimes() {
 
 	for(
 		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
-		i != (_journalDates.begin() - 1) && count < 6;
+		i != (_journalDates.begin() - 1) && cycles.length() < 6;
 		i--
 	) {
 		if(i.value()->menstruationStarted()) {
 			if(lastBegan) {
-				numerator += i.key().daysTo(*lastBegan);
-				count++;
+				cycles.append(i.key().daysTo(*lastBegan));
 			}
 
 			if(lastEnded) {
-				mNumerator += i.key().daysTo(*lastEnded) + 1;
-				mCount++;
+				menstruations.append(i.key().daysTo(*lastEnded) + 1);
 				lastEnded = NULL;
 			}
 
@@ -312,8 +339,7 @@ void CalendarModel::populateMeanCycleTimes() {
 				if(!lastOPKpositive && lastOPKnegative->daysTo(*lastBegan) < 14) {
 					// No positive OPK, but a late negative, so ovulation
 					// likely took place later than this
-					ovulationNumerator += lastOPKnegative->daysTo(*lastBegan) - 1;
-					ovulationCount++;
+					ovulations.append(lastOPKnegative->daysTo(*lastBegan) - 1);
 				}
 				lastOPKnegative = NULL;
 			}
@@ -328,8 +354,7 @@ void CalendarModel::populateMeanCycleTimes() {
 
 		if(lastBegan && i.value()->property("opk") == JournalEntry::OPKPositive) {
 			lastOPKpositive = &i.key();
-			ovulationNumerator += i.key().daysTo(*lastBegan);
-			ovulationCount++;
+			ovulations.append(i.key().daysTo(*lastBegan));
 		}
 
 		if(lastBegan && !lastOPKnegative && i.value()->property("opk") == JournalEntry::OPKNegative) {
@@ -337,10 +362,14 @@ void CalendarModel::populateMeanCycleTimes() {
 		}
 	}
 
-	// TODO: discount very long cycles (likely a skipped period)
-	_meanCycleLength = count == 0 ? 28 : round((double)numerator / count);
-	_meanMenstruationLength = mCount == 0 ? 4 : round((double)mNumerator / mCount);
-	_meanOvulationDaysFromEnd = ovulationCount == 0 ? _meanCycleLength - 14 : round((double)ovulationNumerator / ovulationCount);
+	_meanCycleLength = round(mean(cycles, mean(cycles), stddev(cycles)));
+	if(!_meanCycleLength) _meanCycleLength = 28;
+
+	_meanMenstruationLength = round(mean(menstruations, mean(menstruations), stddev(menstruations)));
+	if(!_meanMenstruationLength) _meanMenstruationLength = 4;
+
+	_meanOvulationDaysFromEnd = round(mean(ovulations, mean(ovulations), stddev(ovulations)));
+	if(!_meanOvulationDaysFromEnd) _meanOvulationDaysFromEnd = _meanCycleLength - 14;
 }
 
 int CalendarModel::cycleDay(QDate date, bool rollover) const {
