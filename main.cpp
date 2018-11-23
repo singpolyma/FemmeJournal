@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
 	QObject::connect(QApplication::instance(), SIGNAL(aboutToQuit()), &parserThread, SLOT(quit()));
 	parserThread.start();
 
-	qmlRegisterType<JournalEntry>("net.singpolyma.thefertilecycle", 1, 0, "JournalEntry");
-	qmlRegisterType<SymptomsModel>("net.singpolyma.thefertilecycle", 1, 0, "SymptomsModel");
+	qmlRegisterType<JournalEntry>("net.singpolyma.femmejournal", 1, 0, "JournalEntry");
+	qmlRegisterType<SymptomsModel>("net.singpolyma.femmejournal", 1, 0, "SymptomsModel");
 
 	QQmlApplicationEngine engine;
 	engine.rootContext()->setContextProperty("calendarModel", &calendarModel);
