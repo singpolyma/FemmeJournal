@@ -306,14 +306,9 @@ static double stddev(QVector<int> v) {
 }
 
 void CalendarModel::populateMeanCycleTimes() {
-	QVector<int> cycles;
-	cycles.reserve(6);
-
-	QVector<int> menstruations;
-	menstruations.reserve(6);
-
-	QVector<int> ovulations;
-	menstruations.reserve(6);
+	QVector<int> cycles(6, 28);
+	QVector<int> menstruations(6, 4);
+	QVector<int> ovulations(6, 14);
 
 	const QDate *lastBegan = NULL;
 	const QDate *lastEnded = NULL;
@@ -327,10 +322,12 @@ void CalendarModel::populateMeanCycleTimes() {
 	) {
 		if(i.value()->menstruationStarted()) {
 			if(lastBegan) {
+				cycles.removeFirst();
 				cycles.append(i.key().daysTo(*lastBegan));
 			}
 
 			if(lastEnded) {
+				menstruations.removeFirst();
 				menstruations.append(i.key().daysTo(*lastEnded) + 1);
 				lastEnded = NULL;
 			}
@@ -339,6 +336,7 @@ void CalendarModel::populateMeanCycleTimes() {
 				if(!lastOPKpositive && lastOPKnegative->daysTo(*lastBegan) < 14) {
 					// No positive OPK, but a late negative, so ovulation
 					// likely took place later than this
+					ovulations.removeFirst();
 					ovulations.append(lastOPKnegative->daysTo(*lastBegan) - 1);
 				}
 				lastOPKnegative = NULL;
@@ -354,6 +352,7 @@ void CalendarModel::populateMeanCycleTimes() {
 
 		if(lastBegan && i.value()->property("opk") == JournalEntry::OPKPositive) {
 			lastOPKpositive = &i.key();
+			ovulations.removeFirst();
 			ovulations.append(i.key().daysTo(*lastBegan));
 		}
 
