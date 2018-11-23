@@ -44,3 +44,8 @@ HEADERS += \
     journalentry.h \
     symptomsmodel.h \
     configmodel.h
+
+DISTFILES += \
+    android/AndroidManifest.xml
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
