@@ -21,6 +21,7 @@ class CalendarModel : public QAbstractListModel
 	Q_PROPERTY(QDate selectedDate MEMBER _selectedDate WRITE setSelectedDate NOTIFY selectedDateChanged FINAL)
 	Q_PROPERTY(JournalEntry *selectedJournal READ selectedJournal NOTIFY selectedJournalChanged FINAL)
 	Q_PROPERTY(QDate nextCycle READ nextCycle NOTIFY nextCycleChanged FINAL)
+	Q_PROPERTY(bool menstruatingToday READ menstruatingToday NOTIFY menstruatingTodayChanged FINAL)
 
 	Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged FINAL)
 	Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged FINAL)
@@ -35,6 +36,7 @@ public:
 	JournalEntry *selectedJournal();
 
 	QDate nextCycle();
+	bool menstruatingToday();
 
 	int month() const;
 	void setMonth(int month);
@@ -69,6 +71,7 @@ Q_SIGNALS:
 	void selectedDateChanged();
 	void selectedJournalChanged();
 	void nextCycleChanged();
+	void menstruatingTodayChanged();
 	void monthChanged();
 	void yearChanged();
 	void localeChanged();

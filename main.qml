@@ -133,9 +133,14 @@ ApplicationWindow {
 					Layout.alignment: Qt.AlignHCenter
 					implicitWidth: col.implicitWidth * 1.10
 					implicitHeight: col.implicitHeight * 1.50
+					opacity: (calendarModel.entryOf(new Date()).menstruationStarted || calendarModel.entryOf(new Date()).menstruationStopped) ? 0 : 1
 
 					onClicked: {
-						calendarModel.entryOf(new Date()).menstruationStarted = true;
+						if(calendarModel.menstruatingToday) {
+							calendarModel.entryOf(new Date()).menstruationStopped = true;
+						} else {
+							calendarModel.entryOf(new Date()).menstruationStarted = true;
+						}
 					}
 
 					Column {
@@ -145,7 +150,7 @@ ApplicationWindow {
 
 						Text {
 							id: colText
-							text: qsTr("Period just started?")
+							text: calendarModel.menstruatingToday ? qsTr("Period ended?") : qsTr("Period just started?")
 							font.pixelSize: parent.parent.parent.width / 20
 						}
 						Text {

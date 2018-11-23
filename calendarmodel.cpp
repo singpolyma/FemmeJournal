@@ -100,6 +100,11 @@ QDate CalendarModel::nextCycle() {
 	return today.addDays(cycleLeft + 1);
 }
 
+bool CalendarModel::menstruatingToday() {
+	QDate today = QDate::currentDate();
+	return data(index(indexOf(today), 0), MenstruatingRole).toBool();
+}
+
 void CalendarModel::refreshMenstrualData() {
 	if(!_ready) return;
 
@@ -117,6 +122,7 @@ void CalendarModel::refreshMenstrualData() {
 	populateMeanCycleTimes();
 
 	emit nextCycleChanged();
+	emit menstruatingTodayChanged();
 
 	QVector<int> roles({MenstruatingRole, CycleDayRole, FertilityRole});
 	emit dataChanged(index(0, 0), index(daysOnACalendarMonth - 1, 0), roles);
