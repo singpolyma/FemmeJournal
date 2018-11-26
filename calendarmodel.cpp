@@ -102,7 +102,7 @@ QDate CalendarModel::nextCycle() {
 
 bool CalendarModel::menstruatingToday() {
 	QDate today = QDate::currentDate();
-	return data(index(indexOf(today), 0), MenstruatingRole).toBool();
+	return menstruating(today, false);
 }
 
 void CalendarModel::refreshMenstrualData() {
@@ -196,30 +196,8 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 			return date.month() - 1;
 		case YearRole:
 			return date.year();
-		case MenstruatingRole: {
-			int cday = cycleDay(date);
-			if(!cday) return false;
-
-			for(
-				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
-				i != _journalDates.end() && !i.value()->menstruationStarted();
-				i++
-			) {
-				if(i.value()->menstruationStopped()) return true;
-			}
-
-			for(
-				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
-				i != (_journalDates.begin() - 1);
-				i--
-			) {
-				if(i == _journalDates.end()) continue;
-				if(i.value()->menstruationStarted() || i.key().daysTo(date) >= cday) break;
-				if(i.value()->menstruationStopped()) return false;
-			}
-
-			return cday <= _meanMenstruationLength;
-		}
+		case MenstruatingRole:
+			return menstruating(date);
 		case CycleDayRole:
 			return cycleDay(date);
 		case FertilityRole: {
@@ -395,6 +373,31 @@ int CalendarModel::cycleDay(QDate date, bool rollover) const {
 	}
 
 	return 0;
+}
+
+bool CalendarModel::menstruating(QDate date, bool rollover) const {
+	int cday = cycleDay(date, rollover);
+	if(!cday) return false;
+
+	for(
+		QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+		i != _journalDates.end() && !i.value()->menstruationStarted();
+		i++
+	) {
+		if(i.value()->menstruationStopped()) return true;
+	}
+
+	for(
+		QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+		i != (_journalDates.begin() - 1);
+		i--
+	) {
+		if(i == _journalDates.end()) continue;
+		if(i.value()->menstruationStarted() || i.key().daysTo(date) >= cday) break;
+		if(i.value()->menstruationStopped()) return false;
+	}
+
+	return cday <= _meanMenstruationLength;
 }
 
 int CalendarModel::rowCount(const QModelIndex &parent) const {

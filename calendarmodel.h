@@ -89,6 +89,7 @@ protected:
 	bool populate(int month, int year, const QLocale &locale, bool force = false);
 	void populateMeanCycleTimes();
 	int cycleDay(QDate date, bool rollover = true) const;
+	bool menstruating(QDate date, bool rollover = true) const;
 
 	int _month;
 	int _year;
