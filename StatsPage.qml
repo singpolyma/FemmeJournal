@@ -61,7 +61,7 @@ Page {
 		delegate: Row {
 			spacing: sizeHelper.font.pixelSize * 2
 
-			Text { text: cycle.date.toLocaleDateString(Locale.ShortFormat); font.weight: Font.Bold }
+			Text { text: cycle.date.toLocaleDateString(Qt.locale(), Locale.ShortFormat); font.weight: Font.Bold; width: parent.parent.width * 0.3 }
 			RowLayout {
 				width: sizeHelper.width
 

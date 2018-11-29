@@ -117,7 +117,7 @@ ApplicationWindow {
 					Text {
 						anchors.centerIn: parent
 						id: projectedStart
-						text: qsTr("Projected start date: ") + calendarModel.nextCycle.toLocaleDateString(Locale.ShortFormat)
+						text: qsTr("Projected start date: ") + calendarModel.nextCycle.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
 						font.pixelSize: parent.parent.width / 25
 					}
 				}
