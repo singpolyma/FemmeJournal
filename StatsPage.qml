@@ -68,7 +68,6 @@ Page {
 				Text { text: "Length: " }
 				Text { text: cycle.length + " days"; horizontalAlignment: Text.AlignRight; Layout.fillWidth: true }
 			}
-			Text { text: cycle.menstrualLength ? "Menstruated for: " + cycle.menstrualLength + " days" : "" }
 		}
 	}
 }
