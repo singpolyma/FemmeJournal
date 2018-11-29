@@ -18,7 +18,7 @@ Page {
 			text:
 				"This application is free software, licensed under the GNU Affero General Public License, Version 3, or any later version." +
 				"<ul>" +
-				"<li><a href='https://ipfs.io/ipns/QmRdPza7cd6cBHHpRNusBz6w8zwXcxeD5NEgRyETRCfQyy'>Source code</a></li>" +
+				"<li><a href='https://ipfs.io/ipns/12D3KooWQSeeZbkkZFsgAbDC1sF1dyVmHtsyngVjErv5Y1SV99KN'>Source code</a></li>" +
 				"<li><a href='https://github.com/singpolyma/FemmeJournal/issues'>Issue tracker</a> / <a href='mailto:femmejournal@singpolyma.net'>Email issues</a></li>" +
 				"<li>Donate: <a href='https://paypal.me/singpolyma'>PayPal</a> or <a href='bitcoin:1GHKCmFbgB9KXh7CHXqCVQY94E6EY8PxRC'>Bitcoin</a></li>" +
 				"</ul>" +
