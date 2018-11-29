@@ -4,10 +4,12 @@ CONFIG += c++11
 
 SOURCES += main.cpp \
     calendarmodel.cpp \
-    qcalparser.cpp \
+    configmodel.cpp \
+    cycle.cpp \
     journalentry.cpp \
-    symptomsmodel.cpp \
-    configmodel.cpp
+    qcalparser.cpp \
+    statsmodel.cpp \
+    symptomsmodel.cpp
 
 RESOURCES += qml.qrc
 
@@ -40,10 +42,12 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     calendarmodel.h \
-    qcalparser.h \
+    configmodel.h \
+    cycle.h \
     journalentry.h \
-    symptomsmodel.h \
-    configmodel.h
+    qcalparser.h \
+    statsmodel.h \
+    symptomsmodel.h
 
 DISTFILES += \
     android/AndroidManifest.xml

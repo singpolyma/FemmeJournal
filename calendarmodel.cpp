@@ -44,7 +44,7 @@ CalendarModel::CalendarModel(ConfigModel *config, QObject *parent) : QAbstractLi
 	_month = _today.month();
 	_year = _today.year();
 	populate(_month, _year, _locale, true);
-	populateMeanCycleTimes();
+	_statsModel = new StatsModel(&_journalDates, this);
 }
 
 void CalendarModel::ready() {
@@ -67,14 +67,14 @@ JournalEntry *CalendarModel::entryOf(const QDate &date) {
 	if(!entry) {
 		entry = new JournalEntry(_config, this);
 		_journalDates.insert(date, entry);
-		addJournalEntry(date, entry);
+		addJournalEntry(date, entry, true);
 		emit newJournalEntry(date, entry);
 	}
 
 	return entry;
 }
 
-void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry) {
+void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry, bool empty) {
 	Q_ASSERT(entry);
 
 	entry->setParent(this);
@@ -88,7 +88,7 @@ void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry) {
 	connect(entry, SIGNAL(opkChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(changed()), this, SIGNAL(journalChanged()));
 
-	refreshMenstrualData();
+	if(!empty) refreshMenstrualData();
 	refreshJournalData();
 }
 
@@ -96,7 +96,7 @@ QDate CalendarModel::nextCycle() {
 	// Predict future cycles based on mean length alone for now
 
 	QDate today = QDate::currentDate();
-	int cycleLeft = _meanCycleLength - cycleDay(today, false);
+	int cycleLeft = _statsModel->meanCycleLength() - cycleDay(today, false);
 	return today.addDays(cycleLeft + 1);
 }
 
@@ -119,7 +119,7 @@ void CalendarModel::refreshMenstrualData() {
 		}
 	}
 
-	populateMeanCycleTimes();
+	_statsModel->refresh();
 
 	emit nextCycleChanged();
 	emit menstruatingTodayChanged();
@@ -202,7 +202,7 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 			return cycleDay(date);
 		case FertilityRole: {
 			int cday = cycleDay(date);
-			QDate nextCycle = date.addDays(_meanCycleLength - cday + 1);
+			QDate nextCycle = date.addDays(_statsModel->meanCycleLength() - cday + 1);
 
 			for(
 				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
@@ -234,7 +234,7 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 				}
 			}
 
-			QDate predictedOvulation = nextCycle.addDays(_meanOvulationDaysFromEnd * -1);
+			QDate predictedOvulation = nextCycle.addDays(_statsModel->meanOvulationDaysFromEnd() * -1);
 
 			QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(predictedOvulation);
 			if(i.key() == predictedOvulation) {
@@ -263,98 +263,6 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 	return QVariant();
 }
 
-static double mean(QVector<int> v, double knownMean = 0, double knownStdDev = 0) {
-	double numerator = 0;
-	int count = 0;
-
-	for(QVector<int>::const_iterator i = v.cbegin(); i != v.cend(); i++) {
-		if(knownMean && knownStdDev && (*i < knownMean - knownStdDev || *i > knownMean + knownStdDev)) continue;
-		numerator += *i;
-		count++;
-	}
-
-	if(count < 1) return 0;
-	return numerator / count;
-}
-
-static double stddev(QVector<int> v) {
-	if(v.length() < 1) return 0;
-
-	double numerator = 0;
-
-	for(QVector<int>::const_iterator i = v.cbegin(); i != v.cend(); i++) {
-		numerator += pow(*i, 2);
-	}
-
-	return sqrt((numerator / v.length()) - pow(mean(v), 2));
-}
-
-void CalendarModel::populateMeanCycleTimes() {
-	QVector<int> cycles(6, 28);
-	QVector<int> menstruations(6, 4);
-	QVector<int> ovulations(6, 14);
-
-	const QDate *lastBegan = NULL;
-	const QDate *lastEnded = NULL;
-	const QDate *lastOPKnegative = NULL;
-	const QDate *lastOPKpositive = NULL;
-
-	for(
-		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
-		i != (_journalDates.begin() - 1) && cycles.length() < 6;
-		i--
-	) {
-		if(i.value()->menstruationStarted()) {
-			if(lastBegan) {
-				cycles.removeFirst();
-				cycles.append(i.key().daysTo(*lastBegan));
-			}
-
-			if(lastEnded) {
-				menstruations.removeFirst();
-				menstruations.append(i.key().daysTo(*lastEnded) + 1);
-				lastEnded = NULL;
-			}
-
-			if(lastBegan && lastOPKnegative) {
-				if(!lastOPKpositive && lastOPKnegative->daysTo(*lastBegan) < 14) {
-					// No positive OPK, but a late negative, so ovulation
-					// likely took place later than this
-					ovulations.removeFirst();
-					ovulations.append(lastOPKnegative->daysTo(*lastBegan) - 1);
-				}
-				lastOPKnegative = NULL;
-			}
-
-			lastOPKpositive = NULL;
-			lastBegan = &i.key();
-		}
-
-		if(i.value()->menstruationStopped()) {
-			lastEnded = &i.key();
-		}
-
-		if(lastBegan && i.value()->property("opk") == JournalEntry::OPKPositive) {
-			lastOPKpositive = &i.key();
-			ovulations.removeFirst();
-			ovulations.append(i.key().daysTo(*lastBegan));
-		}
-
-		if(lastBegan && !lastOPKnegative && i.value()->property("opk") == JournalEntry::OPKNegative) {
-			lastOPKnegative = &i.key();
-		}
-	}
-
-	_meanCycleLength = round(mean(cycles, mean(cycles), stddev(cycles)));
-	if(!_meanCycleLength) _meanCycleLength = 28;
-
-	_meanMenstruationLength = round(mean(menstruations, mean(menstruations), stddev(menstruations)));
-	if(!_meanMenstruationLength) _meanMenstruationLength = 4;
-
-	_meanOvulationDaysFromEnd = round(mean(ovulations, mean(ovulations), stddev(ovulations)));
-	if(!_meanOvulationDaysFromEnd) _meanOvulationDaysFromEnd = _meanCycleLength - 14;
-}
-
 int CalendarModel::cycleDay(QDate date, bool rollover) const {
 	for(
 		QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
@@ -365,7 +273,7 @@ int CalendarModel::cycleDay(QDate date, bool rollover) const {
 		if(i.value()->menstruationStarted()) {
 			if(_lastRecordedMenstruation < date && rollover) {
 				// Predict future cycles based on mean length alone for now
-				return (i.key().daysTo(date) % _meanCycleLength) + 1;
+				return (i.key().daysTo(date) % _statsModel->meanCycleLength()) + 1;
 			} else {
 				return i.key().daysTo(date) + 1;
 			}
@@ -397,7 +305,7 @@ bool CalendarModel::menstruating(QDate date, bool rollover) const {
 		if(i.value()->menstruationStopped()) return false;
 	}
 
-	return cday <= _meanMenstruationLength;
+	return cday <= _statsModel->meanMenstruationLength();
 }
 
 int CalendarModel::rowCount(const QModelIndex &parent) const {

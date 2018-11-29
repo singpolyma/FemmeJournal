@@ -66,6 +66,17 @@ ApplicationWindow {
 				}
 			}
 			ToolButton {
+				onClicked: { stack.push(statsPage) }
+				visible: stack.currentItem != statsPage
+
+				ColouredSvg {
+					anchors.centerIn: parent
+					source: "qrc:/chart.svg"
+					sourceSize: Qt.size(parent.width/2, parent.height/2)
+					color: materialContext.Material.primaryTextColor
+				}
+			}
+			ToolButton {
 				onClicked: { stack.push(calendarPage) }
 				visible: stack.currentItem == summaryPage
 
@@ -170,6 +181,11 @@ ApplicationWindow {
 
 		CalendarPage {
 			id: calendarPage
+			visible: false
+		}
+
+		StatsPage {
+			id: statsPage
 			visible: false
 		}
 

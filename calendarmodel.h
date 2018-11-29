@@ -12,6 +12,7 @@
 
 #include "configmodel.h"
 #include "journalentry.h"
+#include "statsmodel.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -22,6 +23,7 @@ class CalendarModel : public QAbstractListModel
 	Q_PROPERTY(JournalEntry *selectedJournal READ selectedJournal NOTIFY selectedJournalChanged FINAL)
 	Q_PROPERTY(QDate nextCycle READ nextCycle NOTIFY nextCycleChanged FINAL)
 	Q_PROPERTY(bool menstruatingToday READ menstruatingToday NOTIFY menstruatingTodayChanged FINAL)
+	Q_PROPERTY(StatsModel *statsModel MEMBER _statsModel CONSTANT FINAL)
 
 	Q_PROPERTY(int month READ month WRITE setMonth NOTIFY monthChanged FINAL)
 	Q_PROPERTY(int year READ year WRITE setYear NOTIFY yearChanged FINAL)
@@ -82,7 +84,7 @@ Q_SIGNALS:
 public slots:
 	void refreshMenstrualData();
 	void refreshJournalData();
-	void addJournalEntry(QDate date, JournalEntry *entry);
+	void addJournalEntry(QDate date, JournalEntry *entry, bool empty = false);
 	void ready();
 
 protected:
@@ -99,11 +101,9 @@ protected:
 	QMap<QDate, JournalEntry*> _journalDates;
 	QDate _selectedDate;
 	QDate _lastRecordedMenstruation;
-	int _meanCycleLength;
-	int _meanMenstruationLength;
-	int _meanOvulationDaysFromEnd;
 	bool _ready;
 	ConfigModel *_config;
+	StatsModel *_statsModel;
 
 	Q_DISABLE_COPY(CalendarModel)
 };
