@@ -67,7 +67,7 @@ ApplicationWindow {
 			}
 			ToolButton {
 				onClicked: { stack.push(statsPage) }
-				visible: stack.currentItem != statsPage
+				visible: stack.currentItem == summaryPage
 
 				ColouredSvg {
 					anchors.centerIn: parent
