@@ -26,6 +26,7 @@ Page {
 				"<ul>" +
 				"<li><a href='https://material.io/icons/'>arrowback.svg</a> Apache 2.0</li>" +
 				"<li><a href='https://material.io/icons/'>settings.svg</a> Apache 2.0</li>" +
+				"<li><a href='https://material.io/icons/'>chart.svg</a> Apache 2.0</li>" +
 				"<li><a href='https://thenounproject.com/term/edit/1167409'>edit.svg</a> CC-BY 3.0 by Astonish</li>" +
 				"<li><a href='https://thenounproject.com/term/calendar/5906'>calendar.svg</a> CC-BY 3.0 by Adi Dizdarevic</li>" +
 				"<li><a href='https://thenounproject.com/term/heart/1009069'>heart.svg</a> CC-BY 3.0 by Aleksandr Vector</li>" +
