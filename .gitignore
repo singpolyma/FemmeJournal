@@ -1,6 +1,10 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
+icon.ico
+icon.icns
+icon-*.png
+android/res/mipmap-*
 *~
 *.autosave
 *.a

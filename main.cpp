@@ -3,6 +3,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QStandardPaths>
+#include <QIcon>
 #include <QDir>
 #include <QThread>
 #include <QDebug>
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
 {
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 	QGuiApplication app(argc, argv);
+	app.setWindowIcon(QIcon(":/icon.svg"));
 
 	QDir configDir(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/FemmeJournal");
 	if(!configDir.mkpath(".")) {

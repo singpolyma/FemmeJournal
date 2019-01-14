@@ -11,12 +11,60 @@ SOURCES += main.cpp \
     statsmodel.cpp \
     symptomsmodel.cpp
 
+RC_ICONS = icon.ico
+ICON = icon.icns
 RESOURCES += qml.qrc
 
 lint.target = lint
 lint.commands = 'qmllint *.qml'
-QMAKE_EXTRA_TARGETS += lint
-PRE_TARGETDEPS += lint
+
+icon16png.target = icon-16.png
+icon16png.commands = inkscape -z -e icon-16.png -w 16 -h 16 icon.svg
+
+icon32png.target = icon-32.png
+icon32png.commands = inkscape -z -e icon-32.png -w 32 -h 32 icon.svg
+
+icon36png.target = icon-36.png
+icon36png.commands = inkscape -z -e icon-36.png -w 36 -h 36 icon.svg
+
+icon48png.target = icon-48.png
+icon48png.commands = inkscape -z -e icon-48.png -w 48 -h 48 icon.svg
+
+icon72png.target = icon-72.png
+icon72png.commands = inkscape -z -e icon-72.png -w 72 -h 72 icon.svg
+
+icon96png.target = icon-96.png
+icon96png.commands = inkscape -z -e icon-96.png -w 96 -h 96 icon.svg
+
+icon144png.target = icon-144.png
+icon144png.commands = inkscape -z -e icon-144.png -w 144 -h 144 icon.svg
+
+icon192png.target = icon-192.png
+icon192png.commands = inkscape -z -e icon-192.png -w 192 -h 192 icon.svg
+
+icon256png.target = icon-256.png
+icon256png.commands = inkscape -z -e icon-256.png -w 256 -h 256 icon.svg
+
+ico.target = icon.ico
+ico.depends = icon-16.png icon-32.png icon-256.png
+ico.commands = convert icon-16.png icon-32.png icon-256.png icon.ico
+
+icns.target = icon.icns
+icns.depends = icon-16.png icon-32.png icon-256.png
+icns.commands = png2icns icon.icns icon-16.png icon-32.png icon-256.png
+
+androidIcon.target = androidIcon
+androidIcon.depends = icon-36.png icon-48.png icon-72.png icon-96.png icon-144.png icon-192.png
+androidIcon.commands = \
+	mkdir -p android/res/mipmap-ldpi && cp icon-36.png android/res/mipmap-ldpi/icon.png && \
+	mkdir -p android/res/mipmap-mdpi && cp icon-48.png android/res/mipmap-mdpi/icon.png && \
+	mkdir -p android/res/mipmap-hdpi && cp icon-72.png android/res/mipmap-hdpi/icon.png && \
+	mkdir -p android/res/mipmap-xhdpi && cp icon-96.png android/res/mipmap-xhdpi/icon.png && \
+	mkdir -p android/res/mipmap-xxhdpi && cp icon-144.png android/res/mipmap-xxhdpi/icon.png && \
+	mkdir -p android/res/mipmap-xxxhdpi && cp icon-192.png android/res/mipmap-xxxhdpi/icon.png
+
+QMAKE_EXTRA_TARGETS += lint ico icns androidIcon icon16png icon32png icon36png icon48png icon72png icon96png icon144png icon192png icon256png
+PRE_TARGETDEPS += lint icon.ico icon.icns androidIcon
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
