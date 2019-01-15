@@ -168,16 +168,24 @@ Rectangle {
 						anchors.margins: 2
 						height: Math.ceil(parent.height * 0.17)
 
-						Rectangle {
+						Item {
 							implicitHeight: parent.height
 							implicitWidth: height
-							radius: width*0.5
-							color: "black"
 							opacity: summaryText(model.journalEntry) == "" ? 0 : 0.5
+
+							Rectangle {
+								id: summaryCircle
+								anchors.centerIn: parent
+								implicitHeight: parent.parent.height
+								implicitWidth: height
+								radius: width*0.5
+								color: "black"
+								opacity: 0.5
+							}
 
 							ColorOverlay {
 								anchors.fill: parent
-								source: parent
+								source: summaryCircle
 								opacity: 0.5
 								color: Material.foreground
 							}
