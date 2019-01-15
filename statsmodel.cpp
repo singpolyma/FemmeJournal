@@ -156,8 +156,8 @@ void StatsModel::refresh() {
 	if(!_meanOvulationDaysFromEnd || _meanOvulationDaysFromEnd == 14) _meanOvulationDaysFromEnd = _meanCycleLength - 14;
 
 	emit refreshed();
-	beginRemoveRows(QModelIndex(), 0, rowCount() - 1);
+	beginRemoveRows(QModelIndex(), 0, qMax(rowCount() - 1, 0));
 	endRemoveRows();
-	beginInsertRows(QModelIndex(), 0, rowCount() - 1);
+	beginInsertRows(QModelIndex(), 0, qMax(rowCount() - 1, 0));
 	endInsertRows();
 }
