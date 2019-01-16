@@ -10,13 +10,13 @@
         <file>Segment.qml</file>
         <file>SettingsPage.qml</file>
         <file>StatsPage.qml</file>
+        <file>FemmeJournal.svg</file>
         <file>arrowback.svg</file>
         <file>calendar.svg</file>
         <file>chart.svg</file>
         <file>edit.svg</file>
         <file>flower.svg</file>
         <file>heart.svg</file>
-        <file>icon.svg</file>
         <file>settings.svg</file>
         <file>bg.png</file>
     </qresource>
