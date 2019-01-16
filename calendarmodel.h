@@ -35,6 +35,7 @@ public:
 	explicit CalendarModel(ConfigModel *config = nullptr, QObject *parent = nullptr);
 
 	void setSelectedDate(QDate date);
+	Q_INVOKABLE void setSelectedDate(int year, int month, int day);
 	JournalEntry *selectedJournal();
 
 	QDate nextCycle();

@@ -58,6 +58,10 @@ void CalendarModel::setSelectedDate(QDate date) {
 	emit selectedJournalChanged();
 }
 
+void CalendarModel::setSelectedDate(int year, int month, int day) {
+	setSelectedDate(QDate(year, month, day));
+}
+
 JournalEntry *CalendarModel::selectedJournal() {
 	return entryOf(_selectedDate);
 }
