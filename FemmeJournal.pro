@@ -66,11 +66,19 @@ androidIcon.commands = \
 	mkdir -p android/res/mipmap-xxhdpi && cp icon-144.png android/res/mipmap-xxhdpi/icon.png && \
 	mkdir -p android/res/mipmap-xxxhdpi && cp icon-192.png android/res/mipmap-xxxhdpi/icon.png
 
+FemmeJournal.desktop.files = FemmeJournal.desktop
+FemmeJournal.desktop.path = $${PREFIX}/share/applications
+unix:!android:INSTALLS += FemmeJournal.desktop
+
 FemmeJournal.svg.files = FemmeJournal.svg
 FemmeJournal.svg.path = $${PREFIX}/share/icons/hicolor/scalable/apps
 unix:!android:INSTALLS += FemmeJournal.svg
 
-QMAKE_EXTRA_TARGETS += lint ico icns androidIcon icon16png icon32png icon36png icon48png icon72png icon96png icon144png icon192png icon256png FemmeJournal.svg
+appdata.files = net.singpolyma.FemmeJournal.appdata.xml
+appdata.path = $${PREFIX}/share/metainfo
+unix:!android:INSTALLS += appdata
+
+QMAKE_EXTRA_TARGETS += lint ico icns androidIcon icon16png icon32png icon36png icon48png icon72png icon96png icon144png icon192png icon256png FemmeJournal.desktop FemmeJournal.svg appdata
 PRE_TARGETDEPS += lint
 win32:PRE_TARGETDEPS += ico
 macx:PRE_TARGETDEPS += icns

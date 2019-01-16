@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- Copyright 2019 Stephen Paul Weber -->
+<component xmlns="https://specifications.freedesktop.org/metainfo/1.0">
+	<id>net.singpolyma.FemmeJournal</id>
+	<name>FemmeJournal</name>
+	<summary>Period tracking calendar and predictor</summary>
+	<description>Convergent period tracker that works on all screen sizes.</description>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>AGPL-3.0+</project_license>
+	<developer_name>singpolyma</developer_name>
+	<update_contact>femmejournal@singpolyma.net</update_contact>
+	<icon type="remote">https://ipfs.io/ipfs/QmPE7LyBvQXP4S2U7yx1ZZSpqaKZSPJ3jK3RAqe6Hc8sTP/FemmeJournal.svg</icon>
+	<categories>
+		<category>Utility</category>
+		<category>Calendar</category>
+		<category>Science</category>
+		<category>MedicalSoftware</category>
+	</categories>
+	<url type="homepage">https://github.com/singpolyma/FemmeJournal</url>
+	<url type="bugtracker">mailto:femmejournal@singpolma.net</url>
+	<url type="bugtracker">https://github.com/singpolyma/FemmeJournal/issues</url>
+	<url type="donation">https://paypal.me/singpolyma</url>
+	<launchable type="desktop-id">FemmeJournal.desktop</launchable>
+	<provides>
+		<binary>FemmeJournal</binary>
+	</provides>
+	<screenshots>
+		<screenshot type="default">
+			<caption>Calendar view in desktop or tablet mode</caption>
+			<image type="source">https://ipfs.io/ipfs/QmcfJuKngCWMVBwC7dYg2Hn2yEYJZ3vGpxGFPGJSL4ZhGa/screenshot.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Calendar view in mobile</caption>
+			<image type="source">https://ipfs.io/ipfs/QmVvGjFVKtM5oSW4hpaAXA99bpviinZBB5g1KAfZusvbg7/screenshot.png</image>
+		</screenshot>
+	</screenshots>
+	<content_rating type="oars-1.0" />
+</component>
