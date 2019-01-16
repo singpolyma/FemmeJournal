@@ -1,3 +1,12 @@
 #!/bin/sh
 
+while [ $# -gt 0 ]; do
+	case "$1" in
+		--prefix=*)
+			export PREFIX="$(expr "$1" : '--prefix=\(.*\)')"
+		;;
+	esac
+	shift
+done
+
 qmake
