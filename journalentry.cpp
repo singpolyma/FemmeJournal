@@ -22,6 +22,7 @@ JournalEntry::JournalEntry(ConfigModel *config, QObject *parent) :
 	connect(this, SIGNAL(temperatureChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(weightChanged()), this, SIGNAL(changed()));
 	connect(this, SIGNAL(noteChanged()), this, SIGNAL(changed()));
+	connect(&_symptoms, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SIGNAL(symptomsChanged()));
 	connect(&_symptoms, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&)), this, SIGNAL(changed()));
 }
 
