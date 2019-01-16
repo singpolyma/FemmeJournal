@@ -18,7 +18,7 @@ Item {
 	}
 
 	ColorOverlay {
-		anchors.fill: parent
+		anchors.fill: svg
 		source: svg
 		color: parent.color
 		opacity: svg.opacity
