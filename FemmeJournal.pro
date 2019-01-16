@@ -1,3 +1,5 @@
+VERSION = 0.1.0
+
 PREFIX = $$(PREFIX)
 isEmpty(PREFIX):PREFIX = /usr
 
@@ -83,6 +85,8 @@ PRE_TARGETDEPS += lint
 win32:PRE_TARGETDEPS += ico
 macx:PRE_TARGETDEPS += icns
 android:PRE_TARGETDEPS += androidIcon
+
+DEFINES += VERSION=\'\"$${VERSION}\"\'
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
