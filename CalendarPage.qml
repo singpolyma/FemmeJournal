@@ -6,7 +6,7 @@ import net.singpolyma.femmejournal 1.0
 
 Page {
 	title: qsTr("Calendar")
-	property var journal: journal
+	property var journal: parent.width > 1024 ? sidebarJournal : stackJournal
 
 	function intimateSummary(entry) {
 		if(!entry.intimate) return null;
@@ -78,12 +78,21 @@ Page {
 		}
 
 		EditJournalEntry {
-			id: journal
+			id: sidebarJournal
 			title: qsTr("Journal")
 			z: -1
 			Layout.fillHeight: true
 			Layout.minimumWidth: parent.width > parent.height ? 0.4 * parent.width : 0
 			visible: parent.width >= 1024
+		}
+
+		EditJournalEntry {
+			id: stackJournal
+			title: qsTr("Journal")
+			z: -1
+			Layout.fillHeight: true
+			Layout.minimumWidth: parent.width > parent.height ? 0.4 * parent.width : 0
+			visible: false
 		}
 	}
 }
