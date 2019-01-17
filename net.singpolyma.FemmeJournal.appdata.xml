@@ -36,4 +36,8 @@
 		</screenshot>
 	</screenshots>
 	<content_rating type="oars-1.0" />
+
+	<releases>
+		<release version="0.1.0" type="stable" date="2019-01-16" />
+	</releases>
 </component>
