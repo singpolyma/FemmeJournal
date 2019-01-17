@@ -19,6 +19,7 @@
 	<url type="homepage">https://github.com/singpolyma/FemmeJournal</url>
 	<url type="bugtracker">mailto:femmejournal@singpolma.net</url>
 	<url type="bugtracker">https://github.com/singpolyma/FemmeJournal/issues</url>
+	<url type="donation">https://liberapay.com/singpolyma</url>
 	<url type="donation">https://paypal.me/singpolyma</url>
 	<launchable type="desktop-id">FemmeJournal.desktop</launchable>
 	<provides>
