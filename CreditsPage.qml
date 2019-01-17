@@ -20,7 +20,7 @@ Page {
 				"<ul>" +
 				"<li><a href='https://ipfs.io/ipns/12D3KooWQSeeZbkkZFsgAbDC1sF1dyVmHtsyngVjErv5Y1SV99KN'>Source code</a></li>" +
 				"<li><a href='https://github.com/singpolyma/FemmeJournal/issues'>Issue tracker</a> / <a href='mailto:femmejournal@singpolyma.net'>Email issues</a></li>" +
-				"<li>Donate: <a href='https://paypal.me/singpolyma'>PayPal</a> or <a href='bitcoin:1GHKCmFbgB9KXh7CHXqCVQY94E6EY8PxRC'>Bitcoin</a></li>" +
+				"<li>Donate: <a href='https://liberapay.com/singpolyma'>Regular support</a> or <a href='https://paypal.me/singpolyma'>one-time PayPal</a> or <a href='bitcoin:1GHKCmFbgB9KXh7CHXqCVQY94E6EY8PxRC'>Bitcoin</a></li>" +
 				"</ul>" +
 				"<h2>Assets</h2>" +
 				"<ul>" +
