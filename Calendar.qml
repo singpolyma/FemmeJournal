@@ -209,7 +209,7 @@ Rectangle {
 			onClicked: {
 				focus = true;
 				// Workaround for weird timezone QDate conversion bug
-				calendarModel.setSelectedDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+				calendarModel.setSelectedDate(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
 			}
 		}
 
