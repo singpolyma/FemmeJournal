@@ -29,8 +29,6 @@ public:
 
 	QFileInfo dataFileInfo();
 
-	Q_INVOKABLE void readProperty(QByteArray name, void *ret);
-
 signals:
 	void weightUnitChanged(QString oldUnit, QString newUnit);
 	void temperatureUnitChanged(QString oldUnit, QString newUnit);

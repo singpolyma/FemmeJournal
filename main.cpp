@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
 	journalParser.moveToThread(&parserThread);
 
 	CalendarModel calendarModel(&config);
-	QObject::connect(&config, SIGNAL(dataFilePathChanged(QString)), &journalParser, SLOT(changeDataFilePath(QString)));
 	QObject::connect(&calendarModel, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &journalParser, SLOT(addJournalEntry(QDate,JournalEntry*)));
 	QObject::connect(&journalParser, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &calendarModel, SLOT(addJournalEntry(QDate,JournalEntry*)));
 	QObject::connect(&journalParser, SIGNAL(doneParse()), &calendarModel, SLOT(ready()));

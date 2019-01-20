@@ -25,6 +25,8 @@ public slots:
 	void parse();
 	void addJournalEntry(QDate date, JournalEntry *entry);
 	void changeDataFilePath(QString newPath);
+	void changeWeightUnit(QString oldUnit, QString newUnit);
+	void changeTemperatureUnit(QString oldUnit, QString newUnit);
 	void delaySave();
 	void save();
 
@@ -41,6 +43,8 @@ protected:
 	QFile *_file;
 	QTimer _timer;
 	ConfigModel *_config;
+	QString _weightUnit;
+	QString _temperatureUnit;
 };
 
 #endif // QCALPARSER_H

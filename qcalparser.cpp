@@ -11,10 +11,14 @@
 
 #include <QDebug>
 
-QCalParser::QCalParser(QFile *file, ConfigModel *config, QObject *parent) : QObject(parent), m_dataStream(), _timer(this), _config(config) {
+QCalParser::QCalParser(QFile *file, ConfigModel *config, QObject *parent) : QObject(parent), m_dataStream(), _file(file), _timer(this), _config(config) {
 	Q_ASSERT(config);
-	_file = file;
 	_timer.setSingleShot(true);
+	_weightUnit = config->property("weightUnit").toString();
+	_temperatureUnit = config->property("temperatureUnit").toString();
+	connect(config, SIGNAL(dataFilePathChanged(QString)), this, SLOT(changeDataFilePath(QString)));
+	connect(config, SIGNAL(weightUnitChanged(QString,QString)), this, SLOT(changeWeightUnit(QString,QString)));
+	connect(config, SIGNAL(temperatureUnitChanged(QString,QString)), this, SLOT(changeTemperatureUnit(QString,QString)));
 	connect(&_timer, SIGNAL(timeout()), this, SLOT(save()));
 	m_dataStream.setDevice(_file);
 }
@@ -39,17 +43,23 @@ void QCalParser::changeDataFilePath(QString newPath) {
 	save();
 }
 
+void QCalParser::changeWeightUnit(QString oldUnit, QString newUnit) {
+	(void)oldUnit;
+	_weightUnit = newUnit;
+}
+
+void QCalParser::changeTemperatureUnit(QString oldUnit, QString newUnit) {
+	(void)oldUnit;
+	_temperatureUnit = newUnit;
+}
+
 void QCalParser::delaySave() {
 	_timer.start(1000);
 }
 
 void QCalParser::save() {
-	QVariant retVal;
-	QMetaObject::invokeMethod(_config, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "weightUnit"), Q_ARG(void*, &retVal));
-	QString weightUnit = retVal.toString().toUpper();
-
-	QMetaObject::invokeMethod(_config, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "temperatureUnit"), Q_ARG(void*, &retVal));
-	QString temperatureUnit = retVal.toString().toUpper();
+	QString weightUnit = _weightUnit.toUpper();
+	QString temperatureUnit = _temperatureUnit.toUpper();
 
 	m_dataStream.seek(0);
 	_file->seek(0);
@@ -176,18 +186,11 @@ QStringList QCalParser::saveEntry(QString weightUnit, QString temperatureUnit, J
 }
 
 void QCalParser::parse() {
-	QVariant retVal;
-	QMetaObject::invokeMethod(_config, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "weightUnit"), Q_ARG(void*, &retVal));
-	QString weightUnit = retVal.toString();
-
-	QMetaObject::invokeMethod(_config, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "temperatureUnit"), Q_ARG(void*, &retVal));
-	QString temperatureUnit = retVal.toString();
-
 	m_dataStream.seek(0);
 	QString line = m_dataStream.readLine();
 	while(!line.isNull()) {
 		if(line.contains("BEGIN:VJOURNAL")) {
-			parseBlock(weightUnit, temperatureUnit);
+			parseBlock(_weightUnit, _temperatureUnit);
 		} else {
 			m_eventList.append(QVariant::fromValue(line));
 		}

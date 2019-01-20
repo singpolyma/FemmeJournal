@@ -147,7 +147,3 @@ void ConfigModel::saveConfig() {
 
 	_configFile->write(QJsonDocument(o).toJson());
 }
-
-void ConfigModel::readProperty(QByteArray name, void *ret) {
-	*((QVariant*)ret) = property(name.constData());
-}
