@@ -8,10 +8,6 @@ SymptomsModel::SymptomsModel(ConfigModel *config, QObject *parent) : QAbstractLi
 	Q_ASSERT(config);
 }
 
-void SymptomsModel::readSymptoms(void *ret) {
-	*((QVariant*)ret) = QVariant::fromValue(_symptoms);
-}
-
 void SymptomsModel::setSymptomSeverity(QString symptom, enum SymptomSeverity severity) {
 	_symptoms.insert(symptom.toCaseFolded(), severity);
 

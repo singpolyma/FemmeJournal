@@ -80,7 +80,7 @@ Q_SIGNALS:
 	void localeChanged();
 	void titleChanged();
 	void newJournalEntry(QDate, JournalEntry*);
-	void journalChanged();
+	void journalChanged(QDate, QStringList);
 
 public slots:
 	void refreshMenstrualData();

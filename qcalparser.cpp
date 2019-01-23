@@ -27,11 +27,6 @@ QCalParser::~QCalParser() {
 	_file->close();
 }
 
-void QCalParser::addJournalEntry(QDate date, JournalEntry *entry) {
-	Q_ASSERT(entry);
-	m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
-}
-
 void QCalParser::changeDataFilePath(QString newPath) {
 	_file->close();
 	_file->setFileName(newPath);
@@ -53,7 +48,22 @@ void QCalParser::changeTemperatureUnit(QString oldUnit, QString newUnit) {
 	_temperatureUnit = newUnit;
 }
 
-void QCalParser::delaySave() {
+void QCalParser::updateJournalLines(QDate date, QStringList icsLines) {
+	for(
+		QList<QVariant>::iterator i = m_eventList.begin();
+		i != m_eventList.end();
+		i++
+	) {
+		if(i->typeName() == QString("QPair<QDate,QStringList>")) {
+			QPair<QDate,QStringList> v = i->value<QPair<QDate,QStringList>>();
+			if(v.first == date) {
+				i->setValue(QPair<QDate,QStringList>(date, icsLines));
+				goto done;
+			}
+		}
+	}
+	m_eventList.append(QVariant::fromValue(QPair<QDate,QStringList>(date, icsLines)));
+done:
 	_timer.start(1000);
 }
 
@@ -70,22 +80,11 @@ void QCalParser::save() {
 		i != m_eventList.end();
 		i++
 	) {
-		if(i->typeName() == QString("QPair<QDate,JournalEntry*>")) {
-			QPair<QDate,JournalEntry*> v = i->value<QPair<QDate,JournalEntry*>>();
-
-			QStringList lines = saveEntry(weightUnit, temperatureUnit, v.second);
-			if(!lines.empty()) {
-				m_dataStream << "BEGIN:VJOURNAL" << endl;
-				m_dataStream << "DTSTART:" << v.first.toString("yyyyMMdd") << endl;
-				for(QStringList::iterator i = lines.begin(); i != lines.end(); i++) {
-					m_dataStream << *i << endl;
-				}
-				m_dataStream << "END:VJOURNAL" << endl;
-			}
-		} else if(i->typeName() == QString("JournalEntry*")) {
+		if(i->typeName() == QString("QPair<QDate,QStringList>")) {
+			QPair<QDate,QStringList> v = i->value<QPair<QDate,QStringList>>();
 			m_dataStream << "BEGIN:VJOURNAL" << endl;
-			QStringList lines = saveEntry(weightUnit, temperatureUnit, i->value<JournalEntry*>());
-			for(QStringList::iterator i = lines.begin(); i != lines.end(); i++) {
+			m_dataStream << "DTSTART:" << v.first.toString("yyyyMMdd") << endl;
+			for(QStringList::iterator i = v.second.begin(); i != v.second.end(); i++) {
 				m_dataStream << *i << endl;
 			}
 			m_dataStream << "END:VJOURNAL" << endl;
@@ -95,94 +94,6 @@ void QCalParser::save() {
 	}
 
 	m_dataStream.flush();
-}
-
-QStringList QCalParser::saveEntry(QString weightUnit, QString temperatureUnit, JournalEntry *entry) {
-	QStringList lines;
-	QVariant retVal;
-
-	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "menstruationStarted"), Q_ARG(void*, &retVal));
-	if(retVal.toBool()) lines << "X-FEMMEJOURNAL-MENSTRUATION:STARTED";
-
-	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "menstruationStopped"), Q_ARG(void*, &retVal));
-	if(retVal.toBool()) lines << "X-FEMMEJOURNAL-MENSTRUATION:STOPPED";
-
-	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "intimate"), Q_ARG(void*, &retVal));
-	if(retVal.toBool()) {
-		QString line = "X-FEMMEJOURNAL-INTIMATE";
-
-		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "intimateProtection"), Q_ARG(void*, &retVal));
-		if(!retVal.isValid() || retVal.isNull()) {
-			// Protection unknown
-		} else if(retVal.toBool()) {
-			line += ";PROTECTION=TRUE";
-		} else {
-			line += ";PROTECTION=FALSE";
-		}
-
-		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "orgasm"), Q_ARG(void*, &retVal));
-		if(retVal.toInt() == JournalEntry::HadOrgasm) {
-			line += ";ORGASM=TRUE";
-		} else if(retVal.toInt() == JournalEntry::NoOrgasm) {
-			line += ";ORGASM=FALSE";
-		}
-
-		lines << line + ":TRUE";
-	}
-
-	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "opk"), Q_ARG(void*, &retVal));
-	if(retVal.toInt() == JournalEntry::OPKPositive) {
-		lines << "X-FEMMEJOURNAL-OPK:POSITIVE";
-	} else if(retVal.toInt() == JournalEntry::OPKNegative) {
-		lines << "X-FEMMEJOURNAL-OPK:NEGATIVE";
-	}
-
-	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "temperature"), Q_ARG(void*, &retVal));
-	if(retVal.toDouble() != 0) {
-		lines << "X-FEMMEJOURNAL-TEMPERATURE;UNIT=" + temperatureUnit + ":" + QString::number(retVal.toDouble());
-	}
-
-	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "weight"), Q_ARG(void*, &retVal));
-	if(retVal.toDouble() != 0) {
-		lines << "X-FEMMEJOURNAL-WEIGHT;UNIT=" + weightUnit + ":" + QString::number(retVal.toDouble());
-	}
-
-	{
-		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "symptoms"), Q_ARG(void*, &retVal));
-		SymptomsModel *model = retVal.value<SymptomsModel*>();
-		QMetaObject::invokeMethod(model, "readSymptoms", Qt::BlockingQueuedConnection, Q_ARG(void*, &retVal));
-		QMap<QString, enum SymptomsModel::SymptomSeverity> symptoms = retVal.value<QMap<QString, enum SymptomsModel::SymptomSeverity>>();
-		for(
-			QMap<QString, enum SymptomsModel::SymptomSeverity>::const_iterator i = symptoms.cbegin();
-			i != symptoms.cend();
-			i++
-		) {
-			QString line = "X-FEMMEJOURNAL-SYMPTOM";
-			if(*i != SymptomsModel::Unknown) line += ";SEVERITY=" + QString::number(*i);
-			line += ":" + i.key().toUpper();
-			lines << line;
-		}
-	}
-
-	QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "note"), Q_ARG(void*, &retVal));
-	QString note = retVal.toString();
-	if(!note.isEmpty()) {
-		note.replace("\\", "\\\\");
-		note.replace("\n", "\\n");
-		note.replace(",", "\\,");
-		note.replace(";", "\\;");
-		lines << "DESCRIPTION:" + note;
-	}
-
-	{
-		QMetaObject::invokeMethod(entry, "readProperty", Qt::BlockingQueuedConnection, Q_ARG(QByteArray, "unknownLines"), Q_ARG(void*, &retVal));
-		QStringList unknownLines = retVal.value<QStringList>();
-		for(QStringList::iterator i = unknownLines.begin(); i != unknownLines.end(); i++) {
-			lines << *i;
-		}
-	}
-
-	return lines;
 }
 
 void QCalParser::parse() {
@@ -335,10 +246,13 @@ void QCalParser::parseBlock(QString weightUnit, QString temperatureUnit) {
 	}
 
 	if(date.isNull()) {
-		m_eventList.append(QVariant::fromValue(entry));
-		entry->setParent(this);
+		QStringList icsLines = entry->icsLines();
+		icsLines << "END:VJOURNAL";
+		icsLines.prepend("BEGIN:VJOURNAL");
+		m_eventList.append(QVariant::fromValue(icsLines.join('\n')));
+		delete entry;
 	} else {
-		m_eventList.append(QVariant::fromValue(QPair<QDate,JournalEntry*>(date, entry)));
+		m_eventList.append(QVariant::fromValue(QPair<QDate,QStringList>(date, entry->icsLines())));
 		entry->moveToThread(QApplication::instance()->thread());
 		emit newJournalEntry(date, entry);
 	}

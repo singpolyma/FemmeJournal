@@ -74,7 +74,7 @@ public:
 
 	void addUnknownLine(QString line);
 
-	Q_INVOKABLE void readProperty(QByteArray name, void *ret);
+	QStringList icsLines();
 
 signals:
 	void menstruationStartedChanged();

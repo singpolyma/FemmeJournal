@@ -23,11 +23,10 @@ public:
 
 public slots:
 	void parse();
-	void addJournalEntry(QDate date, JournalEntry *entry);
 	void changeDataFilePath(QString newPath);
 	void changeWeightUnit(QString oldUnit, QString newUnit);
 	void changeTemperatureUnit(QString oldUnit, QString newUnit);
-	void delaySave();
+	void updateJournalLines(QDate date, QStringList icsLines);
 	void save();
 
 signals:
@@ -36,7 +35,6 @@ signals:
 
 protected:
 	void parseBlock(QString weightUnit, QString temperatureUnit);
-	QStringList saveEntry(QString weightUnit, QString temperatureUnit, JournalEntry* entry);
 
 	QList<QVariant> m_eventList;
 	QTextStream m_dataStream;

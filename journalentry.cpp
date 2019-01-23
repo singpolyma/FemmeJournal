@@ -133,6 +133,70 @@ void JournalEntry::changeTemperatureUnit(QString oldUnit, QString newUnit) {
 	}
 }
 
-void JournalEntry::readProperty(QByteArray name, void *ret) {
-	*((QVariant*)ret) = property(name.constData());
+QStringList JournalEntry::icsLines() {
+	QStringList lines;
+
+	if(menstruationStarted()) lines << "X-FEMMEJOURNAL-MENSTRUATION:STARTED";
+	if(menstruationStopped()) lines << "X-FEMMEJOURNAL-MENSTRUATION:STOPPED";
+
+	if(intimate()) {
+		QString line = "X-FEMMEJOURNAL-INTIMATE";
+
+		QVariant protection = intimateProtection();
+		if(!protection.isValid() || protection.isNull()) {
+			// Protection unknown
+		} else if(protection.toBool()) {
+			line += ";PROTECTION=TRUE";
+		} else {
+			line += ";PROTECTION=FALSE";
+		}
+
+		if(_orgasm == JournalEntry::HadOrgasm) {
+			line += ";ORGASM=TRUE";
+		} else if(_orgasm == JournalEntry::NoOrgasm) {
+			line += ";ORGASM=FALSE";
+		}
+
+		lines << line + ":TRUE";
+	}
+
+	if(_opk == JournalEntry::OPKPositive) {
+		lines << "X-FEMMEJOURNAL-OPK:POSITIVE";
+	} else if(_opk == JournalEntry::OPKNegative) {
+		lines << "X-FEMMEJOURNAL-OPK:NEGATIVE";
+	}
+
+	if(_temperature != 0) {
+		lines << "X-FEMMEJOURNAL-TEMPERATURE;UNIT=" + _config->property("temperatureUnit").toString() + ":" + QString::number(_temperature);
+	}
+
+	if(_weight != 0) {
+		lines << "X-FEMMEJOURNAL-WEIGHT;UNIT=" + _config->property("weightUnit").toString() + ":" + QString::number(_weight);
+	}
+
+	for(int i = 0; i < _symptoms.rowCount(); i++) {
+		QVariant severity = _symptoms.data(_symptoms.index(i, 0), SymptomsModel::SeverityRole);
+		if(!severity.isValid() || severity.isNull()) continue;
+		QString line = "X-FEMMEJOURNAL-SYMPTOM";
+		if(severity.toInt() != SymptomsModel::Unknown) line += ";SEVERITY=" + QString::number(severity.toInt());
+		line += ":" + _symptoms.data(_symptoms.index(i, 0), SymptomsModel::SymptomRole).toString().toUpper();
+		lines << line;
+	}
+
+	{
+		QString note = _note;
+		if(!note.isEmpty()) {
+			note.replace("\\", "\\\\");
+			note.replace("\n", "\\n");
+			note.replace(",", "\\,");
+			note.replace(";", "\\;");
+			lines << "DESCRIPTION:" + note;
+		}
+	}
+
+	for(QStringList::iterator i = _unknown.begin(); i != _unknown.end(); i++) {
+		lines << *i;
+	}
+
+	return lines;
 }
