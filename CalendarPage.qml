@@ -6,6 +6,8 @@ import net.singpolyma.FemmeJournal 1.0
 
 Page {
 	title: qsTr("Calendar")
+	height: parent.height
+	width: parent.width
 	property var journal: parent.width > 1024 ? sidebarJournal : stackJournal
 
 	function intimateSummary(entry) {
