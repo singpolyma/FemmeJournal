@@ -65,7 +65,7 @@ ApplicationWindow {
 							if(calendarModel.menstruatingToday && !calendarModel.entryOf(new Date()).menstruationStopped) {
 								return qsTr("Day ") + calendarModel.data(calendarModel.index(calendarModel.indexOf(new Date()), 0), 263);
 							} else {
-								var daysLeft = parseInt((calendarModel.nextCycle.getTime() - new Date().getTime()) / 86400000, 10);
+								var daysLeft = Math.floor(calendarModel.nextCycle.getTime() / 86400000) - Math.floor(new Date().getTime() / 86400000);
 								return daysLeft > 0 ? daysLeft + qsTr(" Days Left") : (-1*daysLeft) + qsTr(" Days Late");
 							}
 						}
