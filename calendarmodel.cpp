@@ -219,7 +219,7 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 				}
 				if(i.value()->property("opk") == JournalEntry::OPKPositive) {
 					if(i.key() == date) return "ovulated";
-					if(date.daysTo(i.key()) < 5) return "fertile";
+					if(date.daysTo(i.key()) <= 5) return "fertile";
 					return false;
 				}
 			}
@@ -255,7 +255,7 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 			int daysTo = predictedOvulation.daysTo(date);
 			if(daysTo == 0) return "ovulated";
 			if(daysTo > 0 && daysTo < 2) return "fertile";
-			if(daysTo < 0 && daysTo > -5) return "fertile";
+			if(daysTo < 0 && daysTo >= -5) return "fertile";
 			return false;
 		}
 		case JournalEntryRole:
