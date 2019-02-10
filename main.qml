@@ -32,11 +32,11 @@ ApplicationWindow {
 			}
 
 			ColumnLayout {
-				height: parent.height > parent.width ? parent.height * 0.60 : parent.height
-				width: parent.width
+				height: stack.height > stack.width ? stack.height * 0.60 : stack.height
+				width: stack.width
 
 				Rectangle {
-					Layout.topMargin: parent.parent.height * 0.05
+					Layout.topMargin: stack.height * 0.05
 					Layout.alignment: Qt.AlignHCenter
 					radius: 10
 					color: "#7F" + (""+materialContext.Material.background).substr(1,7)
