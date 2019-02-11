@@ -5,6 +5,7 @@
 #include <QtCore/qdatetime.h>
 #include <QtCore/qlocale.h>
 #include <QtQml/qqml.h>
+#include <QContiguousCache>
 
 #include "configmodel.h"
 #include "cycle.h"
@@ -21,6 +22,7 @@ class StatsModel : public QAbstractListModel
 
 public:
 	explicit StatsModel(ConfigModel *config, QMap<QDate, JournalEntry*> *journalDates, QObject *parent = nullptr);
+	static QDate predictOvulationFromTemperature(QString temperatureUnit, QContiguousCache<QPair<QDate,double>> &temperatureWindow);
 
 	int meanCycleLength() const;
 	int meanMenstruationLength() const;

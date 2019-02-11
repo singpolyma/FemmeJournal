@@ -90,6 +90,7 @@ void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry, bool empty)
 	connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(opkChanged()), this, SLOT(refreshMenstrualData()));
+	connect(entry, SIGNAL(temperatureChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, &JournalEntry::changed, this, [=]() { emit journalChanged(date, entry->icsLines()); });
 
 	if(!empty) refreshMenstrualData();
@@ -205,24 +206,33 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 		case CycleDayRole:
 			return cycleDay(date);
 		case FertilityRole: {
+			QContiguousCache<QPair<QDate,double>> temperatureWindow(7);
 			int cday = cycleDay(date);
 			QDate nextCycle = date.addDays(_statsModel->meanCycleLength() - cday + 1);
 			QDate ovulation = nextCycle.addDays(_statsModel->meanOvulationDaysFromEnd() * -1);
+			QDate temperaturePrediction;
 
 			for(
 				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date.addDays(-cday + 2));
 				i != _journalDates.end();
 				i++
 			) {
+				temperatureWindow.append(qMakePair(i.key(), i.value()->property("temperature").toDouble()));
+				if(i.value()->property("opk") == JournalEntry::OPKPositive) {
+					temperaturePrediction = QDate();
+					ovulation = i.key();
+					break;
+				}
+				if(temperaturePrediction.isNull()) {
+					temperaturePrediction = StatsModel::predictOvulationFromTemperature(_config->property("temperatureUnit").toString(), temperatureWindow);
+				}
 				if(i.value()->menstruationStarted()) {
 					ovulation = i.key().addDays(_statsModel->meanOvulationDaysFromEnd() * -1);
 					break;
 				}
-				if(i.value()->property("opk") == JournalEntry::OPKPositive) {
-					ovulation = i.key();
-					break;
-				}
 			}
+
+			if(temperaturePrediction.isValid()) ovulation = temperaturePrediction;
 
 			QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(ovulation);
 			if(i.key() == ovulation) {

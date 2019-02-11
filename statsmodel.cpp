@@ -87,7 +87,7 @@ static double meanExcludingOutliers(QVector<int> v, double defaultValue, int pre
 	return numerator / count;
 }
 
-static QDate predictOvulationFromTemperature(QString temperatureUnit, QContiguousCache<QPair<QDate,double>> &temperatureWindow) {
+QDate StatsModel::predictOvulationFromTemperature(QString temperatureUnit, QContiguousCache<QPair<QDate,double>> &temperatureWindow) {
 	if(temperatureWindow.size() < 7) return QDate();
 	int firstIndex = temperatureWindow.firstIndex();
 	temperatureWindow.normalizeIndexes();
