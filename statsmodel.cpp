@@ -156,7 +156,7 @@ void StatsModel::refresh() {
 
 				if(lastOPKpositive) {
 					opkPositive = true;
-					ovulationDaysFromEnd = i.key().daysTo(*lastBegan);
+					ovulationDaysFromEnd = lastOPKpositive->daysTo(*lastBegan);
 					ovulations.append(ovulationDaysFromEnd);
 				} else if(lastTemperaturePrediction.isValid()) {
 					ovulationDaysFromEnd = lastTemperaturePrediction.daysTo(*lastBegan);
