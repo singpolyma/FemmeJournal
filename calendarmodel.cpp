@@ -44,7 +44,7 @@ CalendarModel::CalendarModel(ConfigModel *config, QObject *parent) : QAbstractLi
 	_month = _today.month();
 	_year = _today.year();
 	populate(_month, _year, _locale, true);
-	_statsModel = new StatsModel(&_journalDates, this);
+	_statsModel = new StatsModel(config, &_journalDates, this);
 }
 
 void CalendarModel::ready() {

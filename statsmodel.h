@@ -6,8 +6,9 @@
 #include <QtCore/qlocale.h>
 #include <QtQml/qqml.h>
 
-#include "journalentry.h"
+#include "configmodel.h"
 #include "cycle.h"
+#include "journalentry.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -19,7 +20,7 @@ class StatsModel : public QAbstractListModel
 	Q_PROPERTY(int meanOvulationDaysFromEnd READ meanOvulationDaysFromEnd NOTIFY refreshed STORED false FINAL)
 
 public:
-	explicit StatsModel(QMap<QDate, JournalEntry*> *journalDates, QObject *parent = nullptr);
+	explicit StatsModel(ConfigModel *config, QMap<QDate, JournalEntry*> *journalDates, QObject *parent = nullptr);
 
 	int meanCycleLength() const;
 	int meanMenstruationLength() const;
@@ -40,6 +41,7 @@ public slots:
 	void refresh();
 
 protected:
+	ConfigModel *_config;
 	QMap<QDate, JournalEntry*> *_journalDates;
 	QVector<Cycle*> _recentCycles;
 	int _meanCycleLength;
