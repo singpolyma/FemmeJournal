@@ -207,52 +207,36 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 		case FertilityRole: {
 			int cday = cycleDay(date);
 			QDate nextCycle = date.addDays(_statsModel->meanCycleLength() - cday + 1);
+			QDate ovulation = nextCycle.addDays(_statsModel->meanOvulationDaysFromEnd() * -1);
 
 			for(
-				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date.addDays(-cday + 2));
 				i != _journalDates.end();
 				i++
 			) {
 				if(i.value()->menstruationStarted()) {
-					nextCycle = i.key();
+					ovulation = i.key().addDays(_statsModel->meanOvulationDaysFromEnd() * -1);
 					break;
 				}
 				if(i.value()->property("opk") == JournalEntry::OPKPositive) {
-					if(i.key() == date) return "ovulated";
-					if(date.daysTo(i.key()) <= 5) return "fertile";
-					return false;
+					ovulation = i.key();
+					break;
 				}
 			}
 
-			for(
-				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
-				i != (_journalDates.begin() - 1);
-				i--
-			) {
-				if(i == _journalDates.end()) continue;
-				if(i.key().daysTo(date) >= cday) break;
-				if(i.value()->property("opk") == JournalEntry::OPKPositive) {
-					if(i.key() == date) return "ovulated";
-					if(i.key().daysTo(date) < 2) return "fertile";
-					return false;
-				}
-			}
-
-			QDate predictedOvulation = nextCycle.addDays(_statsModel->meanOvulationDaysFromEnd() * -1);
-
-			QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(predictedOvulation);
-			if(i.key() == predictedOvulation) {
+			QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(ovulation);
+			if(i.key() == ovulation) {
 				// If there is data for the predicted day, advance past any negative OPK values
 				for(
 					;
 					i != _journalDates.end() && i.value()->property("opk") == JournalEntry::OPKNegative;
 					i++
 				) {
-					predictedOvulation = predictedOvulation.addDays(1);
+					ovulation = ovulation.addDays(1);
 				}
 			}
 
-			int daysTo = predictedOvulation.daysTo(date);
+			int daysTo = ovulation.daysTo(date);
 			if(daysTo == 0) return "ovulated";
 			if(daysTo > 0 && daysTo < 2) return "fertile";
 			if(daysTo < 0 && daysTo >= -5) return "fertile";
