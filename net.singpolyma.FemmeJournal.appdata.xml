@@ -8,7 +8,7 @@
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>AGPL-3.0+</project_license>
 	<developer_name>singpolyma</developer_name>
-	<update_contact>femmejournal@singpolyma.net</update_contact>
+	<update_contact>FemmeJournal@singpolyma.net</update_contact>
 	<icon type="remote">https://ipfs.io/ipfs/QmPE7LyBvQXP4S2U7yx1ZZSpqaKZSPJ3jK3RAqe6Hc8sTP/FemmeJournal.svg</icon>
 	<categories>
 		<category>Utility</category>
@@ -17,7 +17,7 @@
 		<category>MedicalSoftware</category>
 	</categories>
 	<url type="homepage">https://github.com/singpolyma/FemmeJournal</url>
-	<url type="bugtracker">mailto:femmejournal@singpolma.net</url>
+	<url type="bugtracker">mailto:FemmeJournal@singpolma.net</url>
 	<url type="bugtracker">https://github.com/singpolyma/FemmeJournal/issues</url>
 	<url type="donation">https://liberapay.com/singpolyma</url>
 	<url type="donation">https://paypal.me/singpolyma</url>
