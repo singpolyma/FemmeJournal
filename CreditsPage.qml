@@ -16,9 +16,10 @@ Page {
 			wrapMode: Text.WordWrap
 			textFormat: Text.RichText
 			text:
-				"This application is free software, licensed under the GNU Affero General Public License, Version 3, or any later version." +
+				"Version: " + VERSION +
+				"<p>This application is free software, licensed under the <a href='https://www.gnu.org/licenses/agpl-3.0.en.html'>GNU Affero General Public License, Version 3</a>, or any later version.</p>" +
 				"<ul>" +
-				"<li><a href='https://ipfs.io/ipns/12D3KooWQSeeZbkkZFsgAbDC1sF1dyVmHtsyngVjErv5Y1SV99KN'>Source code (git)</a> </li>" +
+				"<li><a href='https://ipfs.io/ipns/12D3KooWQSeeZbkkZFsgAbDC1sF1dyVmHtsyngVjErv5Y1SV99KN' title='" + COMMIT + "'>Source code (git)</a> </li>" +
 				"<li>Publicly email bugs, feedback, and patches to: <a href='mailto:FemmeJournal@singpolyma.net'>FemmeJournal@singpolyma.net</a> </li>" +
 				"<li>Donate: <a href='https://liberapay.com/singpolyma'>Regular support</a> or <a href='https://paypal.me/singpolyma'>one-time PayPal</a> or <a href='bitcoin:1GHKCmFbgB9KXh7CHXqCVQY94E6EY8PxRC'>Bitcoin</a> </li>" +
 				"</ul>" +

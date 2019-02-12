@@ -64,6 +64,8 @@ int main(int argc, char *argv[])
 	QQmlApplicationEngine engine;
 	engine.rootContext()->setContextProperty("calendarModel", &calendarModel);
 	engine.rootContext()->setContextProperty("config", &config);
+	engine.rootContext()->setContextProperty("VERSION", VERSION);
+	engine.rootContext()->setContextProperty("COMMIT", COMMIT);
 	engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
 	return app.exec();

@@ -17,6 +17,7 @@
 			"name": "FemmeJournal",
 			"sources": [{
 				"type": "git",
+				"disable-shallow-clone": true,
 				"path": ".."
 			}]
 		}

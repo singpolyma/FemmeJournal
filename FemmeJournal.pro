@@ -1,4 +1,11 @@
-VERSION = 0.1.0
+VERSION = $$system(git describe --always --dirty)
+
+DEFINES += VERSION="\\\"$(shell git describe --always --dirty)\\\""
+DEFINES += COMMIT="\\\"$(shell git rev-parse HEAD)\\\""
+
+win32 { # On windows version can only be numerical so remove commit hash
+	VERSION ~= s/-\d+-[a-f0-9]*$//
+}
 
 PREFIX = $$(PREFIX)
 isEmpty(PREFIX):PREFIX = /usr
@@ -85,8 +92,6 @@ PRE_TARGETDEPS += lint
 win32:PRE_TARGETDEPS += ico
 macx:PRE_TARGETDEPS += icns
 android:PRE_TARGETDEPS += androidIcon
-
-DEFINES += VERSION=\'\"$${VERSION}\"\'
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
