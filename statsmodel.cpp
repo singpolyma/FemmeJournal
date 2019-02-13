@@ -41,33 +41,9 @@ QHash<int, QByteArray> StatsModel::roleNames() const {
 	return roles;
 }
 
-static QPair<double, double> meanAndStddev(QVector<int> v, double defaultValue, int preferredCount) {
-	double meanNumerator = 0;
-	double stddevNumerator = 0;
-	int count = 0;
-
-	for(QVector<int>::const_iterator i = v.cbegin(); i != v.cend(); i++) {
-		count++;
-		meanNumerator += *i;
-		stddevNumerator += pow(*i, 2);
-	}
-
-	for(; count < preferredCount; count++) {
-		meanNumerator += defaultValue;
-		stddevNumerator += pow(defaultValue, 2);
-	}
-
-	Q_ASSERT(count);
-
-	double mean = meanNumerator / count;
-
-	return qMakePair(mean, sqrt((stddevNumerator / count) - pow(mean, 2)));
-}
-
 static double meanExcludingOutliers(QVector<int> v, double defaultValue, int preferredCount) {
-	QPair<double, double> truth = meanAndStddev(v, defaultValue, preferredCount);
-	double lowerBound = truth.first - truth.second;
-	double upperBound = truth.first + truth.second;
+	double lowerBound = defaultValue - (defaultValue * 0.5);
+	double upperBound = defaultValue * 1.5;
 
 	double numerator = 0;
 	int count = 0;
