@@ -1,0 +1,14 @@
+image: debian/stable
+packages:
+  - qtbase5-dev
+  - qtdeclarative5-dev
+  - libqt5svg5-dev
+  - qtdeclarative5-dev-tools
+sources:
+  - https://git.sr.ht/~singpolyma/FemmeJournal
+tasks:
+  - build: |
+      export PATH="/usr/lib/$(gcc -dumpmachine)/qt5/bin/:$PATH"
+      cd FemmeJournal
+      qmake
+      make
