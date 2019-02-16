@@ -10,7 +10,7 @@ win32 { # On windows version can only be numerical so remove commit hash
 PREFIX = $$(PREFIX)
 isEmpty(PREFIX):PREFIX = /usr
 
-QT += svg qml quick
+QT += qml
 
 qtHaveModule(charts) {
 	QT += charts

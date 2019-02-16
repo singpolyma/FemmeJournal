@@ -19,7 +19,11 @@
 int main(int argc, char *argv[])
 {
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#ifdef QT_CHARTS_LIB
 	QApplication app(argc, argv);
+#else
+	QGuiApplication app(argc, argv);
+#endif
 	app.setWindowIcon(QIcon(":/FemmeJournal.svg"));
 	app.setApplicationVersion(VERSION);
 

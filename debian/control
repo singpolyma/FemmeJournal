@@ -3,7 +3,7 @@ Section: x11
 Priority: optional
 Maintainer: Stephen Paul Weber <singpolyma@singpolyma.net>
 Build-Depends: debhelper (>= 9), qtbase5-dev, qtdeclarative5-dev,
- libqt5svg5-dev, qtdeclarative5-dev-tools
+ qtdeclarative5-dev-tools
 Standards-Version: 3.9.8
 Homepage: https://FemmeJournal.singpolyma.net
 
