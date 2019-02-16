@@ -1,5 +1,8 @@
 image: debian/stable
 packages:
+  - curl
+  - debhelper
+  - devscripts
   - qtbase5-dev
   - qtdeclarative5-dev
   - libqt5svg5-dev
@@ -8,7 +11,6 @@ sources:
   - https://git.sr.ht/~singpolyma/FemmeJournal
 tasks:
   - build: |
-      export PATH="/usr/lib/$(gcc -dumpmachine)/qt5/bin/:$PATH"
       cd FemmeJournal
-      qmake
-      make
+      debuild -uc -us
+      curl --upload-file ../femmejournal_*_*.deb https://transfer.sh/$(basename ../femmejournal_*_*.deb)
