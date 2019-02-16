@@ -12,6 +12,10 @@ isEmpty(PREFIX):PREFIX = /usr
 
 QT += svg qml quick
 
+qtHaveModule(charts) {
+	QT += charts
+}
+
 CONFIG += c++11
 
 SOURCES += main.cpp \
@@ -21,7 +25,8 @@ SOURCES += main.cpp \
     journalentry.cpp \
     qcalparser.cpp \
     statsmodel.cpp \
-    symptomsmodel.cpp
+    symptomsmodel.cpp \
+    temperaturechartmodel.cpp
 
 RC_ICONS = icon.ico
 ICON = icon.icns
@@ -122,7 +127,8 @@ HEADERS += \
     journalentry.h \
     qcalparser.h \
     statsmodel.h \
-    symptomsmodel.h
+    symptomsmodel.h \
+    temperaturechartmodel.h
 
 DISTFILES += \
     android/AndroidManifest.xml

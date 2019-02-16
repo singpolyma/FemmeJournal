@@ -12,10 +12,14 @@
 #include "calendarmodel.h"
 #include "qcalparser.h"
 
+#ifdef QT_CHARTS_LIB
+#include "temperaturechartmodel.h"
+#endif
+
 int main(int argc, char *argv[])
 {
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-	QGuiApplication app(argc, argv);
+	QApplication app(argc, argv);
 	app.setWindowIcon(QIcon(":/FemmeJournal.svg"));
 	app.setApplicationVersion(VERSION);
 
@@ -51,17 +55,30 @@ int main(int argc, char *argv[])
 	journalParser.moveToThread(&parserThread);
 
 	CalendarModel calendarModel(&config);
+
 	QObject::connect(&journalParser, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &calendarModel, SLOT(addJournalEntry(QDate,JournalEntry*)));
 	QObject::connect(&journalParser, SIGNAL(doneParse()), &calendarModel, SLOT(ready()));
 	QObject::connect(&calendarModel, SIGNAL(journalChanged(QDate, QStringList)), &journalParser, SLOT(updateJournalLines(QDate, QStringList)));
 	QObject::connect(&parserThread, SIGNAL(started()), &journalParser, SLOT(parse()));
 	QObject::connect(QApplication::instance(), SIGNAL(aboutToQuit()), &parserThread, SLOT(quit()));
+
+	QQmlApplicationEngine engine;
+#ifdef QT_CHARTS_LIB
+	TemperatureChartModel temperatureChartModel(&calendarModel);
+	QObject::connect(&journalParser, SIGNAL(doneParse()), &temperatureChartModel, SLOT(ready()));
+	QObject::connect(&journalParser, &QCalParser::newJournalEntry, &temperatureChartModel, &TemperatureChartModel::addJournalEntry);
+	QObject::connect(&calendarModel, &CalendarModel::newJournalEntry, &temperatureChartModel, &TemperatureChartModel::addJournalEntry);
+	engine.rootContext()->setContextProperty("temperatureChartModel", &temperatureChartModel);
+	engine.rootContext()->setContextProperty("QT_CHARTS_LIB", true);
+#else
+	engine.rootContext()->setContextProperty("QT_CHARTS_LIB", false);
+#endif
+
 	parserThread.start();
 
 	qmlRegisterType<JournalEntry>("net.singpolyma.FemmeJournal", 1, 0, "JournalEntry");
 	qmlRegisterType<SymptomsModel>("net.singpolyma.FemmeJournal", 1, 0, "SymptomsModel");
 
-	QQmlApplicationEngine engine;
 	engine.rootContext()->setContextProperty("calendarModel", &calendarModel);
 	engine.rootContext()->setContextProperty("config", &config);
 	engine.rootContext()->setContextProperty("VERSION", VERSION);

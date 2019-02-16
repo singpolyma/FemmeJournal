@@ -10,6 +10,7 @@
         <file>Segment.qml</file>
         <file>SettingsPage.qml</file>
         <file>StatsPage.qml</file>
+        <file>TemperatureChart.qml</file>
         <file>TopBar.qml</file>
         <file>FemmeJournal.svg</file>
         <file>arrowback.svg</file>
