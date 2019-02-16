@@ -358,6 +358,11 @@ Page {
 					onEditingFinished: {
 						calendarModel.selectedJournal.temperature = Number.fromLocaleString(Qt.locale(), text)
 					}
+					onActiveFocusChanged: {
+						if(text === "") {
+							calendarModel.selectedJournal.temperature = 0;
+						}
+					}
 				}
 
 				Label { text: qsTr("Weight") }
@@ -375,6 +380,11 @@ Page {
 					text: calendarModel.selectedJournal.weight === 0 ? "" : formatNumber(calendarModel.selectedJournal.weight, 5)
 					onEditingFinished: {
 						calendarModel.selectedJournal.weight = Number.fromLocaleString(Qt.locale(), text)
+					}
+					onActiveFocusChanged: {
+						if(text === "") {
+							calendarModel.selectedJournal.weight = 0;
+						}
 					}
 				}
 
