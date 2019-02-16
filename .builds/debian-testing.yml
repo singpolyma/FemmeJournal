@@ -5,7 +5,7 @@ tasks:
 - build: |
     cd FemmeJournal
     debuild -uc -us
-    curl --upload-file ../femmejournal_*_*.deb https://transfer.sh/$(basename ../femmejournal_*_*.deb)
+    curl -sT ../femmejournal_*_*.deb https://transfer.sh/$(basename ../femmejournal_*_*.deb)
 packages:
 - curl
 - debhelper
