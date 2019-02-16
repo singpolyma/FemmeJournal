@@ -1,0 +1,14 @@
+Source: femmejournal
+Section: x11
+Priority: optional
+Maintainer: Stephen Paul Weber <singpolyma@singpolyma.net>
+Build-Depends: debhelper (>= 9), qtbase5-dev, qtdeclarative5-dev,
+ libqt5svg5-dev, qtdeclarative5-dev-tools
+Standards-Version: 3.9.8
+Homepage: https://FemmeJournal.singpolyma.net
+
+Package: femmejournal
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Cross-platform, convergence-ready, track menstruation and fertility
+ Period tracker that works on any screen size

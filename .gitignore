@@ -5,6 +5,11 @@ icon.ico
 icon.icns
 icon-*.png
 android/res/mipmap-*
+debian/.debhelper
+debian/femmejournal
+debian/*.substvars
+debian/*.log
+debian/files
 *~
 *.autosave
 *.a

@@ -1,0 +1,13 @@
+femmejournal (0.1.0) stable; urgency=low
+
+  First stable release
+
+  This version builds and runs with Debian 9's Qt 5.7 and upstream's Qt
+  5.7 for Android.  It has been in continuous testing by a single user for
+  most of a year on a Z10, and also ran on a Nexus 4 before that.
+
+  After this release, I intend to make breaking changes needed to fix some
+  quirks on upstream's Qt 5.11 for Debian and for Android, followed by a
+  release named 1.0.
+
+ -- Stephen Paul Weber <singpolyma@singpolyma.net>  Fri, 15 Feb 2019 23:07:48 -0500

@@ -1,0 +1,4 @@
+#!/usr/bin/make -f
+
+%:
+	PATH="/usr/lib/$(shell gcc -dumpmachine)/qt5/bin/:$$PATH" dh $@ --buildsystem=qmake --parallel
