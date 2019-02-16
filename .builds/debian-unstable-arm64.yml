@@ -1,4 +1,4 @@
-image: debian/stable
+image: debian/unstable
 sources:
 - https://git.sr.ht/~singpolyma/FemmeJournal
 tasks:
@@ -14,3 +14,5 @@ packages:
 - qtdeclarative5-dev
 - libqt5svg5-dev
 - qtdeclarative5-dev-tools
+- libqt5charts5-dev
+arch: arm64
