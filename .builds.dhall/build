@@ -1,5 +1,0 @@
-#!/bin/sh
-
-for FILE in *.dhall; do
-	dhall-to-yaml < "$FILE" > ../.builds/$(basename "$FILE" .dhall).yml
-done
