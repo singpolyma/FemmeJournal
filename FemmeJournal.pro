@@ -11,10 +11,8 @@ PREFIX = $$(PREFIX)
 isEmpty(PREFIX):PREFIX = /usr
 
 QT += qml
-
-qtHaveModule(charts) {
-	QT += charts
-}
+qtHaveModule(charts): QT += charts
+android: QT += svg
 
 CONFIG += c++11
 
