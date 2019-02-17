@@ -1,0 +1,3 @@
+#!/bin/sh
+
+echo "./fdroid/metadata.dhall $(fdroid/tags "$@")" | dhall-to-yaml > .fdroid.yml

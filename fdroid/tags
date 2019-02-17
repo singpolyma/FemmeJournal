@@ -1,0 +1,13 @@
+#!/bin/sh
+
+TAGS=""
+for TAG in $(git tag -l --sort=version:refname); do
+	TAGS="$TAGS,{ ref = \"$TAG\", version = \"$TAG\", debug = False }"
+done
+
+VERSION="$(git describe --always --dirty)"
+if [ "$1" = "dev" ] && echo "$VERSION" | grep -- - > /dev/null; then
+	TAGS="$TAGS,{ ref = \"$(git rev-parse HEAD)\", version = \"$VERSION\", debug = True }"
+fi
+
+echo "$TAGS]" | sed -e's/^./[/'

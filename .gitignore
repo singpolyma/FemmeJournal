@@ -1,6 +1,7 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 
+.fdroid.yml
 icon.ico
 icon.icns
 icon-*.png
@@ -28,7 +29,7 @@ debian/files
 *.*#
 core
 !core/
-tags
+/tags
 .DS_Store
 .directory
 *.debug
