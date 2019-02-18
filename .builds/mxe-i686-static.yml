@@ -12,7 +12,7 @@ tasks:
 packages:
 - curl
 - imagemagick
-- inkscape
+- librsvg2-bin
 - mxe-i686-w64-mingw32.static-qt5
 - qtdeclarative5-dev-tools
 repositories:

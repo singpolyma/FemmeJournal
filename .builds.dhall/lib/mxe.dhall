@@ -3,7 +3,7 @@
 	packages = [
 		"curl",
 		"imagemagick",
-		"inkscape",
+		"librsvg2-bin",
 		"mxe-${arch}-w64-mingw32.${style}-qt5",
 		"qtdeclarative5-dev-tools"
 	],

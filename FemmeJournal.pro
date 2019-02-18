@@ -36,31 +36,31 @@ lint.target = lint
 lint.commands = 'qmllint *.qml'
 
 icon16png.target = icon-16.png
-icon16png.commands = inkscape -z -e icon-16.png -w 16 -h 16 FemmeJournal.svg
+icon16png.commands = rsvg-convert -w 16 -h 16 -o icon-16.png FemmeJournal.svg
 
 icon32png.target = icon-32.png
-icon32png.commands = inkscape -z -e icon-32.png -w 32 -h 32 FemmeJournal.svg
+icon32png.commands = rsvg-convert -w 32 -h 32 -o icon-32.png FemmeJournal.svg
 
 icon36png.target = icon-36.png
-icon36png.commands = inkscape -z -e icon-36.png -w 36 -h 36 FemmeJournal.svg
+icon36png.commands = rsvg-convert -w 36 -h 36 -o icon-36.png FemmeJournal.svg
 
 icon48png.target = icon-48.png
-icon48png.commands = inkscape -z -e icon-48.png -w 48 -h 48 FemmeJournal.svg
+icon48png.commands = rsvg-convert -w 48 -h 48 -o icon-48.png FemmeJournal.svg
 
 icon72png.target = icon-72.png
-icon72png.commands = inkscape -z -e icon-72.png -w 72 -h 72 FemmeJournal.svg
+icon72png.commands = rsvg-convert -w 72 -h 72 -o icon-72.png FemmeJournal.svg
 
 icon96png.target = icon-96.png
-icon96png.commands = inkscape -z -e icon-96.png -w 96 -h 96 FemmeJournal.svg
+icon96png.commands = rsvg-convert -w 96 -h 96 -o icon-96.png FemmeJournal.svg
 
 icon144png.target = icon-144.png
-icon144png.commands = inkscape -z -e icon-144.png -w 144 -h 144 FemmeJournal.svg
+icon144png.commands = rsvg-convert -w 144 -h 144 -o icon-144.png FemmeJournal.svg
 
 icon192png.target = icon-192.png
-icon192png.commands = inkscape -z -e icon-192.png -w 192 -h 192 FemmeJournal.svg
+icon192png.commands = rsvg-convert -w 192 -h 192 -o icon-192.png FemmeJournal.svg
 
 icon256png.target = icon-256.png
-icon256png.commands = inkscape -z -e icon-256.png -w 256 -h 256 FemmeJournal.svg
+icon256png.commands = rsvg-convert -w 256 -h 256 -o icon-256.png FemmeJournal.svg
 
 ico.target = icon.ico
 ico.depends = icon-16.png icon-32.png icon-256.png

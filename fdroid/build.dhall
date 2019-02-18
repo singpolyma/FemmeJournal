@@ -7,7 +7,7 @@ in
 	commit = commit,
 	subdir = "android/",
 	output = "../build/build/outputs/apk/build-release-unsigned.apk",
-	sudo = "apt-get install -y inkscape",
+	sudo = "apt-get install -y librsvg2-bin",
 	prebuild = ./prebuild.sh as Text,
 	build =
 		''

@@ -5,7 +5,7 @@
 		"android-sdk-platform-23",
 		"curl",
 		"google-android-ndk-installer",
-		"inkscape"
+		"librsvg2-bin"
 	],
 	repositories = {
 		contrib = "http://ftp.ca.debian.org/debian/ stable contrib",
