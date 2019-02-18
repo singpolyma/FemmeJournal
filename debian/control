@@ -6,9 +6,13 @@ Build-Depends: debhelper (>= 9), qtbase5-dev, qtdeclarative5-dev,
  qtdeclarative5-dev-tools
 Standards-Version: 3.9.8
 Homepage: https://FemmeJournal.singpolyma.net
+Vcs-Git: https://FemmeJournal.singpolyma.net
 
 Package: femmejournal
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ qml-module-qtquick-templates2, qml-module-qtquick-controls2,
+ qml-module-qtquick-window2, qml-module-qt-labs-calendar,
+ qml-module-qtgraphicaleffects
 Description: Cross-platform, convergence-ready, track menstruation and fertility
  Period tracker that works on any screen size

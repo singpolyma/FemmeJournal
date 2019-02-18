@@ -1,1 +1,1 @@
-./lib/debian.dhall "stable" ([]: List Text)
+./lib/debian.dhall "stable" ([]: List Text) ([]: List Text)

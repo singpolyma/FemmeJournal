@@ -1,2 +1,2 @@
-\(releaseName: Text) -> \(extraDepends: List Text) ->
-	./debuild.dhall "ubuntu/${releaseName}" extraDepends
+\(releaseName: Text) ->
+	./debuild.dhall "ubuntu/${releaseName}"

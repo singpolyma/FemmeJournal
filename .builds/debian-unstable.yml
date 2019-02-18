@@ -4,6 +4,8 @@ sources:
 tasks:
 - build: |
     cd FemmeJournal
+    sed -i -e's/^Depends: /Depends: qml-module-qtcharts, /' debian/control
+
     debuild -uc -us
     curl -sT ../femmejournal_*_*.deb https://transfer.sh/$(basename ../femmejournal_*_*.deb)
 packages:

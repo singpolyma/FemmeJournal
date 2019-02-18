@@ -4,6 +4,7 @@ sources:
 tasks:
 - build: |
     cd FemmeJournal
+
     debuild -uc -us
     curl -sT ../femmejournal_*_*.deb https://transfer.sh/$(basename ../femmejournal_*_*.deb)
 packages:
