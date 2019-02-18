@@ -68,7 +68,16 @@ ico.commands = convert icon-16.png icon-32.png icon-256.png icon.ico
 
 icns.target = icon.icns
 icns.depends = icon-16.png icon-32.png icon-256.png
-icns.commands = png2icns icon.icns icon-16.png icon-32.png icon-256.png
+!macx:icns.commands = png2icns icon.icns icon-16.png icon-32.png icon-256.png
+macx:icns.commands = \
+	mkdir icon.iconset && \
+	cp icon-16.png icon.iconset/icon_16x16.png && \
+	cp icon-32.png icon.iconset/icon_16x16@2x.png && \
+	cp icon-32.png icon.iconset/icon_32x32.png && \
+	cp icon-256.png icon.iconset/icon_128x128@2x.png && \
+	cp icon-256.png icon.iconset/icon_256x256.png && \
+	iconutil --convert icns --output icon.icns icon.iconset && \
+	rm -r icon.iconset
 
 androidIcon.target = androidIcon
 androidIcon.depends = icon-36.png icon-48.png icon-72.png icon-96.png icon-144.png icon-192.png
