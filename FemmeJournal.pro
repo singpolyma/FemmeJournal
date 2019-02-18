@@ -3,8 +3,10 @@ VERSION = $$system(git describe --always --dirty)
 DEFINES += VERSION="\\\"$(shell git describe --always --dirty)\\\""
 DEFINES += COMMIT="\\\"$(shell git rev-parse HEAD)\\\""
 
+QMAKE_TARGET_COPYRIGHT = AGPL-3.0+
+QMAKE_TARGET_DESCRIPTION = https://FemmeJournal.singpolyma.net
 win32 { # On windows version can only be numerical so remove commit hash
-	VERSION ~= s/-\d+-[a-f0-9]*$//
+	VERSION ~= s/-.*$//
 }
 
 PREFIX = $$(PREFIX)
