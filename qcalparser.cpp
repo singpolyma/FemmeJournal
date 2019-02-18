@@ -92,23 +92,26 @@ void QCalParser::save() {
 
 void QCalParser::parse() {
 	QFile file(_path);
-	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		qFatal("Could not open file: %s", qUtf8Printable(file.fileName()));
-	}
-	QTextStream dataStream(&file);
+	if(file.exists()) {
+		if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			qFatal("Could not open file: %s", qUtf8Printable(file.fileName()));
+		}
+		QTextStream dataStream(&file);
 
-	QString line = dataStream.readLine();
-	while(!line.isNull()) {
-		if(line.contains("BEGIN:VJOURNAL")) {
-			parseBlock(_weightUnit, _temperatureUnit, &dataStream);
-		} else {
-			m_eventList.append(QVariant::fromValue(line));
+		QString line = dataStream.readLine();
+		while(!line.isNull()) {
+			if(line.contains("BEGIN:VJOURNAL")) {
+				parseBlock(_weightUnit, _temperatureUnit, &dataStream);
+			} else {
+				m_eventList.append(QVariant::fromValue(line));
+			}
+
+			line = dataStream.readLine();
 		}
 
-		line = dataStream.readLine();
+		file.close();
 	}
 
-	file.close();
 	emit doneParse();
 }
 

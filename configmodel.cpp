@@ -67,33 +67,35 @@ ConfigModel::ConfigModel(QString configPath, QString symptomsPath, QObject *pare
 	_symptomsPath(symptomsPath),
 	_configPath(configPath) {
 	QFile symptomsFile(symptomsPath);
-	if(!symptomsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		qFatal("Could not open file: %s", qUtf8Printable(symptomsFile.fileName()));
-	}
-	QTextStream symptomsStream(&symptomsFile);
+	if(symptomsFile.exists()) {
+		if(!symptomsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			qFatal("Could not open file: %s", qUtf8Printable(symptomsFile.fileName()));
+		}
+		QTextStream symptomsStream(&symptomsFile);
 
-	QString line = symptomsStream.readLine();
-	while(!line.isNull()) {
-		addSymptom(line, false);
-		line = symptomsStream.readLine();
+		QString line = symptomsStream.readLine();
+		while(!line.isNull()) {
+			addSymptom(line, false);
+			line = symptomsStream.readLine();
+		}
+		symptomsFile.close();
 	}
-	symptomsFile.close();
 
 	QFile configFile(configPath);
-	if(!configFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		qFatal("Could not open file: %s", qUtf8Printable(configFile.fileName()));
+	if(configFile.exists()) {
+		if(!configFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			qFatal("Could not open file: %s", qUtf8Printable(configFile.fileName()));
+		}
+		QVariantMap fromFile(QJsonDocument::fromJson(configFile.readAll()).object().toVariantMap());
+		configFile.close();
+		if(fromFile.contains("weightUnit")) _weightUnit = fromFile["weightUnit"].toString().toCaseFolded();
+		if(fromFile.contains("temperatureUnit")) _temperatureUnit = fromFile["temperatureUnit"].toString().toCaseFolded();
+		if(fromFile.contains("dataFilePath")) _dataFilePath = fromFile["dataFilePath"].toString();
 	}
-	QVariantMap fromFile(QJsonDocument::fromJson(configFile.readAll()).object().toVariantMap());
-	configFile.close();
-	if(fromFile.contains("weightUnit")) _weightUnit = fromFile["weightUnit"].toString().toCaseFolded();
-	if(fromFile.contains("temperatureUnit")) _temperatureUnit = fromFile["temperatureUnit"].toString().toCaseFolded();
-	if(fromFile.contains("dataFilePath")) _dataFilePath = fromFile["dataFilePath"].toString();
 
 	connect(this, SIGNAL(weightUnitChanged(QString,QString)), this, SLOT(saveConfig()));
 	connect(this, SIGNAL(temperatureUnitChanged(QString,QString)), this, SLOT(saveConfig()));
 	connect(this, SIGNAL(dataFilePathChanged(QString)), this, SLOT(saveConfig()));
-
-	saveSymptoms();
 }
 
 const QStringList& ConfigModel::allSymptoms() const {
