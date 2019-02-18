@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtQml/qqml.h>
 #include <QFile>
+#include <QSaveFile>
 #include <QFileInfo>
 #include <QTextStream>
 
@@ -18,8 +19,7 @@ class ConfigModel : public QObject
 	Q_PROPERTY(QString dataFilePath MEMBER _dataFilePath NOTIFY dataFilePathChanged FINAL)
 
 public:
-	explicit ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent = nullptr);
-	~ConfigModel();
+	explicit ConfigModel(QString configPath, QString symptomsPath, QObject *parent = nullptr);
 
 	const QStringList& allSymptoms() const;
 	int addSymptom(QString symptom, bool save = true);
@@ -43,9 +43,8 @@ protected:
 	QString _temperatureUnit;
 	QString _dataFilePath;
 	QStringList _allSymptoms;
-	QFile *_symptomsFile;
-	QFile *_configFile;
-	QTextStream _symptomsStream;
+	QString _symptomsPath;
+	QString _configPath;
 
 	Q_DISABLE_COPY(ConfigModel)
 };

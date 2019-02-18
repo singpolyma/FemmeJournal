@@ -32,30 +32,15 @@ int main(int argc, char *argv[])
 		qFatal("Could not make config directory: %s", qUtf8Printable(configDir.path()));
 	}
 
-	QFile configFile(configDir.absoluteFilePath("config"));
-	if(!configFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
-		qFatal("Could not open file: %s", qUtf8Printable(configFile.fileName()));
-	}
-
-	QFile symptomsFile(configDir.absoluteFilePath("symptoms"));
-	if(!symptomsFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
-		qFatal("Could not open file: %s", qUtf8Printable(symptomsFile.fileName()));
-	}
-
-	ConfigModel config(&configFile, &symptomsFile);
+	ConfigModel config(configDir.absoluteFilePath("config"), configDir.absoluteFilePath("symptoms"));
 	QFileInfo dataFileInfo = config.dataFileInfo();
 
 	if(!dataFileInfo.dir().mkpath(".")) {
 		qFatal("Could not make data directory: %s", qUtf8Printable(dataFileInfo.dir().path()));
 	}
 
-	QFile journalFile(dataFileInfo.filePath());
-	if(!journalFile.open(QIODevice::ReadWrite | QIODevice::Text)) {
-		qFatal("Could not open file: %s", qUtf8Printable(journalFile.fileName()));
-	}
-
 	QThread parserThread;
-	QCalParser journalParser(&journalFile, &config);
+	QCalParser journalParser(dataFileInfo.filePath(), &config);
 	journalParser.moveToThread(&parserThread);
 
 	CalendarModel calendarModel(&config);

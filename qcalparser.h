@@ -9,6 +9,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
+#include <QSaveFile>
 #include <QTimer>
 #include <QDate>
 
@@ -18,8 +19,7 @@
 class QCalParser : public QObject {
 	Q_OBJECT
 public:
-	QCalParser(QFile *file, ConfigModel *config, QObject *parent = 0);
-	~QCalParser();
+	QCalParser(QString path, ConfigModel *config, QObject *parent = 0);
 
 public slots:
 	void parse();
@@ -34,11 +34,10 @@ signals:
 	void newJournalEntry(QDate date, JournalEntry *entry);
 
 protected:
-	void parseBlock(QString weightUnit, QString temperatureUnit);
+	void parseBlock(QString weightUnit, QString temperatureUnit, QTextStream *dataStream);
 
 	QList<QVariant> m_eventList;
-	QTextStream m_dataStream;
-	QFile *_file;
+	QString _path;
 	QTimer _timer;
 	ConfigModel *_config;
 	QString _weightUnit;

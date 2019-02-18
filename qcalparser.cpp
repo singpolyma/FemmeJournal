@@ -11,7 +11,7 @@
 
 #include <QDebug>
 
-QCalParser::QCalParser(QFile *file, ConfigModel *config, QObject *parent) : QObject(parent), m_dataStream(), _file(file), _timer(this), _config(config) {
+QCalParser::QCalParser(QString path, ConfigModel *config, QObject *parent) : QObject(parent), _path(path), _timer(this), _config(config) {
 	Q_ASSERT(config);
 	_timer.setSingleShot(true);
 	_weightUnit = config->property("weightUnit").toString();
@@ -20,20 +20,10 @@ QCalParser::QCalParser(QFile *file, ConfigModel *config, QObject *parent) : QObj
 	connect(config, SIGNAL(weightUnitChanged(QString,QString)), this, SLOT(changeWeightUnit(QString,QString)));
 	connect(config, SIGNAL(temperatureUnitChanged(QString,QString)), this, SLOT(changeTemperatureUnit(QString,QString)));
 	connect(&_timer, SIGNAL(timeout()), this, SLOT(save()));
-	m_dataStream.setDevice(_file);
-}
-
-QCalParser::~QCalParser() {
-	_file->close();
 }
 
 void QCalParser::changeDataFilePath(QString newPath) {
-	_file->close();
-	_file->setFileName(newPath);
-	if(!_file->open(QIODevice::ReadWrite | QIODevice::Text)) {
-		qFatal("Could not open file: %s", qUtf8Printable(_file->fileName()));
-	}
-	m_dataStream.setDevice(_file);
+	_path = newPath;
 	parse();
 	save();
 }
@@ -71,9 +61,12 @@ void QCalParser::save() {
 	QString weightUnit = _weightUnit.toUpper();
 	QString temperatureUnit = _temperatureUnit.toUpper();
 
-	m_dataStream.seek(0);
-	_file->seek(0);
-	_file->resize(0);
+	QSaveFile file(_path);
+	file.setDirectWriteFallback(true);
+	if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(file.fileName()));
+	}
+	QTextStream dataStream(&file);
 
 	for(
 		QList<QVariant>::iterator i = m_eventList.begin();
@@ -82,41 +75,48 @@ void QCalParser::save() {
 	) {
 		if(i->typeName() == QString("QPair<QDate,QStringList>")) {
 			QPair<QDate,QStringList> v = i->value<QPair<QDate,QStringList>>();
-			m_dataStream << "BEGIN:VJOURNAL" << endl;
-			m_dataStream << "DTSTART:" << v.first.toString("yyyyMMdd") << endl;
+			dataStream << "BEGIN:VJOURNAL" << endl;
+			dataStream << "DTSTART:" << v.first.toString("yyyyMMdd") << endl;
 			for(QStringList::iterator i = v.second.begin(); i != v.second.end(); i++) {
-				m_dataStream << *i << endl;
+				dataStream << *i << endl;
 			}
-			m_dataStream << "END:VJOURNAL" << endl;
+			dataStream << "END:VJOURNAL" << endl;
 		} else {
-			m_dataStream << i->toString() << endl;
+			dataStream << i->toString() << endl;
 		}
 	}
 
-	m_dataStream.flush();
+	dataStream.flush();
+	file.commit();
 }
 
 void QCalParser::parse() {
-	m_dataStream.seek(0);
-	QString line = m_dataStream.readLine();
+	QFile file(_path);
+	if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(file.fileName()));
+	}
+	QTextStream dataStream(&file);
+
+	QString line = dataStream.readLine();
 	while(!line.isNull()) {
 		if(line.contains("BEGIN:VJOURNAL")) {
-			parseBlock(_weightUnit, _temperatureUnit);
+			parseBlock(_weightUnit, _temperatureUnit, &dataStream);
 		} else {
 			m_eventList.append(QVariant::fromValue(line));
 		}
 
-		line = m_dataStream.readLine();
+		line = dataStream.readLine();
 	}
 
+	file.close();
 	emit doneParse();
 }
 
-void QCalParser::parseBlock(QString weightUnit, QString temperatureUnit) {
+void QCalParser::parseBlock(QString weightUnit, QString temperatureUnit, QTextStream *dataStream) {
 	QDate date;
 	JournalEntry *entry = new JournalEntry(_config);
 	QString line;
-	while(!(line = m_dataStream.readLine()).contains(QByteArray("END:VJOURNAL"))) {
+	while(!(line = dataStream->readLine()).contains(QByteArray("END:VJOURNAL"))) {
 		const int deliminatorPosition = line.indexOf(QChar(':'));
 		const QString key   = line.mid(0, deliminatorPosition);
 		const QString value = line.mid(deliminatorPosition + 1, -1);

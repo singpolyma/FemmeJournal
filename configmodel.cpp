@@ -6,7 +6,7 @@
 #include <QJsonDocument>
 #include <QDebug>
 
-ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent) :
+ConfigModel::ConfigModel(QString configPath, QString symptomsPath, QObject *parent) :
 	QObject(parent),
 	_weightUnit("kg"),
 	_temperatureUnit("c"),
@@ -64,20 +64,27 @@ ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent
 		"unbalanced",
 		"weepy"
 	}),
-	_symptomsFile(symptomsFile),
-	_configFile(configFile) {
-	Q_ASSERT(symptomsFile);
-	Q_ASSERT(configFile);
-	_symptomsStream.setDevice(_symptomsFile);
+	_symptomsPath(symptomsPath),
+	_configPath(configPath) {
+	QFile symptomsFile(symptomsPath);
+	if(!symptomsFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(symptomsFile.fileName()));
+	}
+	QTextStream symptomsStream(&symptomsFile);
 
-	QString line = _symptomsStream.readLine();
+	QString line = symptomsStream.readLine();
 	while(!line.isNull()) {
 		addSymptom(line, false);
-		line = _symptomsStream.readLine();
+		line = symptomsStream.readLine();
 	}
+	symptomsFile.close();
 
-	_configFile->seek(0);
-	QVariantMap fromFile(QJsonDocument::fromJson(_configFile->readAll()).object().toVariantMap());
+	QFile configFile(configPath);
+	if(!configFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(configFile.fileName()));
+	}
+	QVariantMap fromFile(QJsonDocument::fromJson(configFile.readAll()).object().toVariantMap());
+	configFile.close();
 	if(fromFile.contains("weightUnit")) _weightUnit = fromFile["weightUnit"].toString().toCaseFolded();
 	if(fromFile.contains("temperatureUnit")) _temperatureUnit = fromFile["temperatureUnit"].toString().toCaseFolded();
 	if(fromFile.contains("dataFilePath")) _dataFilePath = fromFile["dataFilePath"].toString();
@@ -87,11 +94,6 @@ ConfigModel::ConfigModel(QFile *configFile, QFile *symptomsFile, QObject *parent
 	connect(this, SIGNAL(dataFilePathChanged(QString)), this, SLOT(saveConfig()));
 
 	saveSymptoms();
-}
-
-ConfigModel::~ConfigModel() {
-	_symptomsFile->close();
-	_configFile->close();
 }
 
 const QStringList& ConfigModel::allSymptoms() const {
@@ -127,23 +129,29 @@ QFileInfo ConfigModel::dataFileInfo() {
 }
 
 void ConfigModel::saveSymptoms() {
-	_symptomsStream.seek(0);
-	_symptomsFile->seek(0);
-	_symptomsFile->resize(0);
-	for(QStringList::iterator i = _allSymptoms.begin(); i != _allSymptoms.end(); i++) {
-		_symptomsStream << *i << endl;
+	QSaveFile symptomsFile(_symptomsPath);
+	if(!symptomsFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(symptomsFile.fileName()));
 	}
-	_symptomsStream.flush();
+	QTextStream symptomsStream(&symptomsFile);
+	for(QStringList::iterator i = _allSymptoms.begin(); i != _allSymptoms.end(); i++) {
+		symptomsStream << *i << endl;
+	}
+	symptomsStream.flush();
+	symptomsFile.commit();
 }
 
 void ConfigModel::saveConfig() {
-	_configFile->seek(0);
-	_configFile->resize(0);
+	QSaveFile configFile(_configPath);
+	if(!configFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+		qFatal("Could not open file: %s", qUtf8Printable(configFile.fileName()));
+	}
 
 	QJsonObject o;
 	o["weightUnit"] = _weightUnit;
 	o["temperatureUnit"] = _temperatureUnit;
 	o["dataFilePath"] = _dataFilePath;
 
-	_configFile->write(QJsonDocument(o).toJson());
+	configFile.write(QJsonDocument(o).toJson());
+	configFile.commit();
 }
