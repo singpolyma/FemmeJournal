@@ -17,7 +17,7 @@ in
 		LiberapayID = 1216655,
 		Bitcoin = "1GHKCmFbgB9KXh7CHXqCVQY94E6EY8PxRC",
 
-		SourceCode = "https://git.sr.ht/~singpolyma/FemmeJournal",
+		SourceCode = "https://FemmeJournal.singpolyma.net",
 		IssueTracker = "https://lists.sr.ht/~singpolyma/dev",
 
 		AutoName = "FemmeJournal",
