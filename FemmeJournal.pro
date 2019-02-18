@@ -92,8 +92,8 @@ unix:!android:INSTALLS += appdata
 
 QMAKE_EXTRA_TARGETS += lint ico icns androidIcon icon16png icon32png icon36png icon48png icon72png icon96png icon144png icon192png icon256png FemmeJournal.desktop FemmeJournal.svg appdata
 PRE_TARGETDEPS += lint
-win32:PRE_TARGETDEPS += ico
-macx:PRE_TARGETDEPS += icns
+win32:PRE_TARGETDEPS += icon.ico
+macx:PRE_TARGETDEPS += icon.icns
 android:PRE_TARGETDEPS += androidIcon
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
