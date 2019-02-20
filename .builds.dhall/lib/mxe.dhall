@@ -19,7 +19,7 @@
 			cd FemmeJournal
 			${arch}-w64-mingw32.${style}-qmake-qt5
 			make
-			curl -sT FemmeJournal.exe https://transfer.sh/FemmeJournal.exe
+			curl -sT release/FemmeJournal.exe https://transfer.sh/FemmeJournal.exe
 			''
 		}
 	]
