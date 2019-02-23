@@ -1,3 +1,4 @@
+\(installer_code: Text) -> \(arch: Text) -> ''
 # mostly taken from https://gitlab.com/ddorian/openrecipes/blob/master/android-setup-qt.sh
 set -e
 
@@ -6,11 +7,11 @@ mkdir -p /tmp/QT
 QT_INSTALLER="qt-unified-linux-x64-3.0.2-online.run"
 
 cd "$(mktemp -d)"
-wget -O "$QT_INSTALLER" "http://master.qt.io/archive/online_installers/3.0/${QT_INSTALLER}"
+wget -O "$QT_INSTALLER" "http://master.qt.io/archive/online_installers/3.0/$QT_INSTALLER"
 chmod +x "$QT_INSTALLER"
 
 QT_INSTALLER_SCRIPT="qt_installer_script.js"
-cat <<- EOF > "${QT_INSTALLER_SCRIPT}"
+cat <<- EOF > "$QT_INSTALLER_SCRIPT"
 function Controller() {
   installer.autoRejectMessageBoxes();
   installer.installationFinished.connect(function() {
@@ -48,8 +49,8 @@ Controller.prototype.ComponentSelectionPageCallback = function() {
   // --verbose flag. It will then print out a resource tree.
 
   widget.deselectAll();
-  widget.selectComponent("qt.qt5.5113.android_armv7");
-  widget.selectComponent("qt.qt5.5113.qtcharts");
+  widget.selectComponent("qt.qt5.${installer_code}.android_${arch}");
+  widget.selectComponent("qt.qt5.${installer_code}.qtcharts");
 
   gui.clickButton(buttons.NextButton);
 }
@@ -80,3 +81,4 @@ QT_QPA_PLATFORM=minimal ./"$QT_INSTALLER" --script "$QT_INSTALLER_SCRIPT"
 mkdir -p /tmp/QT/bin
 echo "#!/bin/sh" >> /tmp/QT/bin/qmllint
 chmod +x /tmp/QT/bin/qmllint
+''

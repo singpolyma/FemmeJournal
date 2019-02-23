@@ -27,7 +27,7 @@ in
 		Repo = ".",
 
 		Builds = map (Indexed Ref) ./buildType.dhall (\(ref: (Indexed Ref)) ->
-			./build.dhall ref.value.ref ref.value.version (ref.index + 1) ref.value.debug
+			./build.dhall ref.value.ref ref.value.version (ref.index + 1) [5, 10, 1] "armv7" ref.value.debug
 		) indexedRefs,
 
 		AutoUpdateMode = "Version %v",
