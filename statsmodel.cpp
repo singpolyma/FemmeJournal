@@ -65,8 +65,8 @@ static double meanExcludingOutliers(QVector<int> v, double defaultValue, int pre
 
 Date StatsModel::predictOvulationFromTemperature(QString temperatureUnit, QContiguousCache<QPair<Date,double>> &temperatureWindow) {
 	if(temperatureWindow.size() < 7) return Date();
-	int firstIndex = temperatureWindow.firstIndex();
 	temperatureWindow.normalizeIndexes();
+	int firstIndex = temperatureWindow.firstIndex();
 
 	QPair<Date,double> last = temperatureWindow.at(firstIndex + 6);
 	if(last.second == 0) return Date();
