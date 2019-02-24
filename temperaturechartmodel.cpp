@@ -12,7 +12,7 @@ void TemperatureChartModel::ready() {
 	emit endChanged();
 }
 
-void TemperatureChartModel::addJournalEntry(QDate date, JournalEntry *entry) {
+void TemperatureChartModel::addJournalEntry(Date date, JournalEntry *entry) {
 	connect(entry, &JournalEntry::temperatureChanged, this, [=]() {
 		int row = rowCount() + _end.daysTo(date) - 1;
 		if(row >= 0 && row < rowCount()) {
@@ -21,12 +21,16 @@ void TemperatureChartModel::addJournalEntry(QDate date, JournalEntry *entry) {
 	});
 }
 
-QDate TemperatureChartModel::start() {
-	return _end.addDays(0 - rowCount() + 1);
+QDateTime TemperatureChartModel::start() {
+	return _end.addDays(0 - rowCount() + 1).asDateTime();
 }
 
-void TemperatureChartModel::setEnd(QDate end) {
-	_end = end;
+QDateTime TemperatureChartModel::end() {
+	return _end.asDateTime();
+}
+
+void TemperatureChartModel::setEnd(QDateTime end) {
+	_end = end.date();
 	ready();
 }
 
@@ -37,10 +41,10 @@ QVariant TemperatureChartModel::data(const QModelIndex &index, int role) const {
 	int rows = rowCount();
 	if(!index.isValid() || index.row() >= rows || index.column() > columnCount()) return QVariant();
 
-	QDate date = _end.addDays(index.row() - rows + 1);
+	Date date = _end.addDays(index.row() - rows + 1);
 	double temperature = _calendarModel->entryOf(date)->property("temperature").toDouble();
 	if(index.column() == 0) {
-		return date;
+		return QVariant::fromValue(date.asDateTime());
 	} else {
 		return temperature;
 	}
@@ -51,7 +55,7 @@ int TemperatureChartModel::rowCount(const QModelIndex &parent) const {
 	if(parent.isValid()) return 0;
 
 	int rows = 0;
-	for(QDate d = _end; rows < 42 && !_calendarModel->entryOf(d)->menstruationStarted(); d.addDays(-1)) {
+	for(Date d = _end; rows < 42 && !_calendarModel->entryOf(d)->menstruationStarted(); d = d.addDays(-1)) {
 		rows++;
 	}
 

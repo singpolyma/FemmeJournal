@@ -11,14 +11,15 @@ QT_BEGIN_NAMESPACE
 class TemperatureChartModel : public QAbstractTableModel
 {
 	Q_OBJECT
-	Q_PROPERTY(QDate start READ start NOTIFY startChanged STORED false FINAL)
-	Q_PROPERTY(QDate end MEMBER _end WRITE setEnd NOTIFY endChanged FINAL)
+	Q_PROPERTY(QDateTime start READ start NOTIFY startChanged STORED false FINAL)
+	Q_PROPERTY(QDateTime end READ end WRITE setEnd NOTIFY endChanged FINAL)
 
 public:
 	explicit TemperatureChartModel(CalendarModel *calendarModel, QObject *parent = nullptr);
 
-	QDate start();
-	void setEnd(QDate);
+	QDateTime start();
+	QDateTime end();
+	void setEnd(QDateTime);
 
 	QVariant data(const QModelIndex &index, int role) const override;
 	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -30,11 +31,11 @@ Q_SIGNALS:
 
 public slots:
 	void ready();
-	void addJournalEntry(QDate, JournalEntry*);
+	void addJournalEntry(Date, JournalEntry*);
 
 protected:
 	CalendarModel *_calendarModel;
-	QDate _end;
+	Date _end;
 	bool _ready;
 
 	Q_DISABLE_COPY(TemperatureChartModel)

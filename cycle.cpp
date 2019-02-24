@@ -2,7 +2,7 @@
 
 #include <QDebug>
 
-Cycle::Cycle(QDate date, int length, QVariant menstrualLength, QVariant ovulationDaysFromEnd, bool opkPositive, QObject *parent) :
+Cycle::Cycle(Date date, int length, QVariant menstrualLength, QVariant ovulationDaysFromEnd, bool opkPositive, QObject *parent) :
 	QObject(parent),
 	_date(date),
 	_length(length),

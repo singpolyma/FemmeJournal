@@ -10,6 +10,7 @@
 #include <QtCore/qlocale.h>
 #include <QtQml/qqml.h>
 
+#include "date.h"
 #include "configmodel.h"
 #include "journalentry.h"
 #include "statsmodel.h"
@@ -19,9 +20,9 @@ QT_BEGIN_NAMESPACE
 class CalendarModel : public QAbstractListModel
 {
 	Q_OBJECT
-	Q_PROPERTY(QDate selectedDate MEMBER _selectedDate WRITE setSelectedDate NOTIFY selectedDateChanged FINAL)
+	Q_PROPERTY(Date selectedDate MEMBER _selectedDate WRITE setSelectedDate NOTIFY selectedDateChanged FINAL)
 	Q_PROPERTY(JournalEntry *selectedJournal READ selectedJournal NOTIFY selectedJournalChanged FINAL)
-	Q_PROPERTY(QDate nextCycle READ nextCycle NOTIFY nextCycleChanged FINAL)
+	Q_PROPERTY(Date nextCycle READ nextCycle NOTIFY nextCycleChanged FINAL)
 	Q_PROPERTY(bool menstruatingToday READ menstruatingToday NOTIFY menstruatingTodayChanged FINAL)
 	Q_PROPERTY(StatsModel *statsModel MEMBER _statsModel CONSTANT FINAL)
 
@@ -34,11 +35,10 @@ class CalendarModel : public QAbstractListModel
 public:
 	explicit CalendarModel(ConfigModel *config = nullptr, QObject *parent = nullptr);
 
-	void setSelectedDate(QDate date);
-	Q_INVOKABLE void setSelectedDate(int year, int month, int day);
+	void setSelectedDate(Date date);
 	JournalEntry *selectedJournal();
 
-	QDate nextCycle();
+	Date nextCycle();
 	bool menstruatingToday();
 
 	int month() const;
@@ -50,9 +50,9 @@ public:
 	QLocale locale() const;
 	void setLocale(const QLocale &locale);
 
-	Q_INVOKABLE JournalEntry *entryOf(const QDate &date);
-	Q_INVOKABLE QDate dateAt(int index) const;
-	Q_INVOKABLE int indexOf(const QDate &date) const;
+	Q_INVOKABLE JournalEntry *entryOf(const Date &date);
+	Q_INVOKABLE Date dateAt(int index) const;
+	Q_INVOKABLE int indexOf(const Date &date) const;
 
 	enum {
 		DateRole = Qt::UserRole + 1,
@@ -79,29 +79,29 @@ Q_SIGNALS:
 	void yearChanged();
 	void localeChanged();
 	void titleChanged();
-	void newJournalEntry(QDate, JournalEntry*);
-	void journalChanged(QDate, QStringList);
+	void newJournalEntry(Date, JournalEntry*);
+	void journalChanged(Date, QStringList);
 
 public slots:
 	void refreshMenstrualData();
 	void refreshJournalData();
-	void addJournalEntry(QDate date, JournalEntry *entry, bool empty = false);
+	void addJournalEntry(Date date, JournalEntry *entry, bool empty = false);
 	void ready();
 
 protected:
 	bool populate(int month, int year, const QLocale &locale, bool force = false);
 	void populateMeanCycleTimes();
-	int cycleDay(QDate date, bool rollover = true) const;
-	bool menstruating(QDate date, bool rollover = true) const;
+	int cycleDay(Date date, bool rollover = true) const;
+	bool menstruating(Date date, bool rollover = true) const;
 
 	int _month;
 	int _year;
 	QString _title;
 	QLocale _locale;
-	QVector<QDate> _dates;
-	QMap<QDate, JournalEntry*> _journalDates;
-	QDate _selectedDate;
-	QDate _lastRecordedMenstruation;
+	QVector<Date> _dates;
+	QMap<Date, JournalEntry*> _journalDates;
+	Date _selectedDate;
+	Date _lastRecordedMenstruation;
 	bool _ready;
 	ConfigModel *_config;
 	StatsModel *_statsModel;

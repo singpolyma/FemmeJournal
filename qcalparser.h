@@ -11,8 +11,8 @@
 #include <QtCore/QTextStream>
 #include <QSaveFile>
 #include <QTimer>
-#include <QDate>
 
+#include "date.h"
 #include "configmodel.h"
 #include "journalentry.h"
 
@@ -26,12 +26,12 @@ public slots:
 	void changeDataFilePath(QString newPath);
 	void changeWeightUnit(QString oldUnit, QString newUnit);
 	void changeTemperatureUnit(QString oldUnit, QString newUnit);
-	void updateJournalLines(QDate date, QStringList icsLines);
+	void updateJournalLines(Date date, QStringList icsLines);
 	void save();
 
 signals:
 	void doneParse();
-	void newJournalEntry(QDate date, JournalEntry *entry);
+	void newJournalEntry(Date date, JournalEntry *entry);
 
 protected:
 	void parseBlock(QString weightUnit, QString temperatureUnit, QTextStream *dataStream);

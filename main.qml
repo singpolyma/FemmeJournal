@@ -46,7 +46,7 @@ ApplicationWindow {
 					Text {
 						anchors.centerIn: parent
 						id: projectedStart
-						text: qsTr("Projected start date: ") + calendarModel.nextCycle.toLocaleDateString(Qt.locale(), Locale.ShortFormat)
+						text: qsTr("Projected start date: ") + calendarModel.nextCycle.asDateTime().toLocaleDateString(Qt.locale(), Locale.ShortFormat)
 						font.pixelSize: parent.parent.width / 25
 					}
 				}
@@ -65,7 +65,7 @@ ApplicationWindow {
 							if(calendarModel.menstruatingToday && !calendarModel.entryOf(new Date()).menstruationStopped) {
 								return qsTr("Day ") + calendarModel.data(calendarModel.index(calendarModel.indexOf(new Date()), 0), 263);
 							} else {
-								var daysLeft = Math.floor(calendarModel.nextCycle.getTime() / 86400000) - Math.floor(new Date().getTime() / 86400000);
+								var daysLeft = calendarModel.nextCycle.daysTo(new Date());
 								return daysLeft > 0 ? daysLeft + qsTr(" Days Left") : (-1*daysLeft) + qsTr(" Days Late");
 							}
 						}

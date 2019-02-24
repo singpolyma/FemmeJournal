@@ -3,7 +3,7 @@
 
 #include "statsmodel.h"
 
-StatsModel::StatsModel(ConfigModel *config, QMap<QDate, JournalEntry*> *journalDates, QObject *parent) : QAbstractListModel(parent), _config(config), _journalDates(journalDates) {
+StatsModel::StatsModel(ConfigModel *config, QMap<Date, JournalEntry*> *journalDates, QObject *parent) : QAbstractListModel(parent), _config(config), _journalDates(journalDates) {
 	refresh();
 }
 
@@ -63,18 +63,18 @@ static double meanExcludingOutliers(QVector<int> v, double defaultValue, int pre
 	return numerator / count;
 }
 
-QDate StatsModel::predictOvulationFromTemperature(QString temperatureUnit, QContiguousCache<QPair<QDate,double>> &temperatureWindow) {
-	if(temperatureWindow.size() < 7) return QDate();
+Date StatsModel::predictOvulationFromTemperature(QString temperatureUnit, QContiguousCache<QPair<Date,double>> &temperatureWindow) {
+	if(temperatureWindow.size() < 7) return Date();
 	int firstIndex = temperatureWindow.firstIndex();
 	temperatureWindow.normalizeIndexes();
 
-	QPair<QDate,double> last = temperatureWindow.at(firstIndex + 6);
-	if(last.second == 0) return QDate();
+	QPair<Date,double> last = temperatureWindow.at(firstIndex + 6);
+	if(last.second == 0) return Date();
 
 	double sixDayMean = 0;
 	int count = 0;
 	for(int i = firstIndex + 5; i >= firstIndex; i--) {
-		QPair<QDate,double> sample = temperatureWindow.at(i);
+		QPair<Date,double> sample = temperatureWindow.at(i);
 		if(sample.first.daysTo(last.first) > 6) break;
 
 		if(sample.second != 0) {
@@ -83,14 +83,14 @@ QDate StatsModel::predictOvulationFromTemperature(QString temperatureUnit, QCont
 		}
 	}
 
-	if(count < 4) return QDate();
+	if(count < 4) return Date();
 
 	sixDayMean /= count;
 
 	double increment = temperatureUnit == "f" ? 0.4 : 0.2;
 	if(last.second - sixDayMean > increment) return last.first;
 
-	return QDate();
+	return Date();
 }
 
 void StatsModel::refresh() {
@@ -100,20 +100,20 @@ void StatsModel::refresh() {
 	QVector<int> cycles;
 	QVector<int> menstruations;
 	QVector<int> ovulations;
-	QContiguousCache<QPair<QDate,double>> temperatureWindow(7);
+	QContiguousCache<QPair<Date,double>> temperatureWindow(7);
 
-	const QDate *lastBegan = NULL;
-	const QDate *lastEnded = NULL;
-	const QDate *lastOPKnegative = NULL;
-	const QDate *lastOPKpositive = NULL;
-	QDate lastTemperaturePrediction;
+	const Date *lastBegan = NULL;
+	const Date *lastEnded = NULL;
+	const Date *lastOPKnegative = NULL;
+	const Date *lastOPKpositive = NULL;
+	Date lastTemperaturePrediction;
 
 	for(
-		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates->end() - 1);
+		QMap<Date,JournalEntry*>::const_iterator i = (_journalDates->end() - 1);
 		i != (_journalDates->begin() - 1) && _recentCycles.length() < 12;
 		i--
 	) {
-		QDate temperaturePrediction;
+		Date temperaturePrediction;
 		temperatureWindow.prepend(qMakePair(i.key(), i.value()->property("temperature").toDouble()));
 		if((temperaturePrediction = predictOvulationFromTemperature(_config->property("temperatureUnit").toString(), temperatureWindow)).isValid()) {
 			lastTemperaturePrediction = temperaturePrediction;
@@ -150,7 +150,7 @@ void StatsModel::refresh() {
 
 			lastOPKpositive = NULL;
 			lastOPKnegative = NULL;
-			lastTemperaturePrediction = QDate();
+			lastTemperaturePrediction = Date();
 			lastEnded = NULL;
 			lastBegan = &i.key();
 		}

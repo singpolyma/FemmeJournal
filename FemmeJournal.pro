@@ -22,6 +22,7 @@ SOURCES += main.cpp \
     calendarmodel.cpp \
     configmodel.cpp \
     cycle.cpp \
+    date.cpp \
     journalentry.cpp \
     qcalparser.cpp \
     statsmodel.cpp \
@@ -133,6 +134,7 @@ HEADERS += \
     calendarmodel.h \
     configmodel.h \
     cycle.h \
+    date.h \
     journalentry.h \
     qcalparser.h \
     statsmodel.h \

@@ -95,7 +95,7 @@ Rectangle {
 			}
 
 			delegate: Rectangle {
-				color: model.month === cal.month && Math.floor(model.date.getTime() / 86400000) === Math.floor(calendarModel.selectedDate.getTime() / 86400000) ? Qt.lighter(Material.primary) : Material.background
+				color: model.month === cal.month && model.date == calendarModel.selectedDate ? Qt.lighter(Material.primary) : Material.background
 
 				Item {
 					anchors.top: parent.top
@@ -204,12 +204,19 @@ Rectangle {
 						}
 					}
 				}
+
+				MouseArea {
+					anchors.fill: parent
+					onClicked: {
+						calendarModel.selectedDate = model.date;
+					}
+				}
 			}
 
 			onClicked: {
 				focus = true;
-				// Workaround for weird timezone QDate conversion bug
-				calendarModel.setSelectedDate(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+				// Don't use the date argument here, it makes use of
+				// undefined behaviour: https://bugreports.qt.io/browse/QTBUG-29328
 			}
 		}
 

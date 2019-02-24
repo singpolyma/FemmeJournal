@@ -8,6 +8,7 @@
 #include <QThread>
 #include <QDebug>
 
+#include "date.h"
 #include "configmodel.h"
 #include "calendarmodel.h"
 #include "qcalparser.h"
@@ -18,6 +19,8 @@
 
 int main(int argc, char *argv[])
 {
+	qRegisterMetaType<Date>();
+
 	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #ifdef QT_CHARTS_LIB
 	QApplication app(argc, argv);
@@ -45,9 +48,9 @@ int main(int argc, char *argv[])
 
 	CalendarModel calendarModel(&config);
 
-	QObject::connect(&journalParser, SIGNAL(newJournalEntry(QDate,JournalEntry*)), &calendarModel, SLOT(addJournalEntry(QDate,JournalEntry*)));
+	QObject::connect(&journalParser, SIGNAL(newJournalEntry(Date,JournalEntry*)), &calendarModel, SLOT(addJournalEntry(Date,JournalEntry*)));
 	QObject::connect(&journalParser, SIGNAL(doneParse()), &calendarModel, SLOT(ready()));
-	QObject::connect(&calendarModel, SIGNAL(journalChanged(QDate, QStringList)), &journalParser, SLOT(updateJournalLines(QDate, QStringList)));
+	QObject::connect(&calendarModel, SIGNAL(journalChanged(Date, QStringList)), &journalParser, SLOT(updateJournalLines(Date, QStringList)));
 	QObject::connect(&parserThread, SIGNAL(started()), &journalParser, SLOT(parse()));
 	QObject::connect(QApplication::instance(), SIGNAL(aboutToQuit()), &parserThread, SLOT(quit()));
 

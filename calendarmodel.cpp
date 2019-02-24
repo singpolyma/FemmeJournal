@@ -27,7 +27,7 @@ bool CalendarModel::populate(int m, int y, const QLocale &l, bool force) {
 	// the previous month to be visible.
 	if (difference == 0)
 		difference += 7;
-	QDate firstDateToDisplay = firstDayOfMonthDate.addDays(-difference);
+	Date firstDateToDisplay = firstDayOfMonthDate.addDays(-difference);
 
 	for (int i = 0; i < daysOnACalendarMonth; ++i)
 		_dates[i] = firstDateToDisplay.addDays(i);
@@ -52,21 +52,17 @@ void CalendarModel::ready() {
 	refreshMenstrualData();
 }
 
-void CalendarModel::setSelectedDate(QDate date) {
+void CalendarModel::setSelectedDate(Date date) {
 	_selectedDate = date;
 	emit selectedDateChanged();
 	emit selectedJournalChanged();
-}
-
-void CalendarModel::setSelectedDate(int year, int month, int day) {
-	setSelectedDate(QDate(year, month, day));
 }
 
 JournalEntry *CalendarModel::selectedJournal() {
 	return entryOf(_selectedDate);
 }
 
-JournalEntry *CalendarModel::entryOf(const QDate &date) {
+JournalEntry *CalendarModel::entryOf(const Date &date) {
 	JournalEntry *entry = _journalDates.value(date, NULL);
 	if(!entry) {
 		entry = new JournalEntry(_config, this);
@@ -78,7 +74,7 @@ JournalEntry *CalendarModel::entryOf(const QDate &date) {
 	return entry;
 }
 
-void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry, bool empty) {
+void CalendarModel::addJournalEntry(Date date, JournalEntry *entry, bool empty) {
 	Q_ASSERT(entry);
 
 	entry->setParent(this);
@@ -97,7 +93,7 @@ void CalendarModel::addJournalEntry(QDate date, JournalEntry *entry, bool empty)
 	refreshJournalData();
 }
 
-QDate CalendarModel::nextCycle() {
+Date CalendarModel::nextCycle() {
 	// Predict future cycles based on mean length alone for now
 
 	QDate today = QDate::currentDate();
@@ -114,7 +110,7 @@ void CalendarModel::refreshMenstrualData() {
 	if(!_ready) return;
 
 	for(
-		QMap<QDate,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
+		QMap<Date,JournalEntry*>::const_iterator i = (_journalDates.end() - 1);
 		i != (_journalDates.begin() - 1);
 		i--
 	) {
@@ -177,11 +173,11 @@ void CalendarModel::setLocale(const QLocale &locale) {
 	}
 }
 
-QDate CalendarModel::dateAt(int index) const {
+Date CalendarModel::dateAt(int index) const {
 	return _dates.value(index);
 }
 
-int CalendarModel::indexOf(const QDate &date) const {
+int CalendarModel::indexOf(const Date &date) const {
 	if (date < _dates.first() || date > _dates.last())
 		return -1;
 	return qMax(qint64(0), _dates.first().daysTo(date));
@@ -189,10 +185,10 @@ int CalendarModel::indexOf(const QDate &date) const {
 
 QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 	if (index.isValid() && index.row() < daysOnACalendarMonth) {
-		const QDate date = _dates.at(index.row());
+		Date date = _dates.at(index.row());
 		switch (role) {
 		case DateRole:
-			return date;
+			return QVariant::fromValue(date);
 		case DayRole:
 			return date.day();
 		case WeekNumberRole:
@@ -206,24 +202,24 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 		case CycleDayRole:
 			return cycleDay(date);
 		case FertilityRole: {
-			QContiguousCache<QPair<QDate,double>> temperatureWindow(7);
+			QContiguousCache<QPair<Date,double>> temperatureWindow(7);
 			int cday = cycleDay(date);
-			QDate nextCycle = date.addDays(_statsModel->meanCycleLength() - cday + 1);
-			QDate ovulation = nextCycle.addDays(_statsModel->meanOvulationDaysFromEnd() * -1);
-			QDate temperaturePrediction;
+			Date nextCycle = date.addDays(_statsModel->meanCycleLength() - cday + 1);
+			Date ovulation = nextCycle.addDays(_statsModel->meanOvulationDaysFromEnd() * -1);
+			Date temperaturePrediction;
 
 			for(
-				QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date.addDays(-cday + 2));
+				QMap<Date,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date.addDays(-cday + 2));
 				i != _journalDates.end();
 				i++
 			) {
 				temperatureWindow.append(qMakePair(i.key(), i.value()->property("temperature").toDouble()));
 				if(i.value()->property("opk") == JournalEntry::OPKPositive) {
-					temperaturePrediction = QDate();
+					temperaturePrediction = Date();
 					ovulation = i.key();
 					break;
 				}
-				if(temperaturePrediction.isNull()) {
+				if(!temperaturePrediction.isValid()) {
 					temperaturePrediction = StatsModel::predictOvulationFromTemperature(_config->property("temperatureUnit").toString(), temperatureWindow);
 				}
 				if(i.value()->menstruationStarted()) {
@@ -234,7 +230,7 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 
 			if(temperaturePrediction.isValid()) ovulation = temperaturePrediction;
 
-			QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(ovulation);
+			QMap<Date,JournalEntry*>::const_iterator i = _journalDates.lowerBound(ovulation);
 			if(i.key() == ovulation) {
 				// If there is data for the predicted day, advance past any negative OPK values
 				for(
@@ -261,9 +257,9 @@ QVariant CalendarModel::data(const QModelIndex &index, int role) const {
 	return QVariant();
 }
 
-int CalendarModel::cycleDay(QDate date, bool rollover) const {
+int CalendarModel::cycleDay(Date date, bool rollover) const {
 	for(
-		QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+		QMap<Date,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
 		i != (_journalDates.begin() - 1);
 		i--
 	) {
@@ -281,12 +277,12 @@ int CalendarModel::cycleDay(QDate date, bool rollover) const {
 	return 0;
 }
 
-bool CalendarModel::menstruating(QDate date, bool rollover) const {
+bool CalendarModel::menstruating(Date date, bool rollover) const {
 	int cday = cycleDay(date, rollover);
 	if(!cday) return false;
 
 	for(
-		QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+		QMap<Date,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
 		i != _journalDates.end() && !i.value()->menstruationStarted();
 		i++
 	) {
@@ -294,7 +290,7 @@ bool CalendarModel::menstruating(QDate date, bool rollover) const {
 	}
 
 	for(
-		QMap<QDate,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
+		QMap<Date,JournalEntry*>::const_iterator i = _journalDates.lowerBound(date);
 		i != (_journalDates.begin() - 1);
 		i--
 	) {

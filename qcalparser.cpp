@@ -38,21 +38,21 @@ void QCalParser::changeTemperatureUnit(QString oldUnit, QString newUnit) {
 	_temperatureUnit = newUnit;
 }
 
-void QCalParser::updateJournalLines(QDate date, QStringList icsLines) {
+void QCalParser::updateJournalLines(Date date, QStringList icsLines) {
 	for(
 		QList<QVariant>::iterator i = m_eventList.begin();
 		i != m_eventList.end();
 		i++
 	) {
-		if(i->typeName() == QString("QPair<QDate,QStringList>")) {
-			QPair<QDate,QStringList> v = i->value<QPair<QDate,QStringList>>();
+		if(i->typeName() == QString("QPair<Date,QStringList>")) {
+			QPair<Date,QStringList> v = i->value<QPair<Date,QStringList>>();
 			if(v.first == date) {
-				i->setValue(QPair<QDate,QStringList>(date, icsLines));
+				i->setValue(QPair<Date,QStringList>(date, icsLines));
 				goto done;
 			}
 		}
 	}
-	m_eventList.append(QVariant::fromValue(QPair<QDate,QStringList>(date, icsLines)));
+	m_eventList.append(QVariant::fromValue(QPair<Date,QStringList>(date, icsLines)));
 done:
 	_timer.start(1000);
 }
@@ -248,7 +248,7 @@ void QCalParser::parseBlock(QString weightUnit, QString temperatureUnit, QTextSt
 		}
 	}
 
-	if(date.isNull()) {
+	if(!date.isValid()) {
 		QStringList icsLines = entry->icsLines();
 		icsLines << "END:VJOURNAL";
 		icsLines.prepend("BEGIN:VJOURNAL");
