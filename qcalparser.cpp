@@ -39,20 +39,22 @@ void QCalParser::changeTemperatureUnit(QString oldUnit, QString newUnit) {
 }
 
 void QCalParser::updateJournalLines(Date date, QStringList icsLines) {
+	QDate qdate = date.asDateTime().date();
+
 	for(
 		QList<QVariant>::iterator i = m_eventList.begin();
 		i != m_eventList.end();
 		i++
 	) {
-		if(i->typeName() == QString("QPair<Date,QStringList>")) {
-			QPair<Date,QStringList> v = i->value<QPair<Date,QStringList>>();
+		if(i->typeName() == QString("QPair<QDate,QStringList>")) {
+			QPair<QDate,QStringList> v = i->value<QPair<QDate,QStringList>>();
 			if(v.first == date) {
-				i->setValue(QPair<Date,QStringList>(date, icsLines));
+				i->setValue(QPair<QDate,QStringList>(qdate, icsLines));
 				goto done;
 			}
 		}
 	}
-	m_eventList.append(QVariant::fromValue(QPair<Date,QStringList>(date, icsLines)));
+	m_eventList.append(QVariant::fromValue(QPair<QDate,QStringList>(qdate, icsLines)));
 done:
 	_timer.start(1000);
 }
