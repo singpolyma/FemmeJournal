@@ -63,6 +63,7 @@ JournalEntry *CalendarModel::selectedJournal() {
 }
 
 JournalEntry *CalendarModel::entryOf(const Date &date) {
+	Q_ASSERT(date.isValid());
 	JournalEntry *entry = _journalDates.value(date, NULL);
 	if(!entry) {
 		entry = new JournalEntry(_config, this);
