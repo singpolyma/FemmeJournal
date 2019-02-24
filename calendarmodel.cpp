@@ -75,6 +75,10 @@ JournalEntry *CalendarModel::entryOf(const Date &date) {
 	return entry;
 }
 
+JournalEntry *CalendarModel::journalForToday() {
+	return entryOf(QDate::currentDate());
+}
+
 void CalendarModel::addJournalEntry(Date date, JournalEntry *entry, bool empty) {
 	Q_ASSERT(entry);
 
@@ -83,6 +87,7 @@ void CalendarModel::addJournalEntry(Date date, JournalEntry *entry, bool empty) 
 
 	// Use a timer to work-around false binding loop detection
 	if(date == _selectedDate) QTimer::singleShot(0, this, SIGNAL(selectedJournalChanged()));
+	if(date == QDate::currentDate()) QTimer::singleShot(0, this, SIGNAL(journalForTodayChanged()));
 
 	connect(entry, SIGNAL(menstruationStartedChanged()), this, SLOT(refreshMenstrualData()));
 	connect(entry, SIGNAL(menstruationStoppedChanged()), this, SLOT(refreshMenstrualData()));
@@ -178,7 +183,8 @@ Date CalendarModel::dateAt(int index) const {
 	return _dates.value(index);
 }
 
-int CalendarModel::indexOf(const Date &date) const {
+int CalendarModel::indexOfToday() const {
+	QDate date = QDate::currentDate();
 	if (date < _dates.first() || date > _dates.last())
 		return -1;
 	return qMax(qint64(0), _dates.first().daysTo(date));

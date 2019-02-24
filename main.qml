@@ -62,8 +62,8 @@ ApplicationWindow {
 						anchors.centerIn: parent
 						id: daysLeft
 						text: {
-							if(calendarModel.menstruatingToday && !calendarModel.entryOf(new Date()).menstruationStopped) {
-								return qsTr("Day ") + calendarModel.data(calendarModel.index(calendarModel.indexOf(new Date()), 0), 263);
+							if(calendarModel.menstruatingToday && !calendarModel.journalForToday.menstruationStopped) {
+								return qsTr("Day ") + calendarModel.data(calendarModel.index(calendarModel.indexOfToday(), 0), 263);
 							} else {
 								var daysLeft = calendarModel.nextCycle.daysTo(new Date());
 								return daysLeft > 0 ? daysLeft + qsTr(" Days Left") : (-1*daysLeft) + qsTr(" Days Late");
@@ -77,13 +77,13 @@ ApplicationWindow {
 					Layout.alignment: Qt.AlignHCenter
 					implicitWidth: col.implicitWidth * 1.10
 					implicitHeight: col.implicitHeight * 1.50
-					opacity: (calendarModel.entryOf(new Date()).menstruationStarted || calendarModel.entryOf(new Date()).menstruationStopped) ? 0 : 1
+					opacity: (calendarModel.journalForToday.menstruationStarted || calendarModel.journalForToday.menstruationStopped) ? 0 : 1
 
 					onClicked: {
 						if(calendarModel.menstruatingToday) {
-							calendarModel.entryOf(new Date()).menstruationStopped = true;
+							calendarModel.journalForToday.menstruationStopped = true;
 						} else {
-							calendarModel.entryOf(new Date()).menstruationStarted = true;
+							calendarModel.journalForToday.menstruationStarted = true;
 						}
 					}
 

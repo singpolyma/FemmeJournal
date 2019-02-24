@@ -22,6 +22,7 @@ class CalendarModel : public QAbstractListModel
 	Q_OBJECT
 	Q_PROPERTY(Date selectedDate MEMBER _selectedDate WRITE setSelectedDate NOTIFY selectedDateChanged FINAL)
 	Q_PROPERTY(JournalEntry *selectedJournal READ selectedJournal NOTIFY selectedJournalChanged FINAL)
+	Q_PROPERTY(JournalEntry *journalForToday READ journalForToday NOTIFY journalForTodayChanged FINAL)
 	Q_PROPERTY(Date nextCycle READ nextCycle NOTIFY nextCycleChanged FINAL)
 	Q_PROPERTY(bool menstruatingToday READ menstruatingToday NOTIFY menstruatingTodayChanged FINAL)
 	Q_PROPERTY(StatsModel *statsModel MEMBER _statsModel CONSTANT FINAL)
@@ -37,6 +38,7 @@ public:
 
 	void setSelectedDate(Date date);
 	JournalEntry *selectedJournal();
+	JournalEntry *journalForToday();
 
 	Date nextCycle();
 	bool menstruatingToday();
@@ -50,9 +52,9 @@ public:
 	QLocale locale() const;
 	void setLocale(const QLocale &locale);
 
-	Q_INVOKABLE JournalEntry *entryOf(const Date &date);
-	Q_INVOKABLE Date dateAt(int index) const;
-	Q_INVOKABLE int indexOf(const Date &date) const;
+	JournalEntry *entryOf(const Date &date);
+	Date dateAt(int index) const;
+	Q_INVOKABLE int indexOfToday() const;
 
 	enum {
 		DateRole = Qt::UserRole + 1,
@@ -73,6 +75,7 @@ public:
 Q_SIGNALS:
 	void selectedDateChanged();
 	void selectedJournalChanged();
+	void journalForTodayChanged();
 	void nextCycleChanged();
 	void menstruatingTodayChanged();
 	void monthChanged();
