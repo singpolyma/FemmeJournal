@@ -17,7 +17,10 @@ ApplicationWindow {
 		}
 	}
 
-	header: TopBar { id: materialContext }
+	header: TopBar {
+		id: materialContext
+		Material.foreground: "#fff"
+	}
 
 	StackView {
 		id: stack
