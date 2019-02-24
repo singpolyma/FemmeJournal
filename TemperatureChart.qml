@@ -17,8 +17,8 @@ ChartView {
 		}
 
 		axisY: ValueAxis {
-			min: 34
-			max: 40
+			min: temperatureChartModel.yMin
+			max: temperatureChartModel.yMax
 		}
 
 		VXYModelMapper {

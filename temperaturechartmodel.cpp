@@ -2,7 +2,15 @@
 
 #include "temperaturechartmodel.h"
 
-TemperatureChartModel::TemperatureChartModel(CalendarModel *calendarModel, QObject *parent) : QAbstractTableModel(parent), _calendarModel(calendarModel), _end(QDate::currentDate()), _ready(false) { }
+TemperatureChartModel::TemperatureChartModel(ConfigModel *config, CalendarModel *calendarModel, QObject *parent) : QAbstractTableModel(parent), _config(config), _calendarModel(calendarModel), _end(QDate::currentDate()), _ready(false) {
+	connect(config, &ConfigModel::temperatureUnitChanged, [=] {
+		beginResetModel();
+		endResetModel();
+		emit startChanged();
+		emit endChanged();
+		emit yChanged();
+	});
+}
 
 void TemperatureChartModel::ready() {
 	_ready = true;
@@ -27,6 +35,26 @@ QDateTime TemperatureChartModel::start() {
 
 QDateTime TemperatureChartModel::end() {
 	return _end.asDateTime();
+}
+
+double TemperatureChartModel::yMin() {
+	double y = 34;
+	if(_config->property("temperatureUnit").toString() == "c") return y;
+
+	y *= 9;
+	y /= 5;
+	y += 32;
+	return y;
+}
+
+double TemperatureChartModel::yMax() {
+	double y = 40;
+	if(_config->property("temperatureUnit").toString() == "c") return y;
+
+	y *= 9;
+	y /= 5;
+	y += 32;
+	return y;
 }
 
 void TemperatureChartModel::setEnd(QDateTime end) {

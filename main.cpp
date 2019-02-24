@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
 	QQmlApplicationEngine engine;
 #ifdef QT_CHARTS_LIB
-	TemperatureChartModel temperatureChartModel(&calendarModel);
+	TemperatureChartModel temperatureChartModel(&config, &calendarModel);
 	QObject::connect(&journalParser, SIGNAL(doneParse()), &temperatureChartModel, SLOT(ready()));
 	QObject::connect(&journalParser, &QCalParser::newJournalEntry, &temperatureChartModel, &TemperatureChartModel::addJournalEntry);
 	QObject::connect(&calendarModel, &CalendarModel::newJournalEntry, &temperatureChartModel, &TemperatureChartModel::addJournalEntry);
